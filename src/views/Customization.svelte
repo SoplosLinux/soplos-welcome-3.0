@@ -11,7 +11,6 @@
   interface SoplosTool {
     key: string;
     label: string;
-    hint: string;
     icon: string;
     command: string;
     package: string;
@@ -19,8 +18,6 @@
 
   interface NativeTool {
     key: string;
-    label: string;
-    hint: string;
     icon: string;
     command?: string;
     desktopFile?: string;
@@ -38,50 +35,50 @@
 
   const soplosToolsByDesktop: Record<DesktopKind, SoplosTool[]> = {
     xfce: [
-      { key: "theme-manager", label: "Theme Manager", hint: "Customize GTK themes, icons, cursors and XFCE panel", icon: "/assets/icons/soplos/soplos-theme-manager.png", command: "soplos-theme-manager", package: "soplos-theme-manager" },
-      { key: "grub-editor", label: "GRUB Editor", hint: "Edit boot menu (GRUB configuration)", icon: "/assets/icons/soplos/soplos-grub-editor.png", command: "soplos-grub-editor", package: "soplos-grub-editor" },
-      { key: "plymouth-manager", label: "Plymouth Manager", hint: "Customize boot splash screen", icon: "/assets/icons/soplos/soplos-plymouth-manager.png", command: "soplos-plymouth-manager", package: "soplos-plymouth-manager" },
+      { key: "theme-manager", label: "Theme Manager", icon: "/assets/icons/soplos/soplos-theme-manager.png", command: "soplos-theme-manager", package: "soplos-theme-manager" },
+      { key: "grub-editor", label: "GRUB Editor", icon: "/assets/icons/soplos/soplos-grub-editor.png", command: "soplos-grub-editor", package: "soplos-grub-editor" },
+      { key: "plymouth-manager", label: "Plymouth Manager", icon: "/assets/icons/soplos/soplos-plymouth-manager.png", command: "soplos-plymouth-manager", package: "soplos-plymouth-manager" },
     ],
     gnome: [
-      { key: "layout-switcher", label: "Layout Switcher", hint: "Switch between GNOME Shell layout presets", icon: "/assets/icons/soplos/soplos-layout-switcher.png", command: "soplos-layout-switcher", package: "soplos-layout-switcher" },
-      { key: "grub-editor", label: "GRUB Editor", hint: "Edit boot menu (GRUB configuration)", icon: "/assets/icons/soplos/soplos-grub-editor.png", command: "soplos-grub-editor", package: "soplos-grub-editor" },
-      { key: "plymouth-manager", label: "Plymouth Manager", hint: "Customize boot splash screen", icon: "/assets/icons/soplos/soplos-plymouth-manager.png", command: "soplos-plymouth-manager", package: "soplos-plymouth-manager" },
+      { key: "layout-switcher", label: "Layout Switcher", icon: "/assets/icons/soplos/soplos-layout-switcher.png", command: "soplos-layout-switcher", package: "soplos-layout-switcher" },
+      { key: "grub-editor", label: "GRUB Editor", icon: "/assets/icons/soplos/soplos-grub-editor.png", command: "soplos-grub-editor", package: "soplos-grub-editor" },
+      { key: "plymouth-manager", label: "Plymouth Manager", icon: "/assets/icons/soplos/soplos-plymouth-manager.png", command: "soplos-plymouth-manager", package: "soplos-plymouth-manager" },
     ],
     kde: [
-      { key: "grub-editor", label: "GRUB Editor", hint: "Edit boot menu (GRUB configuration)", icon: "/assets/icons/soplos/soplos-grub-editor.png", command: "soplos-grub-editor", package: "soplos-grub-editor" },
-      { key: "plymouth-manager", label: "Plymouth Manager", hint: "Customize boot splash screen", icon: "/assets/icons/soplos/soplos-plymouth-manager.png", command: "soplos-plymouth-manager", package: "soplos-plymouth-manager" },
+      { key: "grub-editor", label: "GRUB Editor", icon: "/assets/icons/soplos/soplos-grub-editor.png", command: "soplos-grub-editor", package: "soplos-grub-editor" },
+      { key: "plymouth-manager", label: "Plymouth Manager", icon: "/assets/icons/soplos/soplos-plymouth-manager.png", command: "soplos-plymouth-manager", package: "soplos-plymouth-manager" },
     ],
   };
 
   const nativeToolsByDesktop: Record<DesktopKind, NativeTool[]> = {
     xfce: [
-      { key: "appearance", label: "Appearance", hint: "Themes, icons, fonts", icon: "/assets/icons/customization/appearance.svg", command: "xfce4-appearance-settings" },
-      { key: "desktop", label: "Desktop", hint: "Wallpapers and desktop", icon: "/assets/icons/customization/wallpaper.svg", command: "xfdesktop-settings" },
-      { key: "wm", label: "Window Manager", hint: "Window decorations", icon: "/assets/icons/customization/window-manager.svg", command: "xfwm4-settings" },
-      { key: "keyboard", label: "Keyboard", hint: "Keyboard and shortcuts", icon: "/assets/icons/customization/keyboard.svg", command: "xfce4-keyboard-settings" },
-      { key: "mouse", label: "Mouse", hint: "Mouse and touchpad", icon: "/assets/icons/customization/mouse.svg", command: "xfce4-mouse-settings" },
-      { key: "notifications", label: "Notifications", hint: "Notification settings", icon: "/assets/icons/customization/notifications.svg", command: "xfce4-notifyd-config" },
-      { key: "settings-editor", label: "Settings Editor", hint: "Advanced settings", icon: "/assets/icons/customization/settings.svg", command: "xfce4-settings-editor" },
+      { key: "appearance", icon: "/assets/icons/customization/appearance.svg", command: "xfce4-appearance-settings" },
+      { key: "desktop", icon: "/assets/icons/customization/wallpaper.svg", command: "xfdesktop-settings" },
+      { key: "wm", icon: "/assets/icons/customization/window-manager.svg", command: "xfwm4-settings" },
+      { key: "keyboard", icon: "/assets/icons/customization/keyboard.svg", command: "xfce4-keyboard-settings" },
+      { key: "mouse", icon: "/assets/icons/customization/mouse.svg", command: "xfce4-mouse-settings" },
+      { key: "notifications", icon: "/assets/icons/customization/notifications.svg", command: "xfce4-notifyd-config" },
+      { key: "settings-editor", icon: "/assets/icons/customization/settings.svg", command: "xfce4-settings-editor" },
     ],
     gnome: [
-      { key: "wallpaper", label: "Wallpaper", hint: "Desktop background", icon: "/assets/icons/customization/wallpaper.svg", command: "gnome-control-center background" },
-      { key: "display", label: "Display", hint: "Monitor settings", icon: "/assets/icons/customization/display.svg", command: "gnome-control-center display" },
-      { key: "power", label: "Power", hint: "Power management", icon: "/assets/icons/customization/power.svg", command: "gnome-control-center power" },
-      { key: "sound", label: "Sound", hint: "Sound settings", icon: "/assets/icons/customization/sound.svg", command: "gnome-control-center sound" },
-      { key: "settings", label: "Settings", hint: "System settings", icon: "/assets/icons/customization/settings.svg", command: "gnome-control-center" },
-      { key: "tweaks", label: "Tweaks", hint: "Advanced tweaks", icon: "/assets/icons/customization/tweaks.svg", command: "gnome-tweaks" },
-      { key: "extensions", label: "Extensions", hint: "Manage extensions", icon: "/assets/icons/customization/extensions.svg", command: "gnome-extensions-app" },
-      { key: "dconf", label: "dconf Editor", hint: "Advanced configuration", icon: "/assets/icons/customization/dconf.svg", command: "dconf-editor" },
+      { key: "wallpaper", icon: "/assets/icons/customization/wallpaper.svg", command: "gnome-control-center background" },
+      { key: "display", icon: "/assets/icons/customization/display.svg", command: "gnome-control-center display" },
+      { key: "power", icon: "/assets/icons/customization/power.svg", command: "gnome-control-center power" },
+      { key: "sound", icon: "/assets/icons/customization/sound.svg", command: "gnome-control-center sound" },
+      { key: "settings", icon: "/assets/icons/customization/settings.svg", command: "gnome-control-center" },
+      { key: "tweaks", icon: "/assets/icons/customization/tweaks.svg", command: "gnome-tweaks" },
+      { key: "extensions", icon: "/assets/icons/customization/extensions.svg", command: "gnome-extensions-app" },
+      { key: "dconf", icon: "/assets/icons/customization/dconf.svg", command: "dconf-editor" },
     ],
     kde: [
-      { key: "look-and-feel", label: "Look and Feel", hint: "Themes and appearance", icon: "/assets/icons/customization/theme-global.svg", desktopFile: "kcm_lookandfeel.desktop" },
-      { key: "login-screen", label: "Login Screen", hint: "Plasma Login manager", icon: "/assets/icons/customization/login.svg", desktopFile: "kcm_plasmalogin.desktop" },
-      { key: "plymouth", label: "Plymouth", hint: "Boot splash configuration", icon: "/assets/icons/customization/splash.svg", desktopFile: "kcm_plymouth.desktop" },
-      { key: "wallpaper", label: "Wallpaper", hint: "Desktop background", icon: "/assets/icons/customization/wallpaper.svg", command: "systemsettings kcm_wallpaper" },
-      { key: "icons", label: "Icons", hint: "Icon theme", icon: "/assets/icons/customization/icons-theme.svg", command: "systemsettings kcm_icons" },
-      { key: "cursor", label: "Cursor", hint: "Mouse cursor style", icon: "/assets/icons/customization/cursors.svg", command: "systemsettings kcm_cursortheme" },
-      { key: "fonts", label: "Fonts", hint: "System fonts", icon: "/assets/icons/customization/fonts.svg", command: "systemsettings kcm_fonts" },
-      { key: "system-settings", label: "System Settings", hint: "All system settings", icon: "/assets/icons/customization/systemsettings.svg", command: "systemsettings" },
+      { key: "look-and-feel", icon: "/assets/icons/customization/theme-global.svg", desktopFile: "kcm_lookandfeel.desktop" },
+      { key: "login-screen", icon: "/assets/icons/customization/login.svg", desktopFile: "kcm_plasmalogin.desktop" },
+      { key: "plymouth", icon: "/assets/icons/customization/splash.svg", desktopFile: "kcm_plymouth.desktop" },
+      { key: "wallpaper", icon: "/assets/icons/customization/wallpaper.svg", command: "systemsettings kcm_wallpaper" },
+      { key: "icons", icon: "/assets/icons/customization/icons-theme.svg", command: "systemsettings kcm_icons" },
+      { key: "cursor", icon: "/assets/icons/customization/cursors.svg", command: "systemsettings kcm_cursortheme" },
+      { key: "fonts", icon: "/assets/icons/customization/fonts.svg", command: "systemsettings kcm_fonts" },
+      { key: "system-settings", icon: "/assets/icons/customization/systemsettings.svg", command: "systemsettings" },
     ],
   };
 
@@ -129,9 +126,7 @@
     const success = await runTracked(wasInstalled ? "uninstall_lucidglyph" : "install_lucidglyph");
     lucidglyphBusy = false;
     if (!success) {
-      infoMessage = wasInstalled
-        ? "Could not remove LucidGlyph. Try again."
-        : "Could not install LucidGlyph. Check your internet connection and try again.";
+      infoMessage = wasInstalled ? $_("customization.lucidGlyph.removeFailed") : $_("customization.lucidGlyph.installFailed");
       return;
     }
     await refreshLucidglyph();
@@ -143,12 +138,11 @@
       }
     }
     if (wasInstalled) {
-      infoMessage = "LucidGlyph removed. A reboot is required for font rendering changes to take effect.";
+      infoMessage = $_("customization.lucidGlyph.removed");
     } else if (desktop === "kde") {
-      infoMessage =
-        "LucidGlyph installed. A reboot is required for font rendering changes to take effect.\n\nKDE Plasma: go to System Settings → Text and Fonts and set Sub-pixel rendering to None.";
+      infoMessage = $_("customization.lucidGlyph.installedKde");
     } else {
-      infoMessage = "LucidGlyph installed. A reboot is required for font rendering changes to take effect.";
+      infoMessage = $_("customization.lucidGlyph.installed");
     }
   }
 
@@ -170,12 +164,12 @@
   class="relative rounded border border-border overflow-hidden mb-5 flex flex-col items-start justify-end text-left p-4 min-h-[200px]"
   style="background: linear-gradient(rgba(20, 20, 22, 0.35), rgba(20, 20, 22, 0.85)), url('/assets/hero/customization-background.png'); background-size: cover; background-position: center;"
 >
-  <p class="text-white font-semibold text-[1rem]">Desktop Customization</p>
-  <p class="text-[0.8rem] text-white/85 mt-1">Customize your desktop environment and themes.</p>
+  <p class="text-white font-semibold text-[1rem]">{$_("customization.hero.title")}</p>
+  <p class="text-[0.8rem] text-white/85 mt-1">{$_("customization.hero.description")}</p>
 </div>
 
 {#if loaded}
-  <div class="text-[0.7rem] font-semibold text-text-muted uppercase tracking-wide mb-2">Soplos Tools</div>
+  <div class="text-[0.7rem] font-semibold text-text-muted uppercase tracking-wide mb-2">{$_("customization.soplosTools")}</div>
   <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-5">
     {#each soplosToolsByDesktop[desktop] as tool}
       {@const installed = installedVersion >= 0 && installedMap[tool.key]}
@@ -185,13 +179,13 @@
       >
         <img src={tool.icon} alt="" class="w-12 h-12 object-contain" />
         <span class="text-[0.85rem] font-semibold text-text-bright">{tool.label}</span>
-        <span class="text-[0.7rem] text-text">{tool.hint}</span>
+        <span class="text-[0.7rem] text-text">{$_(`customization.tools.${tool.key}`)}</span>
         <span
           class="text-[0.68rem] px-2 py-0.5 rounded-full mt-1 {installed
             ? 'bg-success/15 text-success'
             : 'bg-surface-2 text-text'}"
         >
-          {installed ? "Click to open" : "Click to install & open"}
+          {installed ? $_("customization.clickToOpen") : $_("customization.clickToInstallOpen")}
         </span>
       </button>
     {/each}
@@ -203,19 +197,19 @@
     >
       <img src="/assets/icons/customization/fonts.svg" alt="" class="w-12 h-12 object-contain" />
       <span class="text-[0.85rem] font-semibold text-text-bright">LucidGlyph</span>
-      <span class="text-[0.7rem] text-text">Improved font rendering for the system</span>
+      <span class="text-[0.7rem] text-text">{$_("customization.lucidGlyph.description")}</span>
       <span
         class="text-[0.68rem] px-2 py-0.5 rounded-full mt-1 {lucidglyphInstalled
           ? 'bg-success/15 text-success'
           : 'bg-surface-2 text-text'}"
       >
-        {lucidglyphBusy ? "Working…" : lucidglyphInstalled ? "Click to uninstall" : "Click to install"}
+        {lucidglyphBusy ? $_("gaming.working") : lucidglyphInstalled ? $_("drivers.clickToUninstall") : $_("drivers.clickToInstall")}
       </span>
     </button>
   </div>
 
   <div class="text-[0.7rem] font-semibold text-text-muted uppercase tracking-wide mb-2">
-    {desktop === "xfce" ? "XFCE Settings" : desktop === "gnome" ? "GNOME Settings" : "KDE Settings"}
+    {desktop === "xfce" ? $_("customization.xfceSettings") : desktop === "gnome" ? $_("customization.gnomeSettings") : $_("customization.kdeSettings")}
   </div>
   <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
     {#each nativeToolsByDesktop[desktop] as tool}
@@ -224,9 +218,9 @@
         on:click={() => onNativeToolClick(tool)}
       >
         <img src={tool.icon} alt="" class="w-10 h-10 object-contain" />
-        <span class="text-[0.85rem] font-semibold text-text-bright">{tool.label}</span>
-        <span class="text-[0.7rem] text-text">{tool.hint}</span>
-        <span class="text-[0.68rem] px-2 py-0.5 rounded-full bg-surface-2 text-text mt-1">Click to open</span>
+        <span class="text-[0.85rem] font-semibold text-text-bright">{$_(`customization.native.${desktop}.${tool.key}.label`)}</span>
+        <span class="text-[0.7rem] text-text">{$_(`customization.native.${desktop}.${tool.key}.hint`)}</span>
+        <span class="text-[0.68rem] px-2 py-0.5 rounded-full bg-surface-2 text-text mt-1">{$_("customization.clickToOpen")}</span>
       </button>
     {/each}
   </div>
@@ -239,7 +233,7 @@
         class="px-3 py-1.5 rounded border border-border text-text hover:bg-surface hover:text-text-bright text-[0.78rem] transition-colors"
         on:click={() => ($terminalExpanded = !$terminalExpanded)}
       >
-        {$terminalExpanded ? "Hide output" : "Show output"}
+        {$terminalExpanded ? $_("common.hideOutput") : $_("common.showOutput")}
       </button>
     </div>
     <TerminalOutput fullWidth />

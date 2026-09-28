@@ -1,5 +1,7 @@
 <script lang="ts">
-  import { autofocus } from "../lib/autofocus";
+  import Modal from "../components/Modal.svelte";
+  import FlatpakScopeModal from "../components/FlatpakScopeModal.svelte";
+  import { _ } from "svelte-i18n";
   import { onMount } from "svelte";
   import { api } from "../lib/api";
   import { runTracked, terminalExpanded, terminalLines } from "../lib/progress";
@@ -18,8 +20,6 @@
 
   interface OptimizationItem {
     key: string;
-    label: string;
-    hint: string;
     icon: string;
     badge?: string;
     noUninstall?: boolean;
@@ -28,7 +28,6 @@
   interface LauncherItem {
     key: string;
     name: string;
-    description: string;
     icon: string;
     kind: "apt" | "flatpak" | "deb" | "custom";
     package?: string;
@@ -60,33 +59,32 @@
   }
 
   const optimizations: OptimizationItem[] = [
-    { key: "gamemode", label: "GameMode", hint: "Feral GameMode sets the CPU governor to performance, raises game process priority and notifies the kernel while a game is running.", icon: "/assets/icons/gaming/gamemode.png" },
-    { key: "performance-mode", label: "Performance Mode", hint: "Installs a wrapper script that switches the CPU to performance mode while a game runs, restoring it on exit. Add 'soplos-game-performance %command%' to Steam launch options.", icon: "/assets/icons/gaming/performance.png" },
-    { key: "sysctl", label: "Gaming Sysctl", hint: "Kernel parameter tweaks for gaming: vm.max_map_count for Proton/Steam, lower swappiness, reduced latency.", icon: "/assets/icons/gaming/sysctl.svg" },
-    { key: "gpu", label: "Optimize GPU", hint: "Detects your GPU (NVIDIA / AMD / Intel) and applies driver-specific performance tweaks. Installs prime-run on hybrid NVIDIA laptops.", icon: "/assets/icons/gaming/gpu.svg" },
-    { key: "disk-io", label: "Disk I/O", hint: "Installs udev rules that assign the best I/O scheduler per disk type (BFQ for HDD, mq-deadline for SSD, none for NVMe).", icon: "/assets/icons/gaming/disk-io.svg" },
-    { key: "mangohud", label: "MangoHud", hint: "Installs MangoHud, GOverlay, VulkanInfo, gamescope, DXVK and vkBasalt via Flatpak. Add 'mangohud %command%' to Steam launch options.", icon: "/assets/icons/gaming/mangohud.svg", noUninstall: true },
-    { key: "cpu-power", label: "CPU Power", hint: "Installs linux-cpupower and cpupower-gui to control the CPU frequency governor from a graphical interface.", icon: "/assets/icons/gaming/cpupower.png" },
-    { key: "ryzenadj", label: "RyzenAdj", hint: "Fixes overheating on AMD Ryzen Mini PCs with proprietary EC firmware by limiting TDP/temperature via the CPU SMU. Compiles from source and installs as a systemd service.", icon: "/assets/icons/gaming/ryzenadj.png" },
+    { key: "gamemode", icon: "/assets/icons/gaming/gamemode.png" },
+    { key: "performance-mode", icon: "/assets/icons/gaming/performance.png" },
+    { key: "sysctl", icon: "/assets/icons/gaming/sysctl.svg" },
+    { key: "gpu", icon: "/assets/icons/gaming/gpu.svg" },
+    { key: "disk-io", icon: "/assets/icons/gaming/disk-io.svg" },
+    { key: "mangohud", icon: "/assets/icons/gaming/mangohud.svg", noUninstall: true },
+    { key: "cpu-power", icon: "/assets/icons/gaming/cpupower.png" },
+    { key: "ryzenadj", icon: "/assets/icons/gaming/ryzenadj.png" },
   ];
 
   const launchers: LauncherItem[] = [
-    { key: "steam", name: "Steam", description: "Digital distribution platform for video games", icon: "/assets/icons/gaming/steam.png", kind: "flatpak", flatpakId: "com.valvesoftware.Steam" },
-    { key: "lutris", name: "Lutris", description: "Unified platform for managing games on Linux", icon: "/assets/icons/gaming/lutris.png", kind: "flatpak", flatpakId: "net.lutris.Lutris", official: true },
-    { key: "heroic", name: "Heroic Games Launcher", description: "Launcher for Epic, GOG and Amazon Games", icon: "/assets/icons/gaming/heroic.png", kind: "flatpak", flatpakId: "com.heroicgameslauncher.hgl" },
-    { key: "bottles", name: "Bottles", description: "Run Windows applications on Linux using Wine", icon: "/assets/icons/gaming/bottles.png", kind: "flatpak", flatpakId: "com.usebottles.bottles" },
-    { key: "r2modman", name: "R2ModMan", description: "Mod manager for Lethal Company, Valheim and more", icon: "/assets/icons/gaming/r2modman.png", kind: "deb", package: "r2modman", debUrl: "https://github.com/ebkr/r2modmanPlus/releases/download/v3.2.11/r2modman_3.2.11_amd64.deb" },
-    { key: "vinegar", name: "Vinegar (Roblox)", description: "Modern launcher for playing Roblox on Linux", icon: "/assets/icons/gaming/vinegar.png", kind: "flatpak", flatpakId: "org.vinegarhq.Vinegar" },
-    { key: "sober", name: "Sober", description: "Roblox client for Linux", icon: "/assets/icons/gaming/sober.png", kind: "flatpak", flatpakId: "org.vinegarhq.Sober" },
-    { key: "mocktail", name: "Mocktail", description: "Independent community client for playing Roblox on Linux", icon: "/assets/icons/gaming/mocktail.png", kind: "flatpak", flatpakId: "space.bigrat.mocktail" },
-    { key: "prism", name: "Prism Launcher", description: "Custom launcher for Minecraft", icon: "/assets/icons/gaming/prism.png", kind: "flatpak", flatpakId: "org.prismlauncher.PrismLauncher" },
-    { key: "itch", name: "Itch.io", description: "Indie game distribution platform", icon: "/assets/icons/gaming/itch-io.png", kind: "flatpak", flatpakId: "io.itch.itch" },
-    { key: "minigalaxy", name: "Minigalaxy", description: "Simple client for GOG.com", icon: "/assets/icons/gaming/gog.png", kind: "apt", package: "minigalaxy", official: true },
-    { key: "retroarch", name: "RetroArch", description: "Frontend for emulators and game engines", icon: "/assets/icons/gaming/retroarch.png", kind: "apt", package: "retroarch", official: true },
+    { key: "steam", name: "Steam", icon: "/assets/icons/gaming/steam.png", kind: "flatpak", flatpakId: "com.valvesoftware.Steam" },
+    { key: "lutris", name: "Lutris", icon: "/assets/icons/gaming/lutris.png", kind: "flatpak", flatpakId: "net.lutris.Lutris", official: true },
+    { key: "heroic", name: "Heroic Games Launcher", icon: "/assets/icons/gaming/heroic.png", kind: "flatpak", flatpakId: "com.heroicgameslauncher.hgl" },
+    { key: "bottles", name: "Bottles", icon: "/assets/icons/gaming/bottles.png", kind: "flatpak", flatpakId: "com.usebottles.bottles" },
+    { key: "r2modman", name: "R2ModMan", icon: "/assets/icons/gaming/r2modman.png", kind: "deb", package: "r2modman", debUrl: "https://github.com/ebkr/r2modmanPlus/releases/download/v3.2.11/r2modman_3.2.11_amd64.deb" },
+    { key: "vinegar", name: "Vinegar (Roblox)", icon: "/assets/icons/gaming/vinegar.png", kind: "flatpak", flatpakId: "org.vinegarhq.Vinegar" },
+    { key: "sober", name: "Sober", icon: "/assets/icons/gaming/sober.png", kind: "flatpak", flatpakId: "org.vinegarhq.Sober" },
+    { key: "mocktail", name: "Mocktail", icon: "/assets/icons/gaming/mocktail.png", kind: "flatpak", flatpakId: "space.bigrat.mocktail" },
+    { key: "prism", name: "Prism Launcher", icon: "/assets/icons/gaming/prism.png", kind: "flatpak", flatpakId: "org.prismlauncher.PrismLauncher" },
+    { key: "itch", name: "Itch.io", icon: "/assets/icons/gaming/itch-io.png", kind: "flatpak", flatpakId: "io.itch.itch" },
+    { key: "minigalaxy", name: "Minigalaxy", icon: "/assets/icons/gaming/gog.png", kind: "apt", package: "minigalaxy", official: true },
+    { key: "retroarch", name: "RetroArch", icon: "/assets/icons/gaming/retroarch.png", kind: "apt", package: "retroarch", official: true },
     {
       key: "es-de",
       name: "ES-DE",
-      description: "Frontend for emulators with a modern interface",
       icon: "/assets/icons/gaming/ES-DE.png",
       kind: "custom",
       badgeKind: "appimage",
@@ -94,16 +92,15 @@
       customInstall: "install_esde",
       customUninstall: "uninstall_esde",
     },
-    { key: "moonlight", name: "Moonlight", description: "NVIDIA GameStream/Sunshine streaming client", icon: "/assets/icons/gaming/moonlight.png", kind: "flatpak", flatpakId: "com.moonlight_stream.Moonlight" },
-    { key: "chiaki", name: "Chiaki (PS4/PS5)", description: "PlayStation Remote Play client (HDR version)", icon: "/assets/icons/gaming/chiaki.png", kind: "flatpak", flatpakId: "io.github.streetpea.Chiaki4deck" },
-    { key: "discord", name: "Discord", description: "Communication platform for gaming communities", icon: "/assets/icons/gaming/discord.svg", kind: "flatpak", flatpakId: "com.discordapp.Discord" },
-    { key: "protonup", name: "ProtonUp-Qt", description: "Install and manage GE-Proton, Wine-GE and more for Steam and Lutris", icon: "/assets/icons/gaming/protonup.png", kind: "flatpak", flatpakId: "net.davidotek.pupgui2" },
-    { key: "protonplus", name: "ProtonPlus", description: "Manage Proton, Wine and Steam/Lutris compatibility tools", icon: "/assets/icons/gaming/proton+.png", kind: "flatpak", flatpakId: "com.vysp3r.ProtonPlus" },
-    { key: "ppsspp", name: "PPSSPP", description: "PSP emulator with high-quality rendering", icon: "/assets/icons/gaming/ppsspp.png", kind: "flatpak", flatpakId: "org.ppsspp.PPSSPP" },
+    { key: "moonlight", name: "Moonlight", icon: "/assets/icons/gaming/moonlight.png", kind: "flatpak", flatpakId: "com.moonlight_stream.Moonlight" },
+    { key: "chiaki", name: "Chiaki (PS4/PS5)", icon: "/assets/icons/gaming/chiaki.png", kind: "flatpak", flatpakId: "io.github.streetpea.Chiaki4deck" },
+    { key: "discord", name: "Discord", icon: "/assets/icons/gaming/discord.svg", kind: "flatpak", flatpakId: "com.discordapp.Discord" },
+    { key: "protonup", name: "ProtonUp-Qt", icon: "/assets/icons/gaming/protonup.png", kind: "flatpak", flatpakId: "net.davidotek.pupgui2" },
+    { key: "protonplus", name: "ProtonPlus", icon: "/assets/icons/gaming/proton+.png", kind: "flatpak", flatpakId: "com.vysp3r.ProtonPlus" },
+    { key: "ppsspp", name: "PPSSPP", icon: "/assets/icons/gaming/ppsspp.png", kind: "flatpak", flatpakId: "org.ppsspp.PPSSPP" },
     {
       key: "geforcenow",
       name: "GeForce NOW",
-      description: "NVIDIA cloud gaming — stream games from the cloud",
       icon: "/assets/icons/gaming/geforcenow.png",
       kind: "custom",
       badgeKind: "flatpak",
@@ -114,8 +111,8 @@
   ];
 
   const customizationApps: LauncherItem[] = [
-    { key: "openrgb", name: "OpenRGB", description: "Control RGB lighting on supported motherboards, RAM, GPUs and peripherals", icon: "/assets/icons/gaming/openrgb.png", kind: "flatpak", flatpakId: "org.openrgb.OpenRGB" },
-    { key: "msi-keyboard-gui", name: "MSI Keyboard RGB", description: "Configure MSI keyboard RGB lighting", icon: "/assets/icons/gaming/msi-keyboard.png", kind: "apt", package: "msi-keyboard-gui" },
+    { key: "openrgb", name: "OpenRGB", icon: "/assets/icons/gaming/openrgb.png", kind: "flatpak", flatpakId: "org.openrgb.OpenRGB" },
+    { key: "msi-keyboard-gui", name: "MSI Keyboard RGB", icon: "/assets/icons/gaming/msi-keyboard.png", kind: "apt", package: "msi-keyboard-gui" },
   ];
 
   const installedMap: Record<string, boolean> = {};
@@ -195,7 +192,7 @@
         api.invoke<boolean>("is_apt_package_installed", { package: "lutris" }),
       ]);
       if (!userFlatpak && !systemFlatpak && !apt) {
-        infoMessage = "Lutris is not installed. Install it first from the Launchers section below.";
+        infoMessage = $_("gaming.lutrisNotInstalled");
         return;
       }
       if (userFlatpak) await runTracked("fix_lutris_flatpak_user");
@@ -275,7 +272,7 @@
       } else {
         const state = await api.invoke<string>("flatpak_state");
         if (state === "missing") {
-          infoMessage = `${item.name} is installed through Flatpak.\n\nInstall Flatpak and Flathub from the Software tab first.`;
+          infoMessage = $_("softwareTile.flatpakMissing", { values: { name: item.name } });
           return;
         }
         let scope: "user" | "system";
@@ -283,7 +280,7 @@
           scope = await chooseFlatpakScope(item.name);
         } else if (state === "system") {
           scope = "system";
-          infoMessage = `Flathub is only available system-wide on this system (this is what Bazaar does when you install it).\n\n${item.name} will be installed system-wide instead of just for your user.`;
+          infoMessage = $_("softwareTile.flatpakSystemOnly", { values: { name: item.name } });
         } else {
           scope = "user";
         }
@@ -324,8 +321,8 @@
   async function installWallpapers() {
     const success = await runTracked("install_gaming_wallpapers", { desktop });
     infoMessage = success
-      ? "Gaming wallpapers installed. You can now select them from your wallpaper settings."
-      : "Could not install the gaming wallpapers. Check the output above for details.";
+      ? $_("gaming.wallpapersInstalled")
+      : $_("gaming.wallpapersFailed");
   }
 
   onMount(async () => {
@@ -351,8 +348,8 @@
   class="relative rounded border border-border overflow-hidden mb-5 flex flex-col items-start justify-end text-left p-4 min-h-[200px]"
   style="background: linear-gradient(rgba(20, 20, 22, 0.35), rgba(20, 20, 22, 0.85)), url('/assets/hero/gaming-background.png'); background-size: cover; background-position: center;"
 >
-  <p class="text-white font-semibold text-[1rem]">Gaming Center</p>
-  <p class="text-[0.8rem] text-white/85 mt-1">Optimizations, launchers and wallpapers for gaming on Soplos Linux.</p>
+  <p class="text-white font-semibold text-[1rem]">{$_("gaming.hero.title")}</p>
+  <p class="text-[0.8rem] text-white/85 mt-1">{$_("gaming.hero.description")}</p>
 </div>
 
 {#if hardware}
@@ -365,7 +362,7 @@
         CPU
       </div>
       <div class="text-[0.8rem] text-text-bright font-medium truncate mt-1">{hardware.cpu.model}</div>
-      <div class="text-[0.7rem] text-text-muted">{hardware.cpu.cores} cores / {hardware.cpu.threads} threads</div>
+      <div class="text-[0.7rem] text-text-muted">{$_("drivers.coresThreads", { values: { cores: hardware.cpu.cores, threads: hardware.cpu.threads } })}</div>
     </div>
     <div class="bg-surface border border-border rounded p-3">
       <div class="flex items-center gap-1.5 text-[0.72rem] text-text-muted">
@@ -378,7 +375,7 @@
         <div class="text-[0.8rem] text-text-bright font-medium truncate mt-1">{gpu.vendor} {gpu.model}</div>
         <div class="text-[0.7rem] text-text-muted">{gpu.driverStatus}</div>
       {:else}
-        <div class="text-[0.8rem] text-text-muted mt-1">None detected</div>
+        <div class="text-[0.8rem] text-text-muted mt-1">{$_("drivers.noneDetected")}</div>
       {/each}
     </div>
     <div class="bg-surface border border-border rounded p-3">
@@ -386,19 +383,19 @@
         <div class="w-5 h-5 rounded bg-surface-2 grid place-items-center shrink-0">
           <MemoryStick size={13} />
         </div>
-        Memory
+        {$_("drivers.memory")}
       </div>
       <div class="text-[0.8rem] text-text-bright font-medium mt-1">{hardware.memory.total}</div>
-      <div class="text-[0.7rem] text-text-muted">{hardware.memory.available} available</div>
+      <div class="text-[0.7rem] text-text-muted">{$_("drivers.availableSuffix", { values: { available: hardware.memory.available } })}</div>
     </div>
     <div class="bg-surface border border-border rounded p-3">
       <div class="flex items-center gap-1.5 text-[0.72rem] text-text-muted">
         <div class="w-5 h-5 rounded bg-surface-2 grid place-items-center shrink-0">
           <Zap size={13} />
         </div>
-        Optimizations
+        {$_("gaming.optimizationsTitle")}
       </div>
-      <div class="text-[0.8rem] text-text-bright font-medium mt-1">{activeOptimizationsCount} / {optimizations.length} active</div>
+      <div class="text-[0.8rem] text-text-bright font-medium mt-1">{$_("gaming.optimizationsCount", { values: { active: activeOptimizationsCount, total: optimizations.length } })}</div>
     </div>
   </div>
 {/if}
@@ -412,8 +409,8 @@
           <img src="/assets/icons/gaming/gamemode.png" alt="" class="w-full h-full object-contain" />
         </div>
         <div class="text-left">
-          <div class="text-text-bright font-semibold text-[0.9rem]">Optimizations</div>
-          <div class="text-[0.75rem] text-text-muted">Performance tweaks for gaming</div>
+          <div class="text-text-bright font-semibold text-[0.9rem]">{$_("gaming.optimizationsTitle")}</div>
+          <div class="text-[0.75rem] text-text-muted">{$_("gaming.optimizationsSubtitle")}</div>
         </div>
       </div>
       <ChevronDown size={18} class="text-text-muted transition-transform {expanded === 'optimizations' ? 'rotate-180' : ''}" />
@@ -431,19 +428,19 @@
               <div class="w-7 h-7 rounded bg-surface-2 grid place-items-center shrink-0 overflow-hidden">
                 <img src={item.icon} alt="" class="w-full h-full object-contain" />
               </div>
-              <span class="text-[0.85rem] font-semibold text-text-bright">{item.label}</span>
+              <span class="text-[0.85rem] font-semibold text-text-bright">{$_(`gaming.optimizations.${item.key}.label`)}</span>
               <span
                 class="text-[0.68rem] px-2 py-0.5 rounded-full shrink-0 ml-auto {installed
                   ? 'bg-success/15 text-success'
                   : 'bg-surface-2 text-text'}"
               >
-                {installed ? "Installed" : "Not installed"}
+                {installed ? $_("drivers.badge.installed") : $_("drivers.badge.notInstalled")}
               </span>
             </div>
-            <p class="text-[0.72rem] text-text mt-1.5">{item.hint}</p>
+            <p class="text-[0.72rem] text-text mt-1.5">{$_(`gaming.optimizations.${item.key}.hint`)}</p>
             {#if !item.noUninstall || !installed}
               <p class="text-[0.68rem] text-primary mt-1">
-                {installed ? "Click to revert" : "Click to install"}
+                {installed ? $_("gaming.clickToRevert") : $_("drivers.clickToInstall")}
               </p>
             {/if}
           </button>
@@ -459,13 +456,10 @@
             <div class="w-7 h-7 rounded bg-surface-2 grid place-items-center shrink-0 overflow-hidden">
               <img src="/assets/icons/gaming/lutris.png" alt="" class="w-full h-full object-contain" />
             </div>
-            <span class="text-[0.85rem] font-semibold text-text-bright">Lutris Vulkan Fix</span>
+            <span class="text-[0.85rem] font-semibold text-text-bright">{$_("gaming.lutrisFixTitle")}</span>
           </div>
-          <p class="text-[0.72rem] text-text mt-1.5">
-            Fixes Lutris GPU detection inside Flatpak's sandbox (user or system) and makes sure vulkan-tools is present
-            for an apt install. Launch Lutris at least once before applying this fix.
-          </p>
-          <p class="text-[0.68rem] text-primary mt-1">{lutrisFixBusy ? "Working…" : "Click to apply"}</p>
+          <p class="text-[0.72rem] text-text mt-1.5">{$_("gaming.lutrisFixDescription")}</p>
+          <p class="text-[0.68rem] text-primary mt-1">{lutrisFixBusy ? $_("gaming.working") : $_("gaming.clickToApply")}</p>
         </button>
       </div>
 
@@ -474,7 +468,7 @@
         on:click={revertAll}
       >
         <Undo2 size={16} />
-        Revert All
+        {$_("gaming.revertAll")}
       </button>
     {/if}
   </div>
@@ -487,8 +481,8 @@
           <img src="/assets/icons/gaming/steam.png" alt="" class="w-full h-full object-contain" />
         </div>
         <div class="text-left">
-          <div class="text-text-bright font-semibold text-[0.9rem]">Launchers</div>
-          <div class="text-[0.75rem] text-text-muted">{launchers.length} game launchers and clients</div>
+          <div class="text-text-bright font-semibold text-[0.9rem]">{$_("gaming.launchersTitle")}</div>
+          <div class="text-[0.75rem] text-text-muted">{$_("gaming.launchersSubtitle", { values: { count: launchers.length } })}</div>
         </div>
       </div>
       <ChevronDown size={18} class="text-text-muted transition-transform {expanded === 'launchers' ? 'rotate-180' : ''}" />
@@ -505,13 +499,13 @@
             <img src={item.icon} alt="" class="w-10 h-10 object-contain" />
             <span class="text-[0.8rem] font-semibold text-text-bright">{item.name}</span>
             <span class="text-[0.6rem] px-1.5 py-0.5 rounded bg-surface-2 text-text-muted">{badgeLabels[launcherBadgeKind(item)]}</span>
-            <span class="text-[0.68rem] text-text">{item.description}</span>
+            <span class="text-[0.68rem] text-text">{$_(`gaming.launchers.${item.key}`)}</span>
             <span
               class="text-[0.66rem] px-2 py-0.5 rounded-full mt-1 {installed
                 ? 'bg-success/15 text-success'
                 : 'bg-surface-2 text-text'}"
             >
-              {installed ? "Click to uninstall" : "Click to install"}
+              {installed ? $_("drivers.clickToUninstall") : $_("drivers.clickToInstall")}
             </span>
           </button>
         {/each}
@@ -527,8 +521,8 @@
           <img src="/assets/icons/gaming/openrgb.png" alt="" class="w-full h-full object-contain" />
         </div>
         <div class="text-left">
-          <div class="text-text-bright font-semibold text-[0.9rem]">Customization</div>
-          <div class="text-[0.75rem] text-text-muted">Wallpapers and RGB lighting</div>
+          <div class="text-text-bright font-semibold text-[0.9rem]">{$_("app.tabs.customization.label")}</div>
+          <div class="text-[0.75rem] text-text-muted">{$_("gaming.customizationSubtitle")}</div>
         </div>
       </div>
       <ChevronDown size={18} class="text-text-muted transition-transform {expanded === 'customization' ? 'rotate-180' : ''}" />
@@ -541,9 +535,9 @@
           on:click={installWallpapers}
         >
           <img src="/assets/icons/customization/wallpaper.svg" alt="" class="w-10 h-10 object-contain" />
-          <span class="text-[0.8rem] font-semibold text-text-bright">Gaming Wallpapers</span>
-          <span class="text-[0.68rem] text-text">Install exclusive gaming wallpapers for your desktop</span>
-          <span class="text-[0.66rem] px-2 py-0.5 rounded-full mt-1 bg-surface-2 text-text">Click to install</span>
+          <span class="text-[0.8rem] font-semibold text-text-bright">{$_("gaming.wallpapersTitle")}</span>
+          <span class="text-[0.68rem] text-text">{$_("gaming.wallpapersDescription")}</span>
+          <span class="text-[0.66rem] px-2 py-0.5 rounded-full mt-1 bg-surface-2 text-text">{$_("drivers.clickToInstall")}</span>
         </button>
 
         {#each customizationApps as item}
@@ -555,13 +549,13 @@
               <img src={item.icon} alt="" class="w-10 h-10 object-contain" />
               <span class="text-[0.8rem] font-semibold text-text-bright">{item.name}</span>
               <span class="text-[0.6rem] px-1.5 py-0.5 rounded bg-surface-2 text-text-muted">{badgeLabels[launcherBadgeKind(item)]}</span>
-              <span class="text-[0.68rem] text-text">{item.description}</span>
+              <span class="text-[0.68rem] text-text">{$_(`gaming.launchers.${item.key}`)}</span>
               <span
                 class="text-[0.66rem] px-2 py-0.5 rounded-full mt-1 {installed
                   ? 'bg-success/15 text-success'
                   : 'bg-surface-2 text-text'}"
               >
-                {installed ? "Click to uninstall" : "Click to install"}
+                {installed ? $_("drivers.clickToUninstall") : $_("drivers.clickToInstall")}
               </span>
             </button>
           {/each}
@@ -577,7 +571,7 @@
         class="px-3 py-1.5 rounded border border-border text-text hover:bg-surface hover:text-text-bright text-[0.78rem] transition-colors"
         on:click={() => ($terminalExpanded = !$terminalExpanded)}
       >
-        {$terminalExpanded ? "Hide output" : "Show output"}
+        {$terminalExpanded ? $_("common.hideOutput") : $_("common.showOutput")}
       </button>
     </div>
     <TerminalOutput fullWidth />
@@ -585,70 +579,18 @@
 {/if}
 
 {#if infoMessage}
-  <div
-    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-    role="button"
-    tabindex="-1"
-    on:click={() => (infoMessage = "")}
-    on:keydown={(e) => { if (e.key === "Escape" || (e.key === "Enter" && e.target === e.currentTarget)) infoMessage = ""; }}
-  >
-    <div
-      class="w-full max-w-[400px] bg-surface border border-border rounded p-4 flex flex-col gap-3 shadow-lg"
-      role="presentation"
-      on:click|stopPropagation
-    >
-      <p class="text-[0.85rem] text-text-bright whitespace-pre-line">{infoMessage}</p>
-      <button
-        class="bg-primary hover:bg-primary-hover text-text-bright px-3 py-1.5 rounded text-[0.82rem] font-semibold self-end"
-        use:autofocus
-          on:click={() => (infoMessage = "")}
-      >
-        OK
-      </button>
-    </div>
-  </div>
+  <Modal onClose={() => (infoMessage = "")}>
+    <p class="whitespace-pre-line text-text-bright">{infoMessage}</p>
+  </Modal>
 {/if}
 
 {#if flatpakScopeChoice}
-  <div
-    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-    role="button"
-    tabindex="-1"
-    on:click={() => (flatpakScopeChoice = null)}
-    on:keydown={(e) => e.key === "Escape" && (flatpakScopeChoice = null)}
-  >
-    <div
-      class="w-full max-w-[400px] bg-surface border border-border rounded p-4 flex flex-col gap-3 shadow-lg"
-      role="presentation"
-      on:click|stopPropagation
-    >
-      <h3 class="text-text-bright font-semibold text-[0.9rem]">Install {flatpakScopeChoice.name}</h3>
-      <p class="text-[0.8rem] text-text-muted">
-        Flathub is available both for your user and system-wide on this machine. Where do you want to install it?
-      </p>
-      <div class="flex flex-col gap-2">
-        <button
-          class="px-3 py-2 rounded border border-border text-text hover:bg-surface-2 text-[0.82rem] font-semibold text-left"
-          use:autofocus
-          on:click={() => {
-            flatpakScopeChoice?.resolve("user");
-            flatpakScopeChoice = null;
-          }}
-        >
-          Just for me
-          <span class="block text-[0.7rem] text-text-muted font-normal">Installed for your user only, no password needed.</span>
-        </button>
-        <button
-          class="px-3 py-2 rounded border border-border text-text hover:bg-surface-2 text-[0.82rem] font-semibold text-left"
-          on:click={() => {
-            flatpakScopeChoice?.resolve("system");
-            flatpakScopeChoice = null;
-          }}
-        >
-          For all users
-          <span class="block text-[0.7rem] text-text-muted font-normal">Installed system-wide, requires your password.</span>
-        </button>
-      </div>
-    </div>
-  </div>
+  <FlatpakScopeModal
+    name={flatpakScopeChoice.name}
+    onChoose={(scope) => {
+      flatpakScopeChoice?.resolve(scope);
+      flatpakScopeChoice = null;
+    }}
+    onClose={() => (flatpakScopeChoice = null)}
+  />
 {/if}

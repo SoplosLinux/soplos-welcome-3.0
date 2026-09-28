@@ -1,20 +1,23 @@
 <script lang="ts">
-  import { autofocus } from "../lib/autofocus";
   import { onMount } from "svelte";
+  import { _ } from "svelte-i18n";
   import { api } from "../lib/api";
   import { runTracked, terminalExpanded, terminalLines } from "../lib/progress";
   import TerminalOutput from "../components/TerminalOutput.svelte";
+  import Modal from "../components/Modal.svelte";
+  import FlatpakScopeModal from "../components/FlatpakScopeModal.svelte";
   import { ChevronDown, Package, Search } from "lucide-svelte";
 
   interface RecPackage {
     name: string;
     icon: string;
-    description: string;
     official?: boolean;
     kind: "apt" | "flatpak" | "custom" | "manual";
     package?: string;
     flatpak?: string;
     checkPath?: string;
+    // Overrides the source badge; without it, checkPath entries under ~/AppImages show "AppImage" and others none.
+    badge?: string;
     // Fixed Tauri command names for "custom" entries — the script itself
     // lives in Rust (src-tauri/src/commands/recommended.rs), never sent
     // from the frontend. See security plan point 1.
@@ -23,13 +26,12 @@
     postInstall?: string;
     // Shows a license-acceptance confirmation before running customInstall —
     // for non-free components (e.g. VirtualBox Extension Pack's PUEL).
-    licenseConfirm?: { title: string; body: string };
+    licenseConfirm?: boolean;
     disabled?: string; // tooltip reason when the item can't be installed (e.g. Waydroid without Binder)
   }
 
   interface RecCategory {
     key: string;
-    title: string;
     packages: RecPackage[];
   }
 
@@ -37,126 +39,128 @@
   const categories: RecCategory[] = [
     {
       key: "browsers",
-      title: "Web Browsers",
       packages: [
-        { name: "Firefox", icon: "firefox.png", description: "Free and open-source web browser developed by Mozilla", official: true, kind: "apt", package: "firefox" },
-        { name: "Google Chrome", icon: "chrome.png", description: "Web browser developed by Google", kind: "custom", package: "google-chrome-stable", customInstall: "install_chrome" },
-        { name: "Chromium", icon: "chromium.png", description: "Open-source project behind Google Chrome", official: true, kind: "apt", package: "chromium" },
-        { name: "Brave", icon: "brave.png", description: "Privacy-focused browser that blocks ads", kind: "custom", package: "brave-browser", customInstall: "install_brave", customUninstall: "uninstall_brave" },
-        { name: "LibreWolf", icon: "librewolf.png", description: "Firefox fork focused on privacy, security and freedom", kind: "flatpak", flatpak: "io.gitlab.librewolf-community" },
-        { name: "Vivaldi", icon: "vivaldi.png", description: "Feature-packed web browser with built-in tools", kind: "flatpak", flatpak: "com.vivaldi.Vivaldi" },
-        { name: "Opera GX", icon: "opera-gx.png", description: "Gaming browser with system resource controls", kind: "flatpak", flatpak: "com.opera.opera-gx" },
-        { name: "Opera", icon: "opera.png", description: "Feature-rich browser with built-in VPN and ad blocker", kind: "flatpak", flatpak: "com.opera.Opera" },
-        { name: "Zen Browser", icon: "zen-browser.png", description: "Privacy-focused Firefox-based browser with beautiful design", kind: "custom", package: "zen-browser", customInstall: "install_zen_browser" },
-        { name: "Helium", icon: "helium.png", description: "Privacy-focused browser built on Chromium with YouTube integration", kind: "custom", package: "helium-bin", customInstall: "install_helium" },
-        { name: "Midori", icon: "midori.png", description: "Lightweight, fast and secure web browser", kind: "custom", package: "midori", customInstall: "install_midori" },
-        { name: "Brave Origin", icon: "brave-origin.png", description: "Privacy-focused browser by Brave with integrated AI assistant", kind: "custom", package: "brave-origin", customInstall: "install_brave_origin" },
+        { name: "Firefox", icon: "firefox.png", official: true, kind: "apt", package: "firefox" },
+        { name: "Google Chrome", icon: "chrome.png", kind: "custom", package: "google-chrome-stable", customInstall: "install_chrome" },
+        { name: "Chromium", icon: "chromium.png", official: true, kind: "apt", package: "chromium" },
+        { name: "Brave", icon: "brave.png", kind: "custom", package: "brave-browser", customInstall: "install_brave", customUninstall: "uninstall_brave" },
+        { name: "LibreWolf", icon: "librewolf.png", kind: "flatpak", flatpak: "io.gitlab.librewolf-community" },
+        { name: "Vivaldi", icon: "vivaldi.png", kind: "flatpak", flatpak: "com.vivaldi.Vivaldi" },
+        { name: "Opera GX", icon: "opera-gx.png", kind: "flatpak", flatpak: "com.opera.opera-gx" },
+        { name: "Opera", icon: "opera.png", kind: "flatpak", flatpak: "com.opera.Opera" },
+        { name: "Zen Browser", icon: "zen-browser.png", kind: "custom", package: "zen-browser", customInstall: "install_zen_browser" },
+        { name: "Helium", icon: "helium.png", kind: "custom", package: "helium-bin", customInstall: "install_helium" },
+        { name: "Midori", icon: "midori.png", kind: "custom", package: "midori", customInstall: "install_midori" },
+        { name: "Brave Origin", icon: "brave-origin.png", kind: "custom", package: "brave-origin", customInstall: "install_brave_origin" },
       ],
     },
     {
       key: "comunications",
-      title: "Communication",
       packages: [
-        { name: "Thunderbird", icon: "thunderbird.png", description: "Free email client developed by Mozilla", official: true, kind: "apt", package: "thunderbird" },
-        { name: "Discord", icon: "discord.png", description: "Communication app for communities and gaming", kind: "flatpak", flatpak: "com.discordapp.Discord" },
-        { name: "Telegram", icon: "telegram.png", description: "Fast and secure messaging app", kind: "apt", package: "telegram-desktop" },
-        { name: "Signal", icon: "signal.png", description: "Private messaging with end-to-end encryption", kind: "flatpak", flatpak: "org.signal.Signal" },
-        { name: "Element", icon: "element.png", description: "Matrix client for decentralized communication", kind: "flatpak", flatpak: "im.riot.Riot" },
+        { name: "Thunderbird", icon: "thunderbird.png", official: true, kind: "apt", package: "thunderbird" },
+        { name: "Discord", icon: "discord.png", kind: "flatpak", flatpak: "com.discordapp.Discord" },
+        { name: "Telegram", icon: "telegram.png", kind: "apt", package: "telegram-desktop" },
+        { name: "Signal", icon: "signal.png", kind: "flatpak", flatpak: "org.signal.Signal" },
+        { name: "Element", icon: "element.png", kind: "flatpak", flatpak: "im.riot.Riot" },
         {
           name: "WhatsApp",
           icon: "whatsapp.png",
-          description: "WhatsApp Web pinned as its own app window (Soplos WebApp)",
-          kind: "custom",
+                    kind: "custom",
+          badge: "WebApp",
           checkPath: "~/.local/share/applications/soplos-webapp-whatsapp.desktop",
           customInstall: "install_whatsapp",
           customUninstall: "uninstall_whatsapp",
         },
-        { name: "Slack", icon: "slack.png", description: "Team collaboration and communication platform", kind: "flatpak", flatpak: "com.slack.Slack" },
-        { name: "Zoom", icon: "zoom.png", description: "Video conferencing and meetings", kind: "flatpak", flatpak: "us.zoom.Zoom" },
+        { name: "Slack", icon: "slack.png", kind: "flatpak", flatpak: "com.slack.Slack" },
+        { name: "Zoom", icon: "zoom.png", kind: "flatpak", flatpak: "us.zoom.Zoom" },
       ],
     },
     {
       key: "office",
-      title: "Office",
       packages: [
-        { name: "LibreOffice", icon: "libreoffice.png", description: "Complete and free office suite", official: true, kind: "flatpak", flatpak: "org.libreoffice.LibreOffice" },
-        { name: "OnlyOffice", icon: "onlyoffice.png", description: "Office suite compatible with Microsoft Office", kind: "flatpak", flatpak: "org.onlyoffice.desktopeditors" },
-        { name: "WPS Office", icon: "wpsoffice.png", description: "Lightweight and elegant office suite", kind: "flatpak", flatpak: "com.wps.Office" },
-        { name: "Calligra", icon: "calligra.png", description: "KDE office suite: word processor, spreadsheet and presentation", official: true, kind: "flatpak", flatpak: "org.kde.calligra" },
-        { name: "Collabora Office", icon: "collabora.png", description: "Enterprise-grade LibreOffice fork by Collabora", official: true, kind: "flatpak", flatpak: "com.collaboraoffice.Office" },
-        { name: "GenOffice", icon: "genoffice.png", description: "Open-source AI office suite: Docs, Sheets, Slides, PDF, HTML and Markdown", kind: "custom", package: "genoffice", customInstall: "install_genoffice" },
-        { name: "Adobe Reader", icon: "reader.png", description: "Adobe PDF reader", kind: "flatpak", flatpak: "com.adobe.Reader" },
-        { name: "JoPDF", icon: "jopdf.png", description: "PDF editor: annotate, sign, fill forms and merge PDFs", kind: "custom", package: "jopdf", customInstall: "install_jopdf" },
+        { name: "LibreOffice", icon: "libreoffice.png", official: true, kind: "flatpak", flatpak: "org.libreoffice.LibreOffice" },
+        { name: "OnlyOffice", icon: "onlyoffice.png", kind: "flatpak", flatpak: "org.onlyoffice.desktopeditors" },
+        { name: "WPS Office", icon: "wpsoffice.png", kind: "flatpak", flatpak: "com.wps.Office" },
+        { name: "Calligra", icon: "calligra.png", official: true, kind: "flatpak", flatpak: "org.kde.calligra" },
+        { name: "Collabora Office", icon: "collabora.png", official: true, kind: "flatpak", flatpak: "com.collaboraoffice.Office" },
+        { name: "GenOffice", icon: "genoffice.png", kind: "custom", package: "genoffice", customInstall: "install_genoffice" },
+        { name: "Adobe Reader", icon: "reader.png", kind: "flatpak", flatpak: "com.adobe.Reader" },
+        { name: "JoPDF", icon: "jopdf.png", kind: "custom", package: "jopdf", customInstall: "install_jopdf" },
       ],
     },
     {
       key: "multimedia",
-      title: "Multimedia",
       packages: [
-        { name: "VLC Media Player", icon: "vlc.png", description: "Universal media player", official: true, kind: "apt", package: "vlc" },
-        { name: "MPV", icon: "mpv.png", description: "Minimalist and powerful media player", official: true, kind: "apt", package: "mpv" },
-        { name: "Kodi", icon: "kodi.png", description: "Open-source media center", official: true, kind: "apt", package: "kodi" },
-        { name: "Spotify", icon: "spotify.png", description: "Digital music streaming service", kind: "flatpak", flatpak: "com.spotify.Client" },
-        { name: "OBS Studio", icon: "obs-studio.png", description: "Software for streaming and video recording", official: true, kind: "flatpak", flatpak: "com.obsproject.Studio" },
-        { name: "Kdenlive", icon: "kdenlive.png", description: "Professional non-linear video editor", official: true, kind: "flatpak", flatpak: "org.kde.kdenlive" },
-        { name: "OpenShot", icon: "openshot.png", description: "Easy to use video editor", official: true, kind: "flatpak", flatpak: "org.openshot.OpenShot" },
-        { name: "HandBrake", icon: "handbrake.png", description: "Open source video transcoder", official: true, kind: "flatpak", flatpak: "fr.handbrake.ghb" },
-        { name: "DaVinci Resolve", icon: "davinci-resolve.png", description: "Professional video editing (manual install — licensing)", kind: "manual", checkPath: "/opt/resolve/bin/resolve" },
-        { name: "Drift", icon: "drift.png", description: "Edit and export videos easily", kind: "flatpak", flatpak: "org.cutwire.Drift" },
-        { name: "Prism", icon: "prism.png", description: "Trigger and mix live visuals", kind: "flatpak", flatpak: "org.cutwire.Prism" },
-        { name: "Audacity", icon: "audacity.png", description: "Free and open-source audio editor", official: true, kind: "apt", package: "audacity" },
-        { name: "KutEditor", icon: "kuteditor.png", description: "Native podcast editor: multitrack audio, AI transcription and Podcasting 2.0 chapters", official: true, kind: "apt", package: "kuteditor" },
-        { name: "LMMS", icon: "lmms.png", description: "Digital audio workstation", kind: "flatpak", flatpak: "io.lmms.LMMS" },
-        { name: "Mixxx", icon: "mixxx.png", description: "Professional DJ software", official: true, kind: "apt", package: "mixxx" },
-        { name: "Bitwig Studio", icon: "bitwig-studio.png", description: "Professional digital audio workstation for music production", kind: "flatpak", flatpak: "com.bitwig.BitwigStudio" },
-        { name: "Reaper", icon: "reaper.png", description: "Professional digital audio workstation and MIDI sequencer", kind: "flatpak", flatpak: "fm.reaper.Reaper" },
-        { name: "Zrythm", icon: "zrythm.png", description: "Free and open-source digital audio workstation", kind: "flatpak", flatpak: "org.zrythm.Zrythm" },
-        { name: "Ardour", icon: "ardour.png", description: "Professional recording, editing and mixing DAW", kind: "flatpak", flatpak: "org.ardour.Ardour" },
+        { name: "VLC Media Player", icon: "vlc.png", official: true, kind: "apt", package: "vlc" },
+        { name: "MPV", icon: "mpv.png", official: true, kind: "apt", package: "mpv" },
+        { name: "Kodi", icon: "kodi.png", official: true, kind: "apt", package: "kodi" },
+        { name: "Spotify", icon: "spotify.png", kind: "flatpak", flatpak: "com.spotify.Client" },
+        { name: "OBS Studio", icon: "obs-studio.png", official: true, kind: "flatpak", flatpak: "com.obsproject.Studio" },
+        { name: "Kdenlive", icon: "kdenlive.png", official: true, kind: "flatpak", flatpak: "org.kde.kdenlive" },
+        { name: "OpenShot", icon: "openshot.png", official: true, kind: "flatpak", flatpak: "org.openshot.OpenShot" },
+        { name: "HandBrake", icon: "handbrake.png", official: true, kind: "flatpak", flatpak: "fr.handbrake.ghb" },
+        { name: "DaVinci Resolve", icon: "davinci-resolve.png", kind: "manual", checkPath: "/opt/resolve/bin/resolve" },
+        { name: "Drift", icon: "drift.png", kind: "flatpak", flatpak: "org.cutwire.Drift" },
+        { name: "Prism", icon: "prism.png", kind: "flatpak", flatpak: "org.cutwire.Prism" },
+        { name: "Audacity", icon: "audacity.png", official: true, kind: "apt", package: "audacity" },
+        { name: "KutEditor", icon: "kuteditor.png", official: true, kind: "apt", package: "kuteditor" },
+        { name: "LMMS", icon: "lmms.png", kind: "flatpak", flatpak: "io.lmms.LMMS" },
+        { name: "Mixxx", icon: "mixxx.png", official: true, kind: "apt", package: "mixxx" },
+        { name: "Bitwig Studio", icon: "bitwig-studio.png", kind: "flatpak", flatpak: "com.bitwig.BitwigStudio" },
+        { name: "Reaper", icon: "reaper.png", kind: "flatpak", flatpak: "fm.reaper.Reaper" },
+        { name: "Zrythm", icon: "zrythm.png", kind: "flatpak", flatpak: "org.zrythm.Zrythm" },
+        { name: "Ardour", icon: "ardour.png", kind: "flatpak", flatpak: "org.ardour.Ardour" },
       ],
     },
     {
       key: "graphics",
-      title: "Graphics and Design",
       packages: [
-        { name: "GIMP", icon: "gimp.png", description: "Advanced and free image editor", official: true, kind: "apt", package: "gimp" },
-        { name: "Krita", icon: "krita.png", description: "Professional digital painting program", official: true, kind: "apt", package: "krita" },
+        { name: "GIMP", icon: "gimp.png", official: true, kind: "apt", package: "gimp" },
+        { name: "Krita", icon: "krita.png", official: true, kind: "apt", package: "krita" },
         {
           name: "Affinity Suite",
           icon: "affinity.png",
-          description: "Professional photo editing, design and publishing suite",
-          kind: "custom",
+                    kind: "custom",
           checkPath: "~/AppImages/Affinity-3.0.2-x86_64.AppImage",
           customInstall: "install_affinity",
           customUninstall: "uninstall_affinity",
         },
-        { name: "Inkscape", icon: "inkscape.png", description: "Professional vector graphics editor", official: true, kind: "apt", package: "inkscape" },
-        { name: "Blender", icon: "blender.png", description: "Complete and free 3D creation suite", official: true, kind: "apt", package: "blender" },
-        { name: "darktable", icon: "darktable.png", description: "Virtual lighttable for photography", official: true, kind: "apt", package: "darktable" },
-        { name: "RapidRAW", icon: "rapidraw.png", description: "Fast and modern RAW photo editor", kind: "flatpak", flatpak: "io.github.CyberTimon.RapidRAW" },
-        { name: "RawTherapee", icon: "rawtherapee.png", description: "Advanced RAW photo processing program", official: true, kind: "apt", package: "rawtherapee" },
-        { name: "ART", icon: "art.png", description: "Advanced RAW photo editor with local adjustments", kind: "flatpak", flatpak: "us.pixls.art.ART" },
-        { name: "Hugin", icon: "hugin.png", description: "Panorama photo stitcher", official: true, kind: "apt", package: "hugin" },
+        { name: "Fog Panther", icon: "pantherfog.png", kind: "flatpak", flatpak: "com.fogpanther.FogPanther" },
+        {
+          name: "Patchy",
+          icon: "patchy.png",
+                    kind: "custom",
+          badge: "Flatpak",
+          checkPath: "~/.local/share/flatpak/app/com.rtsoft.patchy",
+          customInstall: "install_patchy",
+          customUninstall: "uninstall_patchy",
+        },
+        { name: "Inkscape", icon: "inkscape.png", official: true, kind: "apt", package: "inkscape" },
+        { name: "Blender", icon: "blender.png", official: true, kind: "apt", package: "blender" },
+        { name: "darktable", icon: "darktable.png", official: true, kind: "apt", package: "darktable" },
+        { name: "RapidRAW", icon: "rapidraw.png", kind: "flatpak", flatpak: "io.github.CyberTimon.RapidRAW" },
+        { name: "RawTherapee", icon: "rawtherapee.png", official: true, kind: "apt", package: "rawtherapee" },
+        { name: "ART", icon: "art.png", kind: "flatpak", flatpak: "us.pixls.art.ART" },
+        { name: "Hugin", icon: "hugin.png", official: true, kind: "apt", package: "hugin" },
       ],
     },
     {
       key: "developer",
-      title: "Development",
       packages: [
-        { name: "Visual Studio Code", icon: "vscode.png", description: "Source code editor developed by Microsoft", kind: "custom", package: "code", customInstall: "install_vscode", customUninstall: "uninstall_vscode" },
-        { name: "VSCodium", icon: "vscodium.png", description: "Free version of Visual Studio Code without telemetry", kind: "flatpak", flatpak: "com.vscodium.codium" },
-        { name: "Google Antigravity", icon: "antigravity.png", description: "Advanced Agentic AI Coding Assistant", kind: "custom", checkPath: "/opt/antigravity/antigravity-ide", customInstall: "install_antigravity", customUninstall: "uninstall_antigravity" },
-        { name: "Sublime Text", icon: "sublime-text.png", description: "Sophisticated text editor for code and markup", kind: "custom", package: "sublime-text", customInstall: "install_sublime_text", customUninstall: "uninstall_sublime_text" },
-        { name: "Cursor", icon: "cursor.png", description: "Code editor with integrated AI", kind: "custom", package: "cursor", customInstall: "install_cursor" },
-        { name: "Zed", icon: "zed.png", description: "High-performance, multiplayer code editor", kind: "flatpak", flatpak: "dev.zed.Zed" },
-        { name: "Pulsar", icon: "pulsar.png", description: "A community-led, hyper-hackable text editor", kind: "flatpak", flatpak: "dev.pulsar_edit.Pulsar" },
-        { name: "Geany", icon: "geany.png", description: "Lightweight and fast IDE with multi-language support", official: true, kind: "apt", package: "geany" },
-        { name: "Bluefish", icon: "bluefish.png", description: "Advanced editor for web programmers", official: true, kind: "apt", package: "bluefish" },
-        { name: "Postman", icon: "postman.png", description: "API development and testing platform", kind: "flatpak", flatpak: "com.getpostman.Postman" },
+        { name: "Visual Studio Code", icon: "vscode.png", kind: "custom", package: "code", customInstall: "install_vscode", customUninstall: "uninstall_vscode" },
+        { name: "VSCodium", icon: "vscodium.png", kind: "flatpak", flatpak: "com.vscodium.codium" },
+        { name: "Google Antigravity", icon: "antigravity.png", kind: "custom", checkPath: "/opt/antigravity/antigravity-ide", customInstall: "install_antigravity", customUninstall: "uninstall_antigravity" },
+        { name: "Sublime Text", icon: "sublime-text.png", kind: "custom", package: "sublime-text", customInstall: "install_sublime_text", customUninstall: "uninstall_sublime_text" },
+        { name: "Cursor", icon: "cursor.png", kind: "custom", package: "cursor", customInstall: "install_cursor" },
+        { name: "Zed", icon: "zed.png", kind: "flatpak", flatpak: "dev.zed.Zed" },
+        { name: "Pulsar", icon: "pulsar.png", kind: "flatpak", flatpak: "dev.pulsar_edit.Pulsar" },
+        { name: "Geany", icon: "geany.png", official: true, kind: "apt", package: "geany" },
+        { name: "Bluefish", icon: "bluefish.png", official: true, kind: "apt", package: "bluefish" },
+        { name: "Postman", icon: "postman.png", kind: "flatpak", flatpak: "com.getpostman.Postman" },
         {
           name: "Waydroid",
           icon: "waydroid.png",
-          description: "Android container for developing and testing Android apps",
-          kind: "custom",
+                    kind: "custom",
           package: "waydroid",
           customInstall: "install_waydroid",
           customUninstall: "uninstall_waydroid",
@@ -165,39 +169,35 @@
     },
     {
       key: "app_management",
-      title: "App Management",
       packages: [
-        { name: "Soplos WebApp Manager", icon: "soplos-webapps-manager.png", description: "Manage your web applications with ease", official: true, kind: "apt", package: "soplos-webapp-manager" },
-        { name: "Soplos AppImage Manager", icon: "soplos-appimage-manager.png", description: "Manage and integrate AppImages on your system", official: true, kind: "apt", package: "soplos-appimage-manager" },
-        { name: "Flatseal", icon: "flatseal.png", description: "Manage Flatpak permissions", kind: "flatpak", flatpak: "com.github.tchx84.Flatseal" },
-        { name: "Gear Lever", icon: "gear-lever.png", description: "Manage AppImages effortlessly", kind: "flatpak", flatpak: "it.mijorus.gearlever" },
-        { name: "Warehouse", icon: "warehouse.png", description: "Manage and control your Flatpak apps and runtimes", kind: "flatpak", flatpak: "io.github.flattool.Warehouse" },
+        { name: "Soplos WebApp Manager", icon: "soplos-webapps-manager.png", official: true, kind: "apt", package: "soplos-webapp-manager" },
+        { name: "Soplos AppImage Manager", icon: "soplos-appimage-manager.png", official: true, kind: "apt", package: "soplos-appimage-manager" },
+        { name: "Flatseal", icon: "flatseal.png", kind: "flatpak", flatpak: "com.github.tchx84.Flatseal" },
+        { name: "Gear Lever", icon: "gear-lever.png", kind: "flatpak", flatpak: "it.mijorus.gearlever" },
+        { name: "Warehouse", icon: "warehouse.png", kind: "flatpak", flatpak: "io.github.flattool.Warehouse" },
       ],
     },
     {
       key: "downloads",
-      title: "Downloads",
       packages: [
-        { name: "qBittorrent", icon: "qbittorrent.png", description: "Free and open-source BitTorrent client", kind: "flatpak", flatpak: "org.qbittorrent.qBittorrent" },
-        { name: "Transmission", icon: "transmission.png", description: "Lightweight and easy-to-use BitTorrent client", kind: "apt", package: "transmission-gtk" },
-        { name: "JDownloader", icon: "jdownloader.png", description: "Download manager for direct downloads, video sites and file hosts", kind: "flatpak", flatpak: "org.jdownloader.JDownloader" },
-        { name: "Syncthing Tray", icon: "syncthing.png", description: "Tray application for Syncthing — sync files between devices", kind: "flatpak", flatpak: "io.github.martchus.syncthingtray" },
+        { name: "qBittorrent", icon: "qbittorrent.png", kind: "flatpak", flatpak: "org.qbittorrent.qBittorrent" },
+        { name: "Transmission", icon: "transmission.png", kind: "apt", package: "transmission-gtk" },
+        { name: "JDownloader", icon: "jdownloader.png", kind: "flatpak", flatpak: "org.jdownloader.JDownloader" },
+        { name: "Syncthing Tray", icon: "syncthing.png", kind: "flatpak", flatpak: "io.github.martchus.syncthingtray" },
       ],
     },
     {
       key: "hardware",
-      title: "Hardware",
       packages: [
-        { name: "Resources", icon: "resources.png", description: "Modern system monitor with detailed resource usage", kind: "flatpak", flatpak: "net.nokyan.Resources" },
-        { name: "LACT", icon: "lact.png", description: "GPU control center for AMD and NVIDIA on Linux", kind: "flatpak", flatpak: "io.github.ilya_zlobintsev.LACT" },
-        { name: "CPU Power", icon: "cpupower.png", description: "Control the CPU frequency governor from a graphical interface", kind: "custom", package: "cpupower-gui", customInstall: "install_cpupower_gui", customUninstall: "uninstall_cpupower_gui" },
-        { name: "amdgpu_top", icon: "amdgpu-top.png", description: "Real-time AMD GPU usage monitor with detailed metrics", kind: "custom", package: "amdgpu-top", customInstall: "install_amdgpu_top" },
-        { name: "nvtop", icon: "nvtop.png", description: "GPU process monitor for NVIDIA, AMD and Intel", official: true, kind: "apt", package: "nvtop" },
+        { name: "Resources", icon: "resources.png", kind: "flatpak", flatpak: "net.nokyan.Resources" },
+        { name: "LACT", icon: "lact.png", kind: "flatpak", flatpak: "io.github.ilya_zlobintsev.LACT" },
+        { name: "CPU Power", icon: "cpupower.png", kind: "custom", package: "cpupower-gui", customInstall: "install_cpupower_gui", customUninstall: "uninstall_cpupower_gui" },
+        { name: "amdgpu_top", icon: "amdgpu-top.png", kind: "custom", package: "amdgpu-top", customInstall: "install_amdgpu_top" },
+        { name: "nvtop", icon: "nvtop.png", official: true, kind: "apt", package: "nvtop" },
         {
           name: "CoolerControl",
           icon: "coolercontrol.png",
-          description: "Fan and cooling control with a web interface",
-          kind: "custom",
+                    kind: "custom",
           checkPath: "~/AppImages/CoolerControlD-x86_64.AppImage",
           customInstall: "install_coolercontrol",
           customUninstall: "uninstall_coolercontrol",
@@ -206,16 +206,14 @@
     },
     {
       key: "files",
-      title: "Files",
       packages: [
-        { name: "PeaZip", icon: "peazip.png", description: "Free file archiver and extractor utility", kind: "flatpak", flatpak: "io.github.peazip.PeaZip" },
-        { name: "FileZilla", icon: "filezilla.png", description: "Fast and reliable FTP, FTPS and SFTP client", kind: "apt", package: "filezilla" },
-        { name: "GNOME Commander", icon: "gnome-commander.png", description: "Twin-panel file manager for GNOME", kind: "apt", package: "gnome-commander" },
+        { name: "PeaZip", icon: "peazip.png", kind: "flatpak", flatpak: "io.github.peazip.PeaZip" },
+        { name: "FileZilla", icon: "filezilla.png", kind: "apt", package: "filezilla" },
+        { name: "GNOME Commander", icon: "gnome-commander.png", kind: "apt", package: "gnome-commander" },
         {
           name: "Double Commander",
           icon: "doublecmd.png",
-          description: "Twin-panel file manager with advanced features",
-          kind: "custom",
+                    kind: "custom",
           checkPath: "~/AppImages/doublecmd-gtk-latest-x86_64.AppImage",
           customInstall: "install_doublecmd",
           customUninstall: "uninstall_doublecmd",
@@ -224,52 +222,48 @@
     },
     {
       key: "remotes",
-      title: "Remote Desktops",
       packages: [
-        { name: "Remmina", icon: "remmina.png", description: "Remote desktop client supporting RDP, VNC, SSH and more", official: true, kind: "flatpak", flatpak: "org.remmina.Remmina" },
-        { name: "RustDesk", icon: "rustdesk.png", description: "Open-source remote desktop software, self-hostable", kind: "flatpak", flatpak: "com.rustdesk.RustDesk" },
-        { name: "AnyDesk", icon: "anydesk.png", description: "Fast and secure remote desktop application", kind: "flatpak", flatpak: "com.anydesk.Anydesk" },
-        { name: "NoMachine", icon: "nomachine.png", description: "Remote desktop client for accessing NoMachine servers", kind: "flatpak", flatpak: "com.nomachine.nxplayer" },
+        { name: "Remmina", icon: "remmina.png", official: true, kind: "flatpak", flatpak: "org.remmina.Remmina" },
+        { name: "RustDesk", icon: "rustdesk.png", kind: "flatpak", flatpak: "com.rustdesk.RustDesk" },
+        { name: "AnyDesk", icon: "anydesk.png", kind: "flatpak", flatpak: "com.anydesk.Anydesk" },
+        { name: "NoMachine", icon: "nomachine.png", kind: "flatpak", flatpak: "com.nomachine.nxplayer" },
       ],
     },
     {
       key: "virtual",
-      title: "Virtualization",
       packages: [
         {
           name: "VirtualBox",
           icon: "virtualbox.png",
-          description: "Full-featured virtual machine hypervisor by Oracle",
-          kind: "custom",
+                    kind: "custom",
           package: "virtualbox-7.2",
           customInstall: "install_virtualbox",
           customUninstall: "uninstall_virtualbox",
-          licenseConfirm: {
-            title: "This adds two repositories to your system",
-            body: "Installing VirtualBox adds Oracle's own repository, plus Debian's trixie-security repository (needed because a dependency VirtualBox requires is no longer in this system's own suite). Both stay configured permanently after this — Uninstall removes them again. Continuing accepts this.",
-          },
+          licenseConfirm: true,
         },
         {
           name: "VirtualBox Extension Pack",
           icon: "virtualbox.png",
-          description: "USB 2.0/3.0, RDP, PXE boot and disk encryption support for VirtualBox",
-          kind: "custom",
+                    kind: "custom",
           checkPath: "/usr/lib/virtualbox/ExtensionPacks/Oracle_VirtualBox_Extension_Pack",
           customInstall: "install_vbox_extpack",
           customUninstall: "uninstall_vbox_extpack",
-          licenseConfirm: {
-            title: "Accept Oracle's license",
-            body: "The Extension Pack is distributed under Oracle's Personal Use and Evaluation License (PUEL), separate from VirtualBox's own open-source license. Continuing installs it and accepts that license.",
-          },
+          licenseConfirm: true,
         },
-        { name: "virt-manager", icon: "virtmanager.png", description: "Graphical tool for managing virtual machines via libvirt/QEMU", official: true, kind: "apt", package: "virt-manager" },
-        { name: "GNOME Boxes", icon: "gnomeboxes.png", description: "Simple virtual machine and remote desktop viewer for GNOME", official: true, kind: "apt", package: "gnome-boxes" },
+        { name: "virt-manager", icon: "virtmanager.png", official: true, kind: "apt", package: "virt-manager" },
+        { name: "GNOME Boxes", icon: "gnomeboxes.png", official: true, kind: "apt", package: "gnome-boxes" },
       ],
     },
   ];
 
   const installedMap: Record<string, boolean> = {};
   let installedVersion = 0;
+
+  // Descriptions live in the i18n dictionaries under recommended.desc.<slug>,
+  // where the slug is the lowercase app name with non-alphanumerics as "-".
+  function slug(name: string): string {
+    return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  }
 
   function pkgKey(catKey: string, pkg: RecPackage): string {
     return `${catKey}:${pkg.name}`;
@@ -315,7 +309,7 @@
     await refreshPkgStatus(catKey, pkg);
   }
 
-  let infoMessage = "";
+  let infoMessage: { key: string; name?: string } | null = null;
   let flatpakScopeChoice: { name: string; resolve: (scope: "user" | "system") => void } | null = null;
 
   function chooseFlatpakScope(name: string): Promise<"user" | "system"> {
@@ -347,7 +341,7 @@
       } else {
         const state = await api.invoke<string>("flatpak_state");
         if (state === "missing") {
-          infoMessage = `${pkg.name} is installed through Flatpak.\n\nInstall Flatpak and Flathub from the Software tab first.`;
+          infoMessage = { key: "softwareTile.flatpakMissing", name: pkg.name };
           return;
         }
         let scope: "user" | "system";
@@ -357,7 +351,7 @@
           scope = await chooseFlatpakScope(pkg.name);
         } else if (state === "system") {
           scope = "system";
-          infoMessage = `Flathub is only available system-wide on this system (this is what Bazaar does when you install it).\n\n${pkg.name} will be installed system-wide instead of just for your user.`;
+          infoMessage = { key: "softwareTile.flatpakSystemOnly", name: pkg.name };
         } else {
           scope = "user";
         }
@@ -415,7 +409,7 @@
       }
 
       await api.invoke("davinci_cleanup", { installerPath });
-      infoMessage = "DaVinci Resolve installed successfully.";
+      infoMessage = { key: "recommended.davinci.installed" };
     } finally {
       davinciBusy = false;
     }
@@ -448,7 +442,7 @@
     return categories
       .map((cat) => ({
         cat,
-        packages: q ? cat.packages.filter((p) => p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q)) : cat.packages,
+        packages: q ? cat.packages.filter((p) => p.name.toLowerCase().includes(q) || $_(`recommended.desc.${slug(p.name)}`).toLowerCase().includes(q)) : cat.packages,
       }))
       .filter((c) => c.packages.length > 0);
   })();
@@ -520,7 +514,7 @@
       } else {
         const state = await api.invoke<string>("flatpak_state");
         if (state === "missing") {
-          infoMessage = `${result.name} is installed through Flatpak.\n\nInstall Flatpak and Flathub from the Software tab first.`;
+          infoMessage = { key: "softwareTile.flatpakMissing", name: result.name };
           return;
         }
         const scope: "user" | "system" = state === "both" ? await chooseFlatpakScope(result.name) : state === "system" ? "system" : "user";
@@ -603,7 +597,7 @@
     let forcedScope: "user" | "system" | undefined;
     const needsScopeChoice = targets.some(({ catKey, pkg }) => pkg.kind === "flatpak" && pkg.flatpak && !installedMap[pkgKey(catKey, pkg)]);
     if (needsScopeChoice && (await api.invoke<string>("flatpak_state")) === "both") {
-      forcedScope = await chooseFlatpakScope(`${targets.length} selected apps`);
+      forcedScope = await chooseFlatpakScope($_("recommended.selectedCount", { values: { count: targets.length } }));
     }
 
     for (const [i, { catKey, pkg }] of targets.entries()) {
@@ -656,8 +650,8 @@
   class="relative rounded border border-border overflow-hidden mb-5 flex flex-col items-start justify-end text-left p-4 min-h-[200px]"
   style="background: linear-gradient(rgba(20, 20, 22, 0.35), rgba(20, 20, 22, 0.85)), url('/assets/hero/recommended-background.png'); background-size: cover; background-position: center;"
 >
-  <p class="text-white font-semibold text-[1rem]">Recommended for You</p>
-  <p class="text-[0.8rem] text-white/85 mt-1">Curated applications based on your desktop environment.</p>
+  <p class="text-white font-semibold text-[1rem]">{$_("recommended.hero.title")}</p>
+  <p class="text-[0.8rem] text-white/85 mt-1">{$_("recommended.hero.description")}</p>
 </div>
 
 <div class="sticky top-[-28px] z-30 bg-dark flex items-center gap-2.5 mb-4 py-2">
@@ -665,7 +659,7 @@
     <Search size={15} class="absolute left-2.5 top-1/2 -translate-y-1/2 text-text-muted" />
     <input
       type="text"
-      placeholder="Search programs... (Enter searches apt & Flathub too)"
+      placeholder={$_("recommended.searchPlaceholder")}
       bind:value={searchQuery}
       on:keydown={(e) => {
         if (e.key === "Enter") runExtendedSearch(searchQuery.trim());
@@ -679,7 +673,7 @@
       : 'border border-border text-text hover:bg-surface hover:text-text-bright'}"
     on:click={toggleBatchMode}
   >
-    {batchMode ? "Normal Mode" : "Multiple Selection"}
+    {batchMode ? $_("recommended.modeNormal") : $_("recommended.modeMultiple")}
   </button>
 </div>
 
@@ -692,8 +686,8 @@
             <img src="/assets/icons/{cat.key}/{cat.packages[0].icon}" alt="" class="w-full h-full object-contain" />
           </div>
           <div class="text-left">
-            <div class="text-text-bright font-semibold text-[0.9rem]">{cat.title}</div>
-            <div class="text-[0.75rem] text-text-muted">{packages.length} apps</div>
+            <div class="text-text-bright font-semibold text-[0.9rem]">{$_(`recommended.categories.${cat.key}`)}</div>
+            <div class="text-[0.75rem] text-text-muted">{$_("recommended.appsCount", { values: { count: packages.length } })}</div>
           </div>
         </div>
         <ChevronDown size={18} class="text-text-muted transition-transform {expanded === cat.key || batchMode || searchQuery.trim() !== "" ? 'rotate-180' : ''}" />
@@ -737,25 +731,27 @@
                   {#if pkg.kind === "flatpak"}
                     <span class="text-[0.62rem] px-1.5 py-0.5 rounded bg-surface-2 text-text-muted">Flatpak</span>
                   {/if}
-                  {#if pkg.checkPath}
+                  {#if pkg.badge}
+                    <span class="text-[0.62rem] px-1.5 py-0.5 rounded bg-surface-2 text-text-muted">{pkg.badge}</span>
+                  {:else if pkg.checkPath?.includes("AppImages")}
                     <span class="text-[0.62rem] px-1.5 py-0.5 rounded bg-surface-2 text-text-muted">AppImage</span>
                   {/if}
                   {#if pkg.official && pkg.kind === "apt"}
-                    <span class="text-[0.62rem] px-1.5 py-0.5 rounded bg-success/15 text-success">Official</span>
+                    <span class="text-[0.62rem] px-1.5 py-0.5 rounded bg-success/15 text-success">{$_("recommended.official")}</span>
                   {/if}
                 </div>
-                <p class="text-[0.72rem] text-text mt-0.5">{pkg.description}</p>
+                <p class="text-[0.72rem] text-text mt-0.5">{$_(`recommended.desc.${slug(pkg.name)}`)}</p>
                 {#if !batchMode}
                   {#if pkg.kind === "manual"}
                     {#if installed}
-                      <span class="mt-2 inline-block text-[0.68rem] px-2 py-0.5 rounded-full bg-success/15 text-success">Installed</span>
+                      <span class="mt-2 inline-block text-[0.68rem] px-2 py-0.5 rounded-full bg-success/15 text-success">{$_("drivers.badge.installed")}</span>
                     {:else}
                       <button
                         class="mt-2 px-2.5 py-1.5 rounded bg-primary hover:bg-primary-hover text-text-bright text-[0.75rem] font-semibold disabled:opacity-60"
                         disabled={davinciBusy}
                         on:click={() => togglePkg(cat.key, pkg)}
                       >
-                        {davinciBusy ? "Installing…" : "Install"}
+                        {davinciBusy ? $_("recommended.installing") : $_("common.install")}
                       </button>
                     {/if}
                   {:else}
@@ -766,7 +762,7 @@
                           class="px-2.5 py-1.5 rounded bg-primary hover:bg-primary-hover text-text-bright text-[0.75rem] font-semibold"
                           on:click={() => updateAntigravity(cat.key, pkg)}
                         >
-                          Update to {antigravityLatestVersion}
+                          {$_("recommended.updateTo", { values: { version: antigravityLatestVersion } })}
                         </button>
                       {/if}
                       <button
@@ -775,18 +771,20 @@
                           : 'bg-primary hover:bg-primary-hover text-text-bright'}"
                         on:click={() => togglePkg(cat.key, pkg)}
                       >
-                        {installed ? "Uninstall" : "Install"}
+                        {installed ? $_("common.uninstall") : $_("common.install")}
                       </button>
                     </div>
                     {#if isAntigravity && installed && antigravityInstalledVersion}
                       <p class="text-[0.65rem] text-text-muted mt-1">
-                        {antigravityUpdateAvailable ? `Installed: ${antigravityInstalledVersion}` : `Version ${antigravityInstalledVersion}`}
+                        {antigravityUpdateAvailable
+                          ? $_("recommended.installedVersion", { values: { version: antigravityInstalledVersion } })
+                          : $_("recommended.version", { values: { version: antigravityInstalledVersion } })}
                       </p>
                     {/if}
                   {/if}
                 {:else if installed}
                   <span class="inline-block mt-2 text-[0.68rem] px-2 py-0.5 rounded-full {selected.has(key) ? 'bg-danger/15 text-danger' : 'bg-success/15 text-success'}">
-                    {selected.has(key) ? "Will be uninstalled" : "Installed"}
+                    {selected.has(key) ? $_("recommended.willBeUninstalled") : $_("drivers.badge.installed")}
                   </span>
                 {/if}
               </div>
@@ -796,22 +794,22 @@
       {/if}
     </div>
   {:else}
-    <p class="text-[0.82rem] text-text-muted text-center py-10">No results found for "{searchQuery}"</p>
+    <p class="text-[0.82rem] text-text-muted text-center py-10">{$_("recommended.noResults", { values: { query: searchQuery } })}</p>
   {/each}
 </div>
 
 {#if searchQuery.trim() !== "" && !batchMode}
   <div class="bg-surface border border-border rounded p-4 mt-3.5">
     {#if searchQuery.trim().length < MIN_EXTENDED_SEARCH_LEN}
-      <p class="text-[0.75rem] text-text-muted">Keep typing, then press Enter to search apt & Flathub…</p>
+      <p class="text-[0.75rem] text-text-muted">{$_("recommended.keepTyping")}</p>
     {:else if extendedSearching}
-      <p class="text-[0.82rem] text-text-muted">Searching apt & Flathub for "{searchQuery.trim()}"…</p>
+      <p class="text-[0.82rem] text-text-muted">{$_("recommended.searching", { values: { query: searchQuery.trim() } })}</p>
     {:else if extendedSearchedFor !== searchQuery.trim()}
-      <p class="text-[0.75rem] text-text-muted">Press Enter to search apt & Flathub for "{searchQuery.trim()}"</p>
+      <p class="text-[0.75rem] text-text-muted">{$_("recommended.pressEnter", { values: { query: searchQuery.trim() } })}</p>
     {:else if extendedResults.length === 0}
-      <p class="text-[0.82rem] text-text-muted">No apt or Flathub results for "{extendedSearchedFor}".</p>
+      <p class="text-[0.82rem] text-text-muted">{$_("recommended.noExtended", { values: { query: extendedSearchedFor } })}</p>
     {:else}
-      <p class="text-[0.75rem] text-text-muted mb-3">{extendedResults.length} results from apt & Flathub for "{extendedSearchedFor}"</p>
+      <p class="text-[0.75rem] text-text-muted mb-3">{$_("recommended.extendedCount", { values: { count: extendedResults.length, query: extendedSearchedFor } })}</p>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
         {#each extendedResults as result (result.kind + result.id)}
           {@const installed = extendedInstalledVersion >= 0 && extendedInstalledMap[result.id]}
@@ -835,7 +833,7 @@
                   : 'bg-primary hover:bg-primary-hover text-text-bright'}"
                 on:click={() => toggleExtendedResult(result)}
               >
-                {installed ? "Uninstall" : "Install"}
+                {installed ? $_("common.uninstall") : $_("common.install")}
               </button>
             </div>
           </div>
@@ -848,20 +846,20 @@
 {#if batchMode}
   <div class="fixed bottom-0 left-0 right-0 bg-surface border-t border-border px-6 py-3 flex items-center gap-3 z-40">
     <button class="px-3 py-1.5 rounded border border-border text-text hover:bg-surface-2 text-[0.78rem]" on:click={selectAll}>
-      Select All
+      {$_("recommended.selectAll")}
     </button>
     <button class="px-3 py-1.5 rounded border border-border text-text hover:bg-surface-2 text-[0.78rem]" on:click={deselectAll}>
-      Deselect All
+      {$_("recommended.deselectAll")}
     </button>
     <span class="flex-1 text-center text-[0.8rem] text-text-muted">
-      {selected.size} {selected.size === 1 ? "program" : "programs"} selected
+      {$_("recommended.selectedCount", { values: { count: selected.size } })}
     </span>
     <button
       class="px-4 py-1.5 rounded bg-primary hover:bg-primary-hover text-text-bright text-[0.82rem] font-semibold disabled:opacity-50"
       disabled={selected.size === 0 || batchBusy}
       on:click={applyToSelected}
     >
-      {batchBusy ? "Working…" : "Apply to Selected"}
+      {batchBusy ? $_("gaming.working") : $_("recommended.applySelected")}
     </button>
   </div>
 {/if}
@@ -873,7 +871,7 @@
         class="px-3 py-1.5 rounded border border-border text-text hover:bg-surface hover:text-text-bright text-[0.78rem] transition-colors"
         on:click={() => ($terminalExpanded = !$terminalExpanded)}
       >
-        {$terminalExpanded ? "Hide output" : "Show output"}
+        {$terminalExpanded ? $_("common.hideOutput") : $_("common.showOutput")}
       </button>
     </div>
     <TerminalOutput fullWidth />
@@ -881,188 +879,72 @@
 {/if}
 
 {#if infoMessage}
-  <div
-    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-    role="button"
-    tabindex="-1"
-    on:click={() => (infoMessage = "")}
-    on:keydown={(e) => { if (e.key === "Escape" || (e.key === "Enter" && e.target === e.currentTarget)) infoMessage = ""; }}
-  >
-    <div class="w-full max-w-[400px] bg-surface border border-border rounded p-4 flex flex-col gap-3 shadow-lg" role="presentation" on:click|stopPropagation>
-      <p class="text-[0.85rem] text-text-bright whitespace-pre-line">{infoMessage}</p>
-      <button
-        class="bg-primary hover:bg-primary-hover text-text-bright px-3 py-1.5 rounded text-[0.82rem] font-semibold self-end"
-        use:autofocus
-          on:click={() => (infoMessage = "")}
-      >
-        OK
-      </button>
-    </div>
-  </div>
+  <Modal variant="info" maxWidth={420} onClose={() => (infoMessage = null)}>
+    <p class="whitespace-pre-line">{$_(infoMessage.key, { values: { name: infoMessage.name ?? "" } })}</p>
+  </Modal>
 {/if}
 
 {#if flatpakScopeChoice}
-  <div
-    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-    role="button"
-    tabindex="-1"
-    on:click={() => (flatpakScopeChoice = null)}
-    on:keydown={(e) => e.key === "Escape" && (flatpakScopeChoice = null)}
-  >
-    <div
-      class="w-full max-w-[400px] bg-surface border border-border rounded p-4 flex flex-col gap-3 shadow-lg"
-      role="presentation"
-      on:click|stopPropagation
-    >
-      <h3 class="text-text-bright font-semibold text-[0.9rem]">Install {flatpakScopeChoice.name}</h3>
-      <p class="text-[0.8rem] text-text-muted">
-        Flathub is available both for your user and system-wide on this machine. Where do you want to install it?
-      </p>
-      <div class="flex flex-col gap-2">
-        <button
-          class="px-3 py-2 rounded border border-border text-text hover:bg-surface-2 text-[0.82rem] font-semibold text-left"
-          use:autofocus
-          on:click={() => {
-            flatpakScopeChoice?.resolve("user");
-            flatpakScopeChoice = null;
-          }}
-        >
-          Just for me
-          <span class="block text-[0.7rem] text-text-muted font-normal">Installed for your user only, no password needed.</span>
-        </button>
-        <button
-          class="px-3 py-2 rounded border border-border text-text hover:bg-surface-2 text-[0.82rem] font-semibold text-left"
-          on:click={() => {
-            flatpakScopeChoice?.resolve("system");
-            flatpakScopeChoice = null;
-          }}
-        >
-          For all users
-          <span class="block text-[0.7rem] text-text-muted font-normal">Installed system-wide, requires your password.</span>
-        </button>
-      </div>
-    </div>
-  </div>
+  <FlatpakScopeModal
+    name={flatpakScopeChoice.name}
+    onChoose={(scope) => {
+      flatpakScopeChoice?.resolve(scope);
+      flatpakScopeChoice = null;
+    }}
+    onClose={() => (flatpakScopeChoice = null)}
+  />
 {/if}
 
 {#if davinciConfirmOpen}
-  <div
-    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-    role="button"
-    tabindex="-1"
-    on:click={() => (davinciConfirmOpen = false)}
-    on:keydown={(e) => { if (e.key === "Escape") davinciConfirmOpen = false; else if (e.key === "Enter" && e.target === e.currentTarget) startDavinciInstall(); }}
+  <Modal
+    variant="confirm"
+    title={$_("recommended.davinci.title")}
+    confirmLabel={$_("kernels.continue")}
+    onClose={() => (davinciConfirmOpen = false)}
+    onConfirm={startDavinciInstall}
   >
-    <div class="w-full max-w-[440px] bg-surface border border-border rounded p-4 flex flex-col gap-3 shadow-lg" role="presentation" on:click|stopPropagation>
-      <h3 class="text-text-bright font-semibold text-[0.9rem]">DaVinci Resolve Installation</h3>
-      <p class="text-[0.8rem] text-text-muted whitespace-pre-line">
-        DaVinci Resolve requires manual download due to licensing.
-
-        1. Go to blackmagicdesign.com and download the Linux version (ZIP).
-        2. Click Continue to select the downloaded file.
-        3. We will convert it to a Debian package and install it.
-      </p>
-      <div class="flex justify-end gap-2">
-        <button
-          class="px-3 py-1.5 rounded border border-border text-text hover:bg-surface-2 text-[0.82rem]"
-          on:click={() => (davinciConfirmOpen = false)}
-        >
-          Cancel
-        </button>
-        <button
-          class="bg-primary hover:bg-primary-hover text-text-bright px-3 py-1.5 rounded text-[0.82rem] font-semibold"
-          use:autofocus
-          on:click={startDavinciInstall}
-        >
-          Continue
-        </button>
-      </div>
-    </div>
-  </div>
+    <p class="whitespace-pre-line text-text-muted">{$_("recommended.davinci.body")}</p>
+  </Modal>
 {/if}
 
 {#if licenseConfirmTarget}
-  <div
-    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-    role="button"
-    tabindex="-1"
-    on:click={() => (licenseConfirmTarget = null)}
-    on:keydown={(e) => { if (e.key === "Escape") licenseConfirmTarget = null; else if (e.key === "Enter" && e.target === e.currentTarget) confirmLicenseInstall(); }}
+  <Modal
+    variant="warning"
+    title={$_(`recommended.license.${slug(licenseConfirmTarget.pkg.name)}.title`)}
+    confirmLabel={$_("recommended.license.acceptInstall")}
+    onClose={() => (licenseConfirmTarget = null)}
+    onConfirm={confirmLicenseInstall}
   >
-    <div class="w-full max-w-[440px] bg-surface border border-border rounded p-4 flex flex-col gap-3 shadow-lg" role="presentation" on:click|stopPropagation>
-      <h3 class="text-text-bright font-semibold text-[0.9rem]">{licenseConfirmTarget.pkg.licenseConfirm?.title}</h3>
-      <p class="text-[0.8rem] text-text-muted">{licenseConfirmTarget.pkg.licenseConfirm?.body}</p>
-      <div class="flex justify-end gap-2">
-        <button
-          class="px-3 py-1.5 rounded border border-border text-text hover:bg-surface-2 text-[0.82rem]"
-          on:click={() => (licenseConfirmTarget = null)}
-        >
-          Cancel
-        </button>
-        <button
-          class="bg-primary hover:bg-primary-hover text-text-bright px-3 py-1.5 rounded text-[0.82rem] font-semibold"
-          use:autofocus
-          on:click={confirmLicenseInstall}
-        >
-          Accept and install
-        </button>
-      </div>
-    </div>
-  </div>
+    <p class="text-text-muted">{$_(`recommended.license.${slug(licenseConfirmTarget.pkg.name)}.body`)}</p>
+  </Modal>
 {/if}
 
 {#if davinciPatchesOpen}
-  <div
-    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-    role="button"
-    tabindex="-1"
-    on:click={() => confirmDavinciPatches(false)}
-    on:keydown={(e) => { if (e.key === "Escape") confirmDavinciPatches(false); else if (e.key === "Enter" && e.target === e.currentTarget) confirmDavinciPatches(true); }}
+  <Modal
+    variant="confirm"
+    maxWidth={480}
+    title={$_("recommended.davinci.patchesTitle")}
+    confirmLabel={$_("recommended.davinci.apply")}
+    cancelLabel={$_("recommended.davinci.skip")}
+    onClose={() => confirmDavinciPatches(false)}
+    onConfirm={() => confirmDavinciPatches(true)}
   >
-    <div
-      class="w-full max-w-[460px] bg-surface border border-border rounded p-4 flex flex-col gap-3 shadow-lg"
-      role="presentation"
-      on:click|stopPropagation
-    >
-      <h3 class="text-text-bright font-semibold text-[0.9rem]">Optional Patches for DaVinci Resolve</h3>
-      <p class="text-[0.8rem] text-text-muted">
-        DaVinci Resolve is installed. The following optional patches can fix common issues on certain hardware. Select the
-        ones you want to apply:
-      </p>
-      <label class="flex items-start gap-2 text-[0.8rem] text-text-bright">
-        <input type="checkbox" class="mt-0.5" bind:checked={davinciApplyMic} />
+    <p class="text-text-muted mb-3">{$_("recommended.davinci.patchesIntro")}</p>
+    <div class="flex flex-col gap-2.5">
+      <label class="flex items-start gap-2.5 px-3 py-2.5 rounded-lg border border-border cursor-pointer hover:border-primary/50 {davinciApplyMic ? 'border-primary bg-primary/5' : ''}">
+        <input type="checkbox" class="mt-1" bind:checked={davinciApplyMic} />
         <span>
-          Virtual microphone
-          <span class="block text-[0.7rem] text-text-muted font-normal">
-            Creates a virtual PipeWire microphone so DaVinci Resolve can start when no physical capture device is present.
-          </span>
+          <span class="block text-[0.85rem] font-semibold text-text-bright">{$_("recommended.davinci.micTitle")}</span>
+          <span class="block text-[0.75rem] text-text-muted">{$_("recommended.davinci.micHint")}</span>
         </span>
       </label>
-      <label class="flex items-start gap-2 text-[0.8rem] text-text-bright">
-        <input type="checkbox" class="mt-0.5" bind:checked={davinciApplyGpu} />
+      <label class="flex items-start gap-2.5 px-3 py-2.5 rounded-lg border border-border cursor-pointer hover:border-primary/50 {davinciApplyGpu ? 'border-primary bg-primary/5' : ''}">
+        <input type="checkbox" class="mt-1" bind:checked={davinciApplyGpu} />
         <span>
-          Integrated GPU patch (AMD / Intel iGPU, mini PCs)
-          <span class="block text-[0.7rem] text-text-muted font-normal">
-            Installs OpenCL drivers, firmware and patches the launcher so DaVinci Resolve works on integrated AMD or Intel
-            graphics.
-          </span>
+          <span class="block text-[0.85rem] font-semibold text-text-bright">{$_("recommended.davinci.gpuTitle")}</span>
+          <span class="block text-[0.75rem] text-text-muted">{$_("recommended.davinci.gpuHint")}</span>
         </span>
       </label>
-      <div class="flex justify-end gap-2">
-        <button
-          class="px-3 py-1.5 rounded border border-border text-text hover:bg-surface-2 text-[0.82rem]"
-          on:click={() => confirmDavinciPatches(false)}
-        >
-          Skip
-        </button>
-        <button
-          class="bg-primary hover:bg-primary-hover text-text-bright px-3 py-1.5 rounded text-[0.82rem] font-semibold"
-          use:autofocus
-          on:click={() => confirmDavinciPatches(true)}
-        >
-          Apply Selected
-        </button>
-      </div>
     </div>
-  </div>
+  </Modal>
 {/if}

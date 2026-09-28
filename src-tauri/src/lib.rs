@@ -179,6 +179,8 @@ pub fn run() {
             commands::recommended::uninstall_waydroid,
             commands::recommended::install_geforcenow,
             commands::recommended::uninstall_geforcenow,
+            commands::recommended::install_patchy,
+            commands::recommended::uninstall_patchy,
             commands::recommended::install_esde,
             commands::recommended::uninstall_esde,
             commands::recommended::link_ppsspp_lutris_runner,

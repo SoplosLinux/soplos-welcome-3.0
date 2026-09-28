@@ -66,9 +66,15 @@
   </developer>
 
   <releases>
-    <release version="3.0.0-alpha" date="2026-09-17">
+    <release version="3.0.0-beta" date="2026-09-28">
       <description>
-        <p>First alpha of the Tauri-based rewrite of Soplos Welcome.</p>
+        <p>First beta of the Tauri-based rewrite of Soplos Welcome.</p>
+        <ul>
+          <li>Interface available in English, Spanish, German, French, Italian, Portuguese, Romanian and Russian</li>
+          <li>New popup dialogs and faster Drivers, Security and Gaming sections</li>
+          <li>About 100 recommended applications, including Patchy, Fog Panther, WhatsApp and Telegram</li>
+          <li>System cleaning now keeps the Flatpak runtimes still in use</li>
+        </ul>
       </description>
     </release>
   </releases>

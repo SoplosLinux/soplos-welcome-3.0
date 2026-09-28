@@ -102,7 +102,7 @@
         on:click={openAbout}
         title={$_("sidebar.aboutTooltip")}
       >
-        Soplos Welcome · 3.0.0-alpha
+        Soplos Welcome · 3.0.0-beta
       </button>
     </div>
   </div>

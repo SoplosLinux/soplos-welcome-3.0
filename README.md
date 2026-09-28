@@ -1,29 +1,34 @@
 # Soplos Welcome 3.0
 
-Rewrite in Tauri 2 + Rust + Svelte, following `Soplos-Welcome-3.0-Informe-Tecnico.md`.
+Welcome and system setup application for Soplos Linux.
 
-Status: Fase 0 (scaffolding) done. Builds and runs.
+It gives you one place to update the system, install drivers and kernels, harden security, pick applications, tune the desktop and optimize the machine for gaming.
 
-## Getting started
+## Installation
 
-```bash
-npm install
-npm run tauri dev
-```
-
-### Blank white window on a VM (VMware/VirtualBox)
-
-WebKitGTK's DMA-BUF renderer can fail silently on virtual GPUs, leaving the window blank with no error. `main.rs` detects virtualization (DMI vendor/product strings, falling back to `systemd-detect-virt`) and sets `WEBKIT_DISABLE_DMABUF_RENDERER=1` automatically before the webview starts, so this should never surface at runtime — Soplos ISOs are used both on bare metal and in VMs. If a new virtualization platform ever slips past the detection, the manual workaround is still:
+Soplos Welcome comes preinstalled on Soplos Linux. If you need to install it again:
 
 ```bash
-WEBKIT_DISABLE_DMABUF_RENDERER=1 npm run tauri dev
+sudo apt install soplos-welcome
 ```
 
-## Before building
+Open it from the applications menu, or press F1 inside the application to see the About dialog. Tasks that need administrator rights ask for your password through pkexec.
 
-- Install the Rust toolchain and Tauri's system dependencies (WebKitGTK, etc.) if not already present.
+## Sections
 
-## Structure
+- **Home**: system overview and quick links.
+- **Software**: APT, Flatpak (user, system or both scopes), Snap and Flathub management, system update and upgrade, and system cleaning that keeps the Flatpak runtimes still in use (VAAPI, GL and NVIDIA extensions).
+- **Drivers**: GPU, Wi-Fi and hardware detection with NVIDIA, CUDA, ROCm and oneAPI installers, VirtualBox guest additions and Wi-Fi repair.
+- **Kernels**: Soplos kernels repository, XanMod and Liquorix, kernel cleanup and a shortcut to Soplos Kernel Installer.
+- **Security**: firewall (UFW), antivirus and rootkit scans, VPN and network tools.
+- **Recommended**: about 100 curated applications in 12 categories, single or multiple selection, and extended search across APT and Flathub.
+- **Customization**: desktop tools for Xfce, GNOME and KDE, wallpapers and font rendering.
+- **Gaming**: launchers, performance mode, sysctl, GPU and disk I/O optimizations, MangoHud, Lutris fixes and one-click revert.
 
-- `src-tauri/` — Rust backend (commands, services, privilege escalation).
-- `src/` — Svelte + Tailwind frontend. Only the Home view has real content; the rest are placeholders for Fases 2-4.
+## Languages
+
+The interface is available in English, Spanish, German, French, Italian, Portuguese, Romanian and Russian. It starts in the system language and falls back to English. The language can be changed at any time from the sidebar.
+
+## License
+
+GPL-3.0-or-later. See `LICENSE`.

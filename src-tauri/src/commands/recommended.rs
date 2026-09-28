@@ -395,6 +395,37 @@ pub fn uninstall_geforcenow() -> u64 {
     start_job("bash", vec!["-c".to_string(), "flatpak uninstall --user -y com.nvidia.geforcenow".to_string()])
 }
 
+// Patchy is only published as a standalone .flatpak bundle on GitHub, not on
+// Flathub. Installed for the user (like GeForce NOW above); its runtime is
+// pulled from Flathub, so a user remote is added only when no Flathub remote
+// exists in ANY scope — adding a second one when a system remote is already
+// there is what makes flatpak hang asking which one to use.
+#[tauri::command]
+pub fn install_patchy() -> u64 {
+    start_job(
+        "bash",
+        vec![
+            "-c".to_string(),
+            format!(
+                r#"{VERIFY_DOWNLOAD_SH}
+if ! flatpak remotes --columns=name | grep -qx flathub; then
+  flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+fi
+echo "Downloading Patchy..."
+verify_and_download "https://github.com/SethRobinson/Patchy/releases/download/v1.00/PatchyLinux.flatpak" /tmp/PatchyLinux.flatpak
+flatpak install --user -y --noninteractive --bundle /tmp/PatchyLinux.flatpak
+rm -f /tmp/PatchyLinux.flatpak
+echo "Patchy installed.""#
+            ),
+        ],
+    )
+}
+
+#[tauri::command]
+pub fn uninstall_patchy() -> u64 {
+    start_job("bash", vec!["-c".to_string(), "flatpak uninstall --user -y com.rtsoft.patchy".to_string()])
+}
+
 const ESDE_DESKTOP_ENTRY: &str = "[Desktop Entry]\nName=ES-DE\nExec=%HOME%/AppImages/ES-DE_x64.AppImage\nIcon=%HOME%/AppImages/.icons/es-de.png\nType=Application\nCategories=Game;\nComment=Frontend for emulators with a modern interface\nX-AppImage-Integrate=true\n";
 
 #[tauri::command]
