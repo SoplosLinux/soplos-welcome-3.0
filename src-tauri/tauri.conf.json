@@ -1,0 +1,76 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "soplos-welcome",
+  "version": "3.0.0-alpha",
+  "identifier": "org.soploslinux.welcome",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build",
+    "devUrl": "http://localhost:1420",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Soplos Welcome",
+        "width": 1100,
+        "height": 720,
+        "minWidth": 900,
+        "minHeight": 600,
+        "resizable": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["deb"],
+    "publisher": "Sergi Perich",
+    "homepage": "https://soplos.org",
+    "copyright": "Copyright © 2026 Sergi Perich",
+    "license": "GPL-3.0-or-later",
+    "licenseFile": "../LICENSE",
+    "category": "Utility",
+    "shortDescription": "Welcome screen for Soplos Linux",
+    "longDescription": "A welcome application for new users of Soplos Linux. Provides easy access to common system configuration and software installation tasks.",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.png"
+    ],
+    "resources": [
+      "resources/vbox/VBoxLinuxAdditions.run",
+      "resources/wallpapers/wallpapers.tar.xz",
+      "resources/davinci/makeresolvedeb_1.10.1_multi.sh",
+      "resources/appimage-icons/affinity.png",
+      "resources/appimage-icons/es-de.png",
+      "resources/appimage-icons/coolercontrol.png",
+      "resources/appimage-icons/doublecmd.png",
+      "resources/appimage-icons/whatsapp.png"
+    ],
+    "linux": {
+      "deb": {
+        "section": "utils",
+        "priority": "optional",
+        "depends": ["curl", "wget", "pkexec | policykit-1"],
+        "desktopTemplate": "resources/debian/soplos-welcome.desktop.hbs",
+        "files": {
+          "/usr/share/polkit-1/actions/org.soploslinux.welcome.policy": "resources/polkit/org.soploslinux.welcome.policy",
+          "/usr/share/metainfo/org.soploslinux.welcome.metainfo.xml": "resources/appstream/org.soploslinux.welcome.metainfo.xml",
+          "/usr/share/doc/soplos-welcome/copyright": "resources/debian/copyright",
+          "/usr/share/doc/soplos-welcome/screenshots/screenshot01.png": "../public/assets/screenshots/screenshot01.png",
+          "/usr/share/doc/soplos-welcome/screenshots/screenshot02.png": "../public/assets/screenshots/screenshot02.png",
+          "/usr/share/doc/soplos-welcome/screenshots/screenshot03.png": "../public/assets/screenshots/screenshot03.png",
+          "/usr/share/doc/soplos-welcome/screenshots/screenshot04.png": "../public/assets/screenshots/screenshot04.png",
+          "/usr/share/doc/soplos-welcome/screenshots/screenshot05.png": "../public/assets/screenshots/screenshot05.png",
+          "/usr/share/doc/soplos-welcome/screenshots/screenshot06.png": "../public/assets/screenshots/screenshot06.png",
+          "/usr/share/doc/soplos-welcome/screenshots/screenshot07.png": "../public/assets/screenshots/screenshot07.png",
+          "/usr/share/doc/soplos-welcome/screenshots/screenshot08.png": "../public/assets/screenshots/screenshot08.png"
+        }
+      }
+    }
+  }
+}

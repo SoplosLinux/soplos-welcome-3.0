@@ -1,0 +1,42 @@
+[package]
+name = "soplos-welcome"
+version = "3.0.0-alpha"
+description = "Soplos Welcome"
+authors = ["Sergi Perich <info@soploslinux.com>"]
+license = "GPL-3.0-or-later"
+edition = "2021"
+
+[lib]
+name = "soplos_welcome_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+# No "devtools" feature here: Tauri already enables the inspector
+# automatically on debug builds (cfg(debug_assertions)); declaring the
+# feature would force it on in release builds too.
+tauri = { version = "2", features = [] }
+tauri-plugin-shell = "2"
+tauri-plugin-dialog = "2"
+tauri-plugin-single-instance = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+# For Recommended's extended apt/Flathub search: Debian's own package icons
+# (DEP-11 AppStream data, already downloaded locally by apt) ship as JPEG
+# XL, which WebKitGTK can't render in an <img> tag — jxl-oxide decodes them
+# in pure Rust (no system libjxl needed) so they can be re-encoded as PNG.
+jxl-oxide = "0.12"
+image = { version = "0.25", default-features = false, features = ["png"] }
+flate2 = "1"
+tar = "0.4"
+base64 = "0.23"
+ureq = "3"
+
+[profile.release]
+panic = "abort"
+codegen-units = 1
+lto = true
+opt-level = "s"
+strip = true

@@ -1,0 +1,282 @@
+// Software-center-style search across apt and Flathub — separate from
+// Recommended's local ~100-app catalog filter, this queries the system's
+// real package databases. Both search commands build Command::args() (never
+// a shell string), so the query never needs shell-injection validation —
+// there's no shell to break out of.
+
+use std::collections::{HashMap, HashSet};
+use std::fs::File;
+use std::io::Read;
+use std::process::Command;
+use std::sync::{Mutex, OnceLock};
+
+use base64::Engine;
+use serde::Serialize;
+
+#[derive(Serialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct SearchResult {
+    pub name: String,
+    pub id: String,
+    pub description: String,
+    pub kind: String,
+    pub icon: Option<String>,
+}
+
+const MAX_RESULTS: usize = 40;
+const APT_LISTS_DIR: &str = "/var/lib/apt/lists";
+
+// === apt icons: Debian's DEP-11 AppStream data, already downloaded locally
+// by apt update, ships icons as JPEG XL — jxl-oxide decodes them in pure
+// Rust (verified against a real icon extracted from this exact system
+// before writing this) since WebKitGTK can't render JXL in an <img> tag. ===
+
+// Decompressing every *_dep11_Components-*.yml.gz (tens of MB of YAML) and
+// decoding each JXL icon is expensive enough that redoing it on every
+// keystroke-triggered search made the UI stutter — both caches below are
+// built at most once per process lifetime and reused for every later search.
+static ICON_NAME_MAP: OnceLock<HashMap<String, String>> = OnceLock::new();
+static ICON_DATA_CACHE: OnceLock<Mutex<HashMap<String, String>>> = OnceLock::new();
+
+fn icon_name_map() -> &'static HashMap<String, String> {
+    ICON_NAME_MAP.get_or_init(build_dep11_icon_name_map)
+}
+
+/// Scans every *_dep11_Components-*.yml.gz once and returns a map of
+/// {package name -> icon filename (e.g. "vlc_vlc.jxl")} for every package
+/// that has one, so a 40-result search only decompresses each multi-MB
+/// file once instead of once per package.
+fn build_dep11_icon_name_map() -> HashMap<String, String> {
+    let mut map = HashMap::new();
+    let Ok(entries) = std::fs::read_dir(APT_LISTS_DIR) else {
+        return map;
+    };
+    for entry in entries.flatten() {
+        let path = entry.path();
+        let Some(name) = path.file_name().and_then(|n| n.to_str()) else {
+            continue;
+        };
+        if !name.contains("dep11_Components") || !name.ends_with(".yml.gz") {
+            continue;
+        }
+        let Ok(file) = File::open(&path) else { continue };
+        let mut decoder = flate2::read::GzDecoder::new(file);
+        let mut content = String::new();
+        if decoder.read_to_string(&mut content).is_err() {
+            continue;
+        }
+        // DEP-11 stanzas are separated by a line containing only "---".
+        for stanza in content.split("\n---\n") {
+            let Some(pkg_line) = stanza.lines().find(|l| l.starts_with("Package: ")) else {
+                continue;
+            };
+            let package = pkg_line.trim_start_matches("Package: ").trim();
+            if map.contains_key(package) {
+                continue;
+            }
+            // Only the first "name:" line under the "cached:" icon block —
+            // good enough, we only need one filename per package.
+            if let Some(cached_idx) = stanza.find("cached:") {
+                let after = &stanza[cached_idx..];
+                if let Some(name_idx) = after.find("name:") {
+                    let line = &after[name_idx + "name:".len()..];
+                    let filename = line.lines().next().unwrap_or("").trim();
+                    if !filename.is_empty() {
+                        map.insert(package.to_string(), filename.to_string());
+                    }
+                }
+            }
+        }
+    }
+    map
+}
+
+/// Resolves the requested icon filenames to PNG data URIs, decoding each one
+/// at most once per process lifetime — a cache hit skips both the tarball
+/// scan and the JXL decode entirely.
+fn resolve_icons(wanted: &HashSet<&str>) -> HashMap<String, String> {
+    let cache = ICON_DATA_CACHE.get_or_init(|| Mutex::new(HashMap::new()));
+    let mut result = HashMap::new();
+    let mut missing: HashSet<&str> = HashSet::new();
+    {
+        let cached = cache.lock().unwrap();
+        for &filename in wanted {
+            match cached.get(filename) {
+                Some(data_uri) => {
+                    result.insert(filename.to_string(), data_uri.clone());
+                }
+                None => {
+                    missing.insert(filename);
+                }
+            }
+        }
+    }
+    if missing.is_empty() {
+        return result;
+    }
+    let decoded = extract_and_decode_icons(&missing);
+    let mut cached = cache.lock().unwrap();
+    for (filename, data_uri) in decoded {
+        cached.insert(filename.clone(), data_uri.clone());
+        result.insert(filename, data_uri);
+    }
+    result
+}
+
+/// Extracts only the requested icon filenames from every *_dep11_icons-64x64.tar.gz,
+/// decoding each JXL to a PNG data URI. One pass per tarball regardless of
+/// how many of `wanted` filenames it actually contains.
+fn extract_and_decode_icons(wanted: &HashSet<&str>) -> HashMap<String, String> {
+    let mut result = HashMap::new();
+    if wanted.is_empty() {
+        return result;
+    }
+    let Ok(entries) = std::fs::read_dir(APT_LISTS_DIR) else {
+        return result;
+    };
+    for entry in entries.flatten() {
+        let path = entry.path();
+        let Some(name) = path.file_name().and_then(|n| n.to_str()) else {
+            continue;
+        };
+        if !name.contains("dep11_icons-64x64.tar.gz") {
+            continue;
+        }
+        let Ok(file) = File::open(&path) else { continue };
+        let decoder = flate2::read::GzDecoder::new(file);
+        let mut archive = tar::Archive::new(decoder);
+        let Ok(tar_entries) = archive.entries() else { continue };
+        for tar_entry in tar_entries.flatten() {
+            let mut tar_entry = tar_entry;
+            let Ok(entry_path) = tar_entry.path().map(|p| p.into_owned()) else { continue };
+            let Some(filename) = entry_path.file_name().and_then(|n| n.to_str()) else {
+                continue;
+            };
+            if result.contains_key(filename) || !wanted.contains(filename) {
+                continue;
+            }
+            let mut jxl_bytes = Vec::new();
+            if tar_entry.read_to_end(&mut jxl_bytes).is_err() {
+                continue;
+            }
+            if let Some(data_uri) = decode_jxl_to_png_data_uri(&jxl_bytes) {
+                result.insert(filename.to_string(), data_uri);
+            }
+        }
+    }
+    result
+}
+
+fn decode_jxl_to_png_data_uri(jxl_bytes: &[u8]) -> Option<String> {
+    let image = jxl_oxide::JxlImage::builder().read(jxl_bytes).ok()?;
+    let render = image.render_frame(0).ok()?;
+    let fb = render.image_all_channels();
+    let width = fb.width() as u32;
+    let height = fb.height() as u32;
+    let channels = fb.channels();
+    if width == 0 || height == 0 || channels == 0 {
+        return None;
+    }
+    let buf = fb.buf();
+    let mut rgba = Vec::with_capacity((width * height * 4) as usize);
+    for px in buf.chunks(channels) {
+        let r = (px[0].clamp(0.0, 1.0) * 255.0) as u8;
+        let g = (px.get(1).copied().unwrap_or(px[0]).clamp(0.0, 1.0) * 255.0) as u8;
+        let b = (px.get(2).copied().unwrap_or(px[0]).clamp(0.0, 1.0) * 255.0) as u8;
+        let a = (px.get(3).copied().unwrap_or(1.0).clamp(0.0, 1.0) * 255.0) as u8;
+        rgba.extend_from_slice(&[r, g, b, a]);
+    }
+    let img_buf = image::RgbaImage::from_raw(width, height, rgba)?;
+    let mut png_bytes = Vec::new();
+    img_buf
+        .write_to(&mut std::io::Cursor::new(&mut png_bytes), image::ImageFormat::Png)
+        .ok()?;
+    Some(format!("data:image/png;base64,{}", base64::engine::general_purpose::STANDARD.encode(&png_bytes)))
+}
+
+// === Flathub icons: their own API gives a direct PNG URL per app id — no
+// decoding needed, the frontend's <img> tag can load it straight away. ===
+
+fn resolve_flatpak_icon(app_id: &str) -> Option<String> {
+    let url = format!("https://flathub.org/api/v2/appstream/{app_id}");
+    let mut response = ureq::get(&url).call().ok()?;
+    let bytes = response.body_mut().read_to_vec().ok()?;
+    let json: serde_json::Value = serde_json::from_slice(&bytes).ok()?;
+    json.get("icon")?.as_str().map(|s| s.to_string())
+}
+
+#[tauri::command]
+pub fn search_apt(query: String) -> Vec<SearchResult> {
+    let query = query.trim();
+    if query.is_empty() {
+        return vec![];
+    }
+    let output = match Command::new("apt-cache").args(["search", "--names-only", query]).output() {
+        Ok(o) if o.status.success() => o,
+        _ => return vec![],
+    };
+    let mut results: Vec<SearchResult> = String::from_utf8_lossy(&output.stdout)
+        .lines()
+        .filter_map(|line| {
+            let (name, description) = line.split_once(" - ")?;
+            Some(SearchResult {
+                name: name.trim().to_string(),
+                id: name.trim().to_string(),
+                description: description.trim().to_string(),
+                kind: "apt".to_string(),
+                icon: None,
+            })
+        })
+        .take(MAX_RESULTS)
+        .collect();
+
+    let name_map = icon_name_map();
+    let wanted: HashSet<&str> = results.iter().filter_map(|r| name_map.get(&r.id).map(|s| s.as_str())).collect();
+    let icon_data = resolve_icons(&wanted);
+    for r in &mut results {
+        if let Some(filename) = name_map.get(&r.id) {
+            r.icon = icon_data.get(filename).cloned();
+        }
+    }
+    results
+}
+
+#[tauri::command]
+pub fn search_flatpak(query: String) -> Vec<SearchResult> {
+    let query = query.trim();
+    if query.is_empty() {
+        return vec![];
+    }
+    let output = match Command::new("flatpak")
+        .args(["search", query, "--columns=name,application,description"])
+        .output()
+    {
+        Ok(o) if o.status.success() => o,
+        _ => return vec![],
+    };
+    let mut results: Vec<SearchResult> = String::from_utf8_lossy(&output.stdout)
+        .lines()
+        .filter_map(|line| {
+            let mut parts = line.split('\t');
+            let name = parts.next()?.trim().to_string();
+            let id = parts.next()?.trim().to_string();
+            let description = parts.next().unwrap_or("").trim().to_string();
+            if name.is_empty() || id.is_empty() || id == "-" {
+                return None;
+            }
+            Some(SearchResult {
+                name,
+                id,
+                description,
+                kind: "flatpak".to_string(),
+                icon: None,
+            })
+        })
+        .take(MAX_RESULTS)
+        .collect();
+
+    for r in &mut results {
+        r.icon = resolve_flatpak_icon(&r.id);
+    }
+    results
+}

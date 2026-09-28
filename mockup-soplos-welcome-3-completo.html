@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Soplos Welcome 3.0 — Mockup Completo</title>
+  <style>
+    /* ============================================================
+       SOPLOS WELCOME 3.0 — Mockup completo
+       Colores oficiales extraídos de soplos.org/styles/styles.css
+       ============================================================ */
+    :root {
+      --primary: #ff7d2e;
+      --primary-hover: #e66a1f;
+      --secondary: #fec431;
+      --accent: #ef5a33;
+      --dark: #252527;
+      --surface: #2c2c2e;
+      --surface-2: #353538;
+      --border: #3d3d40;
+      --text: #c0c0c0;
+      --text-bright: #ffffff;
+      --text-muted: #888888;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --radius: 8px;
+      --shadow: 0 5px 15px rgba(0, 0, 0, 0.25);
+      --transition: all 0.2s ease;
+      --font: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: var(--font);
+      background: var(--dark);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* ---------- Sidebar ---------- */
+    .sidebar {
+      width: 230px;
+      background: #1e1e20;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 18px 10px;
+      flex-shrink: 0;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 6px 12px 22px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--text-bright);
+    }
+
+    .logo-mark {
+      width: 34px;
+      height: 34px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: var(--dark);
+    }
+
+    .nav {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      flex: 1;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: var(--radius);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: var(--transition);
+      font-size: 0.92rem;
+      user-select: none;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+      font-family: inherit;
+    }
+
+    .nav-item:hover {
+      background: var(--surface);
+      color: var(--text-bright);
+    }
+
+    .nav-item.active {
+      background: rgba(255, 125, 46, 0.15);
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .nav-item .icon {
+      width: 20px;
+      text-align: center;
+      font-size: 1.05rem;
+    }
+
+    .sidebar-footer {
+      padding: 12px 10px 4px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+      margin-top: 12px;
+    }
+
+    /* ---------- Main ---------- */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-width: 0;
+    }
+
+    .header {
+      padding: 16px 28px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+      background: #1e1e20;
+    }
+
+    .header h1 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-bright);
+    }
+
+    .header-actions { display: flex; gap: 10px; }
+
+    .btn {
+      padding: 8px 16px;
+      border-radius: var(--radius);
+      border: none;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: inherit;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: var(--text-bright);
+    }
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow);
+    }
+
+    .btn-secondary {
+      background: var(--secondary);
+      color: var(--dark);
+    }
+    .btn-secondary:hover {
+      filter: brightness(0.92);
+      transform: translateY(-1px);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover {
+      background: var(--surface);
+      color: var(--text-bright);
+    }
+
+    .btn-sm { padding: 6px 12px; font-size: 0.82rem; }
+
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 28px;
+    }
+
+    .content::-webkit-scrollbar { width: 8px; }
+    .content::-webkit-scrollbar-track { background: transparent; }
+    .content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    /* Tabs content */
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ---------- Shared components ---------- */
+    .hero {
+      background: linear-gradient(135deg, rgba(255,125,46,0.12), rgba(37,37,39,0.9));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+    }
+    .hero h2 { font-size: 1.45rem; color: var(--text-bright); margin-bottom: 6px; }
+    .hero p { color: var(--text); max-width: 460px; line-height: 1.45; font-size: 0.95rem; }
+
+    .sys-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+    .sys-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+    }
+    .sys-card .label { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 4px; }
+    .sys-card .value { font-size: 1.05rem; font-weight: 600; color: var(--text-bright); }
+
+    .section-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text-bright);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      transition: var(--transition);
+    }
+    .card:hover { border-color: var(--primary); transform: translateY(-2px); }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .card-icon {
+      width: 38px;
+      height: 38px;
+      background: var(--surface-2);
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      font-size: 1.2rem;
+    }
+    .card h3 { font-size: 0.95rem; font-weight: 600; color: var(--text-bright); }
+    .card p { font-size: 0.82rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 14px; }
+
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .badge {
+      font-size: 0.72rem;
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+    .badge-success { background: rgba(34,197,94,0.15); color: var(--success); }
+    .badge-warning { background: rgba(245,158,11,0.15); color: var(--warning); }
+    .badge-danger  { background: rgba(239,68,68,0.15); color: var(--danger); }
+    .badge-muted   { background: var(--surface-2); color: var(--text-muted); }
+    .badge-primary { background: rgba(255,125,46,0.18); color: var(--primary); }
+
+    /* Rows (drivers, kernels…) */
+    .row-list { display: flex; flex-direction: column; gap: 8px; }
+
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 13px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      gap: 12px;
+    }
+    .row-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+    .row-icon {
+      width: 34px;
+      height: 34px;
+      background: var(--surface-2);
+      border-radius: 7px;
+      display: grid;
+      place-items: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+    .row-name { font-weight: 560; color: var(--text-bright); font-size: 0.92rem; }
+    .row-meta { font-size: 0.78rem; color: var(--text-muted); }
+
+    /* Search / filters */
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .search {
+      flex: 1;
+      min-width: 180px;
+      padding: 9px 14px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text-bright);
+      font-size: 0.9rem;
+      font-family: inherit;
+      outline: none;
+    }
+    .search:focus { border-color: var(--primary); }
+    .search::placeholder { color: var(--text-muted); }
+
+    .filter-chip {
+      padding: 7px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text);
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: inherit;
+    }
+    .filter-chip:hover, .filter-chip.active {
+      background: rgba(255,125,46,0.15);
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    /* Category title inside recommended */
+    .cat-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--secondary);
+      margin: 20px 0 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .cat-title:first-child { margin-top: 0; }
+
+    /* Progress / status bar example */
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 16px;
+      font-size: 0.85rem;
+    }
+    .status-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+    }
+
+    /* Empty / placeholder note */
+    .note {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 8px;
+    }
+
+    @media (max-width: 1000px) {
+      .sys-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 720px) {
+      .sidebar { width: 64px; }
+      .nav-item span:not(.icon), .logo span:not(.logo-mark), .sidebar-footer { display: none; }
+      .hero { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-mark">S</div>
+      <span>Soplos Welcome</span>
+    </div>
+
+    <nav class="nav">
+      <button class="nav-item active" data-tab="home"><span class="icon">🏠</span><span>Inicio</span></button>
+      <button class="nav-item" data-tab="drivers"><span class="icon">🎮</span><span>Drivers</span></button>
+      <button class="nav-item" data-tab="kernels"><span class="icon">⚙️</span><span>Kernels</span></button>
+      <button class="nav-item" data-tab="software"><span class="icon">📦</span><span>Software</span></button>
+      <button class="nav-item" data-tab="recommended"><span class="icon">⭐</span><span>Recomendadas</span></button>
+      <button class="nav-item" data-tab="security"><span class="icon">🛡️</span><span>Seguridad</span></button>
+      <button class="nav-item" data-tab="customization"><span class="icon">🎨</span><span>Personalización</span></button>
+      <button class="nav-item" data-tab="gaming"><span class="icon">🎯</span><span>Gaming</span></button>
+    </nav>
+
+    <div class="sidebar-footer">Soplos Linux · 3.0.0-alpha</div>
+  </aside>
+
+  <!-- ===================== MAIN ===================== -->
+  <div class="main">
+    <header class="header">
+      <h1 id="page-title">Bienvenido a Soplos</h1>
+      <div class="header-actions">
+        <button class="btn btn-ghost">Actualizar sistema</button>
+        <button class="btn btn-primary">Asistente rápido</button>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- ========== HOME ========== -->
+      <div class="tab-panel active" id="tab-home">
+        <div class="hero">
+          <div>
+            <h2>Tu sistema está listo</h2>
+            <p>Configura drivers, instala software recomendado y personaliza tu experiencia. Mismo aspecto en cualquier escritorio.</p>
+          </div>
+          <button class="btn btn-primary">Empezar configuración</button>
+        </div>
+
+        <div class="sys-grid">
+          <div class="sys-card"><div class="label">Procesador</div><div class="value">AMD Ryzen 7 5800X</div></div>
+          <div class="sys-card"><div class="label">Gráficos</div><div class="value">NVIDIA RTX 3070</div></div>
+          <div class="sys-card"><div class="label">Kernel</div><div class="value">6.12.0-soplos</div></div>
+          <div class="sys-card"><div class="label">Escritorio</div><div class="value">Plasma 6.6</div></div>
+        </div>
+
+        <div class="section-title"><span>Acciones rápidas</span></div>
+        <div class="cards-grid">
+          <div class="card">
+            <div class="card-header"><div class="card-icon">🎮</div><h3>Drivers NVIDIA</h3></div>
+            <p>GPU NVIDIA detectada. Instala los drivers propietarios recomendados.</p>
+            <div class="card-footer">
+              <span class="badge badge-warning">Pendiente</span>
+              <button class="btn btn-primary btn-sm">Instalar</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-icon">📦</div><h3>Apps recomendadas</h3></div>
+            <p>Más de 60 aplicaciones seleccionadas listas para instalar con un clic.</p>
+            <div class="card-footer">
+              <span class="badge badge-muted">60+ apps</span>
+              <button class="btn btn-ghost btn-sm">Explorar</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-icon">🛡️</div><h3>Seguridad básica</h3></div>
+            <p>Firewall, backups y herramientas de limpieza del sistema.</p>
+            <div class="card-footer">
+              <span class="badge badge-success">Recomendado</span>
+              <button class="btn btn-ghost btn-sm">Configurar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== DRIVERS ========== -->
+      <div class="tab-panel" id="tab-drivers">
+        <div class="status-bar">
+          <span class="status-dot"></span>
+          Hardware escaneado · NVIDIA RTX 3070 detectada · Wi-Fi OK
+        </div>
+
+        <div class="section-title"><span>Gráficos</span></div>
+        <div class="row-list" style="margin-bottom:22px;">
+          <div class="row">
+            <div class="row-left">
+              <div class="row-icon">🟢</div>
+              <div>
+                <div class="row-name">NVIDIA Driver 580</div>
+                <div class="row-meta">Recomendado para RTX 3070 · Propietario · OpenCL/CUDA</div>
+              </div>
+            </div>
+            <button class="btn btn-primary btn-sm">Instalar</button>
+          </div>
+          <div class="row">
+            <div class="row-left">
+              <div class="row-icon">⚪</div>
+              <div>
+                <div class="row-name">NVIDIA Driver 550 (legacy branch)</div>
+                <div class="row-meta">Alternativa estable</div>
+              </div>
+            </div>
+            <button class="btn btn-ghost btn-sm">Instalar</button>
+          </div>
+          <div class="row">
+            <div class="row-left">
+              <div class="row-icon">⚡</div>
+              <div>
+                <div class="row-name">PRIME Render Offload</div>
+                <div class="row-meta">Ahorro de batería en laptops híbridos Intel+NVIDIA</div>
+              </div>
+            </div>
+            <button class="btn btn-ghost btn-sm">Configurar</button>
+          </div>
+        </div>
+
+        <div class="section-title"><span>Wi-Fi & otros</span></div>
+        <div class="row-list">
+          <div class="row">
+            <div class="row-left">
+              <div class="row-icon">📶</div>
+              <div>
+                <div class="row-name">Wi-Fi (Intel AX200)</div>
+                <div class="row-meta">Driver en kernel · Funcionando</div>
+              </div>
+            </div>
+            <span class="badge badge-success">OK</span>
+          </div>
+          <div class="row">
+            <div class="row-left">
+              <div class="row-icon">🖨️</div>
+              <div>
+                <div class="row-name">Impresoras (CUPS + drivers)</div>
+                <div class="row-meta">Soporte genérico + fabricantes</div>
+              </div>
+            </div>
+            <button class="btn btn-ghost btn-sm">Instalar</button>
+          </div>
+          <div class="row">
+            <div class="row-left">
+              <div class="row-icon">💻</div>
+              <div>
+                <div class="row-name">Herramientas de máquina virtual</div>
+                <div class="row-meta">VirtualBox / VMware / QEMU guest tools</div>
+              </div>
+            </div>
+            <button class="btn btn-ghost btn-sm">Instalar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== KERNELS ========== -->
+      <div class="tab-panel" id="tab-kernels">
+        <div class="status-bar">
+          <span class="status-dot"></span>
+          Kernel actual: 6.12.0-soplos · x86-64-v3 detectado
+        </div>
+
+        <div class="section-title"><span>Kernels disponibles</span></div>
+        <div class="row-list" style="margin-bottom:22px;">
+          <div class="row">
+            <div class="row-left">
+              <div class="row-icon">🚀</div>
+              <div>
+                <div class="row-name">Soplos Kernel (actual)</div>
+                <div class="row-meta">Optimizado · Parches gaming y NVIDIA</div>
+              </div>
+            </div>
+            <span class="badge badge-success">Activo</span>
+          </div>
+          <div class="row">
+            <div class="row-left">
+              <div class="row-icon">⚡</div>
+              <div>
+                <div class="row-name">Liquorix</div>
+                <div class="row-meta">Zen + BORE · Bajo latencia</div>
+              </div>
+            </div>
+            <button class="btn btn-primary btn-sm">Instalar</button>
+          </div>
+          <div class="row">
+            <div class="row-left">
+              <div class="row-icon">🔧</div>
+              <div>
+                <div class="row-name">XanMod EDGE (x64v3)</div>
+                <div class="row-meta">Compatible con tu CPU</div>
+              </div>
+            </div>
+            <button class="btn btn-ghost btn-sm">Instalar</button>
+          </div>
+          <div class="row">
+            <div class="row-left">
+              <div class="row-icon">🛡️</div>
+              <div>
+                <div class="row-name">XanMod LTS</div>
+                <div class="row-meta">Larga duración · Más estable</div>
+              </div>
+            </div>
+            <button class="btn btn-ghost btn-sm">Instalar</button>
+          </div>
+          <div class="row">
+            <div class="row-left">
+              <div class="row-icon">⏱️</div>
+              <div>
+                <div class="row-name">XanMod RT (PREEMPT_RT)</div>
+                <div class="row-meta">Tiempo real</div>
+              </div>
+            </div>
+            <button class="btn btn-ghost btn-sm">Instalar</button>
+          </div>
+        </div>
+
+        <div class="section-title"><span>Mantenimiento</span></div>
+        <div class="row-list">
+          <div class="row">
+            <div class="row-left">
+              <div class="row-icon">🧹</div>
+              <div>
+                <div class="row-name">Limpiar kernels antiguos</div>
+                <div class="row-meta">Conserva el más reciente de cada familia</div>
+              </div>
+            </div>
+            <button class="btn btn-ghost btn-sm">Ejecutar</button>
+          </div>
+          <div class="row">
+            <div class="row-left">
+              <div class="row-icon">🔐</div>
+              <div>
+                <div class="row-name">Microcódigo CPU (Intel / AMD)</div>
+                <div class="row-meta">Actualizaciones de seguridad de firmware</div>
+              </div>
+            </div>
+            <button class="btn btn-ghost btn-sm">Instalar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== SOFTWARE ========== -->
+      <div class="tab-panel" id="tab-software">
+        <div class="section-title"><span>Centros de software</span></div>
+        <div class="cards-grid">
+          <div class="card">
+            <div class="card-header"><div class="card-icon">🛒</div><h3>GNOME Software</h3></div>
+            <p>Tienda gráfica completa con soporte Flatpak y Snap.</p>
+            <div class="card-footer">
+              <span class="badge badge-muted">No instalado</span>
+              <button class="btn btn-primary btn-sm">Instalar</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-icon">🔍</div><h3>Discover (KDE)</h3></div>
+            <p>Centro de software de Plasma. Ideal para Tyson.</p>
+            <div class="card-footer">
+              <span class="badge badge-success">Instalado</span>
+              <button class="btn btn-ghost btn-sm" disabled>Listo</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-icon">📋</div><h3>Synaptic</h3></div>
+            <p>Gestor clásico de paquetes APT. Potente y detallado.</p>
+            <div class="card-footer">
+              <span class="badge badge-muted">No instalado</span>
+              <button class="btn btn-primary btn-sm">Instalar</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-title"><span>Formatos de paquete</span></div>
+        <div class="row-list">
+          <div class="row">
+            <div class="row-left">
+              <div class="row-icon">📦</div>
+              <div>
+                <div class="row-name">Flatpak + Flathub</div>
+                <div class="row-meta">Aplicaciones sandboxed desde Flathub</div>
+              </div>
+            </div>
+            <span class="badge badge-success">Activo</span>
+          </div>
+          <div class="row">
+            <div class="row-left">
+              <div class="row-icon">📎</div>
+              <div>
+                <div class="row-name">Snap</div>
+                <div class="row-meta">Paquetes universal de Canonical</div>
+              </div>
+            </div>
+            <button class="btn btn-ghost btn-sm">Activar</button>
+          </div>
+          <div class="row">
+            <div class="row-left">
+              <div class="row-icon">🔧</div>
+              <div>
+                <div class="row-name">Soplos Repo Selector</div>
+                <div class="row-meta">Gestiona repositorios oficiales y de terceros</div>
+              </div>
+            </div>
+            <button class="btn btn-ghost btn-sm">Abrir</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== RECOMMENDED ========== -->
+      <div class="tab-panel" id="tab-recommended">
+        <div class="toolbar">
+          <input class="search" type="search" placeholder="Buscar aplicaciones…" />
+          <button class="filter-chip active">Todas</button>
+          <button class="filter-chip">Navegadores</button>
+          <button class="filter-chip">Comunicación</button>
+          <button class="filter-chip">Oficina</button>
+          <button class="filter-chip">Multimedia</button>
+          <button class="filter-chip">Desarrollo</button>
+          <button class="filter-chip">Gaming</button>
+        </div>
+
+        <div class="cat-title">Navegadores</div>
+        <div class="cards-grid">
+          <div class="card">
+            <div class="card-header"><div class="card-icon">🌐</div><h3>Firefox</h3></div>
+            <p>Navegador por defecto. Privacidad y extensiones.</p>
+            <div class="card-footer"><span class="badge badge-success">Instalado</span></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-icon">Brave</div><h3>Brave</h3></div>
+            <p>Rápido, con bloqueo de anuncios integrado.</p>
+            <div class="card-footer">
+              <span class="badge badge-muted">Flatpak</span>
+              <button class="btn btn-primary btn-sm">Instalar</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-icon">🦊</div><h3>LibreWolf</h3></div>
+            <p>Firefox orientado a privacidad máxima.</p>
+            <div class="card-footer">
+              <span class="badge badge-muted">Flatpak</span>
+              <button class="btn btn-primary btn-sm">Instalar</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="cat-title">Comunicación</div>
+        <div class="cards-grid">
+          <div class="card">
+            <div class="card-header"><div class="card-icon">💬</div><h3>Telegram</h3></div>
+            <p>Cliente de mensajería oficial.</p>
+            <div class="card-footer">
+              <span class="badge badge-muted">Flatpak</span>
+              <button class="btn btn-primary btn-sm">Instalar</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-icon">🎮</div><h3>Discord</h3></div>
+            <p>Chat de voz y texto para comunidades.</p>
+            <div class="card-footer">
+              <span class="badge badge-muted">Flatpak</span>
+              <button class="btn btn-primary btn-sm">Instalar</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-icon">📧</div><h3>Thunderbird</h3></div>
+            <p>Cliente de correo y calendario.</p>
+            <div class="card-footer">
+              <span class="badge badge-muted">APT</span>
+              <button class="btn btn-primary btn-sm">Instalar</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="cat-title">Desarrollo</div>
+        <div class="cards-grid">
+          <div class="card">
+            <div class="card-header"><div class="card-icon">⌨️</div><h3>VS Code</h3></div>
+            <p>Editor de código de Microsoft.</p>
+            <div class="card-footer">
+              <span class="badge badge-muted">Flatpak</span>
+              <button class="btn btn-primary btn-sm">Instalar</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-icon">⚡</div><h3>Zed</h3></div>
+            <p>Editor moderno de alto rendimiento.</p>
+            <div class="card-footer">
+              <span class="badge badge-muted">Flatpak</span>
+              <button class="btn btn-primary btn-sm">Instalar</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-icon">🤖</div><h3>Waydroid</h3></div>
+            <p>Contenedor Android para desarrollo y apps.</p>
+            <div class="card-footer">
+              <span class="badge badge-primary">Repo</span>
+              <button class="btn btn-primary btn-sm">Instalar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== SECURITY ========== -->
+      <div class="tab-panel" id="tab-security">
+        <div class="section-title"><span>Copias de seguridad</span></div>
+        <div class="row-list" style="margin-bottom:22px;">
+          <div class="row">
+            <div class="row-left">
+              <div class="row-icon">💾</div>
+              <div>
+                <div class="row-name">Timeshift</div>
+                <div class="row-meta">Snapshots del sistema (estilo System Restore)</div>
+              </div>
+            </div>
+            <button class="btn btn-primary btn-sm">Instalar / Abrir</button>
+          </div>
+          <div class="row">
+            <div class="row-left">
+              <div class="row-icon">📁</div>
+              <div>
+                <div class="row-name">Déjà Dup</div>
+                <div class="row-meta">Copias de seguridad de archivos de usuario</div>
+              </div>
+            </div>
+            <button class="btn btn-ghost btn-sm">Instalar</button>
+          </div>
+        </div>
+
+        <div class="section-title"><span>Firewall y protección</span></div>
+        <div class="row-list" style="margin-bottom:22px;">
+          <div class="row">
+            <div class="row-left">
+              <div class="row-icon">🔥</div>
+              <div>
+                <div class="row-name">UFW + GUFW</div>
+                <div class="row-meta">Firewall sencillo con interfaz gráfica</div>
+              </div>
+            </div>
+            <button class="btn btn-ghost btn-sm">Configurar</button>
+          </div>
+          <div class="row">
+            <div class="row-left">
+              <div class="row-icon">🦠</div>
+              <div>
+                <div class="row-name">ClamAV + ClamTk</div>
+                <div class="row-meta">Antivirus bajo demanda</div>
+              </div>
+            </div>
+            <button class="btn btn-ghost btn-sm">Instalar</button>
+          </div>
+          <div class="row">
+            <div class="row-left">
+              <div class="row-icon">🕵️</div>
+              <div>
+                <div class="row-name">rkhunter</div>
+                <div class="row-meta">Escáner de rootkits</div>
+              </div>
+            </div>
+            <button class="btn btn-ghost btn-sm">Instalar</button>
+          </div>
+        </div>
+
+        <div class="section-title"><span>Limpieza y VPN</span></div>
+        <div class="row-list">
+          <div class="row">
+            <div class="row-left">
+              <div class="row-icon">🧹</div>
+              <div>
+                <div class="row-name">Soplos Sys Cleaner</div>
+                <div class="row-meta">Limpieza de cachés, kernels, Flatpak, logs…</div>
+              </div>
+            </div>
+            <button class="btn btn-primary btn-sm">Abrir</button>
+          </div>
+          <div class="row">
+            <div class="row-left">
+              <div class="row-icon">🔒</div>
+              <div>
+                <div class="row-name">Cloudflare WARP</div>
+                <div class="row-meta">VPN / DNS seguro</div>
+              </div>
+            </div>
+            <button class="btn btn-ghost btn-sm">Instalar</button>
+          </div>
+          <div class="row">
+            <div class="row-left">
+              <div class="row-icon">🛡️</div>
+              <div>
+                <div class="row-name">NordVPN</div>
+                <div class="row-meta">Cliente oficial desde repositorio</div>
+              </div>
+            </div>
+            <button class="btn btn-ghost btn-sm">Instalar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== CUSTOMIZATION ========== -->
+      <div class="tab-panel" id="tab-customization">
+        <div class="section-title"><span>Herramientas Soplos</span></div>
+        <div class="cards-grid">
+          <div class="card">
+            <div class="card-header"><div class="card-icon">🎨</div><h3>Theme Manager</h3></div>
+            <p>Temas, wallpapers, iconos, panel y dock (Tyron).</p>
+            <div class="card-footer">
+              <span class="badge badge-primary">Exclusivo</span>
+              <button class="btn btn-primary btn-sm">Abrir</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-icon">🥾</div><h3>GRUB Editor</h3></div>
+            <p>Personaliza el cargador de arranque y sus temas.</p>
+            <div class="card-footer">
+              <span class="badge badge-primary">Exclusivo</span>
+              <button class="btn btn-primary btn-sm">Abrir</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-icon">🖥️</div><h3>Plymouth Manager</h3></div>
+            <p>Pantallas de arranque (splash) con vista previa.</p>
+            <div class="card-footer">
+              <span class="badge badge-primary">Exclusivo</span>
+              <button class="btn btn-primary btn-sm">Abrir</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-title"><span>Ajustes del escritorio</span></div>
+        <div class="row-list">
+          <div class="row">
+            <div class="row-left">
+              <div class="row-icon">🪟</div>
+              <div>
+                <div class="row-name">Ajustes nativos del escritorio</div>
+                <div class="row-meta">Abre la configuración de XFCE / Plasma / GNOME</div>
+              </div>
+            </div>
+            <button class="btn btn-ghost btn-sm">Abrir</button>
+          </div>
+          <div class="row">
+            <div class="row-left">
+              <div class="row-icon">🔤</div>
+              <div>
+                <div class="row-name">LucidGlyph</div>
+                <div class="row-meta">Mejora de renderizado de fuentes</div>
+              </div>
+            </div>
+            <button class="btn btn-ghost btn-sm">Instalar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== GAMING ========== -->
+      <div class="tab-panel" id="tab-gaming">
+        <div class="section-title"><span>Launchers</span></div>
+        <div class="cards-grid">
+          <div class="card">
+            <div class="card-header"><div class="card-icon">🎮</div><h3>Steam</h3></div>
+            <p>Plataforma de Valve + Proton.</p>
+            <div class="card-footer">
+              <span class="badge badge-muted">APT</span>
+              <button class="btn btn-primary btn-sm">Instalar</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-icon">🦸</div><h3>Heroic</h3></div>
+            <p>Epic Games, GOG y Amazon Games.</p>
+            <div class="card-footer">
+              <span class="badge badge-muted">Flatpak</span>
+              <button class="btn btn-primary btn-sm">Instalar</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-icon">🍷</div><h3>Lutris</h3></div>
+            <p>Gestiona juegos de cualquier origen.</p>
+            <div class="card-footer">
+              <span class="badge badge-muted">APT</span>
+              <button class="btn btn-primary btn-sm">Instalar</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-icon">🍾</div><h3>Bottles</h3></div>
+            <p>Entornos Wine/Proton fáciles de usar.</p>
+            <div class="card-footer">
+              <span class="badge badge-muted">Flatpak</span>
+              <button class="btn btn-primary btn-sm">Instalar</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-icon">☁️</div><h3>GeForce NOW</h3></div>
+            <p>Cliente nativo Flatpak de NVIDIA.</p>
+            <div class="card-footer">
+              <span class="badge badge-muted">Flatpak</span>
+              <button class="btn btn-primary btn-sm">Instalar</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-icon">📱</div><h3>Mocktail</h3></div>
+            <p>Roblox en Linux.</p>
+            <div class="card-footer">
+              <span class="badge badge-muted">Flatpak</span>
+              <button class="btn btn-primary btn-sm">Instalar</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-title"><span>Optimizaciones</span></div>
+        <div class="row-list">
+          <div class="row">
+            <div class="row-left">
+              <div class="row-icon">📊</div>
+              <div>
+                <div class="row-name">MangoHud</div>
+                <div class="row-meta">Overlay de rendimiento (FPS, GPU, CPU…)</div>
+              </div>
+            </div>
+            <button class="btn btn-ghost btn-sm">Instalar</button>
+          </div>
+          <div class="row">
+            <div class="row-left">
+              <div class="row-icon">🔋</div>
+              <div>
+                <div class="row-name">Perfiles de energía / CPU</div>
+                <div class="row-meta">Performance / Balanced / Powersave</div>
+              </div>
+            </div>
+            <button class="btn btn-ghost btn-sm">Configurar</button>
+          </div>
+          <div class="row">
+            <div class="row-left">
+              <div class="row-icon">🖼️</div>
+              <div>
+                <div class="row-name">Pack de wallpapers gaming</div>
+                <div class="row-meta">Fondos temáticos Soplos</div>
+              </div>
+            </div>
+            <button class="btn btn-ghost btn-sm">Aplicar</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /.content -->
+  </div><!-- /.main -->
+
+  <script>
+    const titles = {
+      home: 'Bienvenido a Soplos',
+      drivers: 'Drivers y hardware',
+      kernels: 'Kernels',
+      software: 'Software',
+      recommended: 'Aplicaciones recomendadas',
+      security: 'Seguridad',
+      customization: 'Personalización',
+      gaming: 'Gaming'
+    };
+
+    document.querySelectorAll('.nav-item').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tab = btn.dataset.tab;
+
+        document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        document.getElementById('tab-' + tab).classList.add('active');
+
+        document.getElementById('page-title').textContent = titles[tab] || 'Soplos Welcome';
+      });
+    });
+  </script>
+</body>
+</html>

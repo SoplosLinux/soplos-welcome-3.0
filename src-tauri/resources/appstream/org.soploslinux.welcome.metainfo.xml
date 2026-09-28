@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>org.soploslinux.welcome</id>
+  <pkgname>soplos-welcome</pkgname>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  <project_group>org.soploslinux</project_group>
+
+  <name>Soplos Welcome</name>
+  <summary>Welcome screen for Soplos Linux</summary>
+
+  <description>
+    <p>
+      A welcome application for new users of Soplos Linux. Provides easy access
+      to common system configuration and software installation tasks: driver
+      setup, recommended applications, kernel management, security tools,
+      customization and gaming optimizations.
+    </p>
+  </description>
+
+  <launchable type="desktop-id">org.soploslinux.welcome.desktop</launchable>
+
+  <screenshots>
+    <screenshot type="default">
+      <image>screenshot01.png</image>
+      <caption>Home screen with system overview and quick links</caption>
+    </screenshot>
+    <screenshot>
+      <image>screenshot02.png</image>
+      <caption>Software management with package managers and repositories</caption>
+    </screenshot>
+    <screenshot>
+      <image>screenshot03.png</image>
+      <caption>Drivers and hardware detection</caption>
+    </screenshot>
+    <screenshot>
+      <image>screenshot04.png</image>
+      <caption>Kernel management and Soplos Kernels repository</caption>
+    </screenshot>
+    <screenshot>
+      <image>screenshot05.png</image>
+      <caption>Security and system protection tools</caption>
+    </screenshot>
+    <screenshot>
+      <image>screenshot06.png</image>
+      <caption>Recommended applications by category</caption>
+    </screenshot>
+    <screenshot>
+      <image>screenshot07.png</image>
+      <caption>Desktop customization tools</caption>
+    </screenshot>
+    <screenshot>
+      <image>screenshot08.png</image>
+      <caption>Gaming center with optimizations and launchers</caption>
+    </screenshot>
+  </screenshots>
+
+  <provides>
+    <binary>soplos-welcome</binary>
+  </provides>
+
+  <url type="homepage">https://soplos.org</url>
+
+  <developer id="org.soploslinux">
+    <name>Sergi Perich</name>
+  </developer>
+
+  <releases>
+    <release version="3.0.0-alpha" date="2026-09-17">
+      <description>
+        <p>First alpha of the Tauri-based rewrite of Soplos Welcome.</p>
+      </description>
+    </release>
+  </releases>
+
+  <content_rating type="oars-1.1" />
+</component>
