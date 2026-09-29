@@ -61,14 +61,14 @@
           "/usr/share/polkit-1/actions/org.soploslinux.welcome.policy": "resources/polkit/org.soploslinux.welcome.policy",
           "/usr/share/metainfo/org.soploslinux.welcome.metainfo.xml": "resources/appstream/org.soploslinux.welcome.metainfo.xml",
           "/usr/share/doc/soplos-welcome/copyright": "resources/debian/copyright",
-          "/usr/share/doc/soplos-welcome/screenshots/screenshot01.png": "../public/assets/screenshots/screenshot01.png",
-          "/usr/share/doc/soplos-welcome/screenshots/screenshot02.png": "../public/assets/screenshots/screenshot02.png",
-          "/usr/share/doc/soplos-welcome/screenshots/screenshot03.png": "../public/assets/screenshots/screenshot03.png",
-          "/usr/share/doc/soplos-welcome/screenshots/screenshot04.png": "../public/assets/screenshots/screenshot04.png",
-          "/usr/share/doc/soplos-welcome/screenshots/screenshot05.png": "../public/assets/screenshots/screenshot05.png",
-          "/usr/share/doc/soplos-welcome/screenshots/screenshot06.png": "../public/assets/screenshots/screenshot06.png",
-          "/usr/share/doc/soplos-welcome/screenshots/screenshot07.png": "../public/assets/screenshots/screenshot07.png",
-          "/usr/share/doc/soplos-welcome/screenshots/screenshot08.png": "../public/assets/screenshots/screenshot08.png"
+          "/usr/share/doc/soplos-welcome/screenshots/screenshot01.png": "resources/screenshots/screenshot01.png",
+          "/usr/share/doc/soplos-welcome/screenshots/screenshot02.png": "resources/screenshots/screenshot02.png",
+          "/usr/share/doc/soplos-welcome/screenshots/screenshot03.png": "resources/screenshots/screenshot03.png",
+          "/usr/share/doc/soplos-welcome/screenshots/screenshot04.png": "resources/screenshots/screenshot04.png",
+          "/usr/share/doc/soplos-welcome/screenshots/screenshot05.png": "resources/screenshots/screenshot05.png",
+          "/usr/share/doc/soplos-welcome/screenshots/screenshot06.png": "resources/screenshots/screenshot06.png",
+          "/usr/share/doc/soplos-welcome/screenshots/screenshot07.png": "resources/screenshots/screenshot07.png",
+          "/usr/share/doc/soplos-welcome/screenshots/screenshot08.png": "resources/screenshots/screenshot08.png"
         }
       }
     }
