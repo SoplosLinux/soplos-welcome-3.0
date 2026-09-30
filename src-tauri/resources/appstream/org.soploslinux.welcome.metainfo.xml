@@ -66,6 +66,15 @@
   </developer>
 
   <releases>
+    <release version="3.0.0-1-beta" date="2026-09-30">
+      <description>
+        <p>New recommended applications and a smaller installed package.</p>
+        <ul>
+          <li>New recommended applications: Concat, Glassy Music, Orchard and Sonora</li>
+          <li>Smaller installed package</li>
+        </ul>
+      </description>
+    </release>
     <release version="3.0.0-beta" date="2026-09-28">
       <description>
         <p>First beta of the Tauri-based rewrite of Soplos Welcome.</p>
@@ -74,7 +83,14 @@
           <li>New popup dialogs and faster Drivers, Security and Gaming sections</li>
           <li>About 100 recommended applications, including Patchy, Fog Panther, WhatsApp and Telegram</li>
           <li>System cleaning now keeps the Flatpak runtimes still in use</li>
+          <li>Clear confirmation before installing VirtualBox or its Extension Pack, since both add extra repositories or a separate license</li>
+          <li>Automatic fix for a blank window in virtual machines</li>
         </ul>
+      </description>
+    </release>
+    <release version="3.0.0-alpha" date="2026-09-17">
+      <description>
+        <p>Full architecture rewrite of Soplos Welcome, from Python 3 and GTK3 to Tauri 2 with a Rust backend and a Svelte frontend.</p>
       </description>
     </release>
   </releases>

@@ -426,6 +426,102 @@ pub fn uninstall_patchy() -> u64 {
     start_job("bash", vec!["-c".to_string(), "flatpak uninstall --user -y com.rtsoft.patchy".to_string()])
 }
 
+// Concat and Glassy Music are only published as GitHub Release .deb files
+// (no Flathub, no PPA), so the same "ask the GitHub API for the newest
+// release, grab its .deb" pattern as Helium/Zen Browser above applies here.
+#[tauri::command]
+pub fn install_concat() -> u64 {
+    start_pkexec_job(format!(
+        r#"{VERIFY_DOWNLOAD_SH}
+CONCAT_URL=$(curl -s https://api.github.com/repos/jub0t/Concat/releases/latest | grep browser_download_url | grep linux-x86_64.deb | cut -d\" -f4)
+verify_and_download "$CONCAT_URL" /tmp/concat.deb
+apt install -y /tmp/concat.deb
+rm -f /tmp/concat.deb"#
+    ))
+}
+
+#[tauri::command]
+pub fn uninstall_concat() -> u64 {
+    start_pkexec_job("apt remove -y concat".to_string())
+}
+
+#[tauri::command]
+pub fn install_glassy_music() -> u64 {
+    start_pkexec_job(format!(
+        r#"{VERIFY_DOWNLOAD_SH}
+GLASSY_URL=$(curl -s https://api.github.com/repos/NanKillBro/glassy-music-nankill/releases/latest | grep browser_download_url | grep amd64.deb | cut -d\" -f4)
+verify_and_download "$GLASSY_URL" /tmp/glassy-music.deb
+apt install -y /tmp/glassy-music.deb
+rm -f /tmp/glassy-music.deb"#
+    ))
+}
+
+#[tauri::command]
+pub fn uninstall_glassy_music() -> u64 {
+    start_pkexec_job("apt remove -y glassy-music-nankill-mod".to_string())
+}
+
+// Orchard's own "stable" GitHub releases have shipped with an empty asset
+// list since v4.5.0 (their desktop build pipeline currently only publishes
+// working Linux packages under the 5.0.0 beta track), and /releases/latest
+// on this repo can resolve to an unrelated mobile-app release with no Linux
+// assets at all — so unlike Helium/Zen/Concat/Glassy Music above, there is
+// no reliable "always get the newest" URL to query here. This is pinned to
+// the current beta and needs a manual bump if Orchard ever publishes a
+// working stable release again. App id confirmed from the bundle's own ref
+// header (app/dev.sfg.orchard/x86_64), since Orchard doesn't publish it
+// anywhere else.
+#[tauri::command]
+pub fn install_orchard() -> u64 {
+    start_job(
+        "bash",
+        vec![
+            "-c".to_string(),
+            format!(
+                r#"{VERIFY_DOWNLOAD_SH}
+if ! flatpak remotes --columns=name | grep -qx flathub; then
+  flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+fi
+echo "Downloading Orchard..."
+verify_and_download "https://github.com/SFG5453/Orchard/releases/download/v5.0.0-beta.9/orchard-packages-5.0.0-linux-x64.flatpak" /tmp/orchard.flatpak
+flatpak install --user -y --noninteractive --bundle /tmp/orchard.flatpak
+rm -f /tmp/orchard.flatpak
+echo "Orchard installed.""#
+            ),
+        ],
+    )
+}
+
+#[tauri::command]
+pub fn uninstall_orchard() -> u64 {
+    start_job("bash", vec!["-c".to_string(), "flatpak uninstall --user -y dev.sfg.orchard".to_string()])
+}
+
+// Sonora publishes its own single-app Flatpak repo instead of using
+// Flathub — flatpak can install straight from a .flatpakref URL, which
+// adds that repo (named "sonora") and installs the app in one step.
+#[tauri::command]
+pub fn install_sonora() -> u64 {
+    start_job(
+        "bash",
+        vec![
+            "-c".to_string(),
+            "flatpak install --user -y --noninteractive https://sonorahq.github.io/sonora/sonora.flatpakref".to_string(),
+        ],
+    )
+}
+
+#[tauri::command]
+pub fn uninstall_sonora() -> u64 {
+    start_job(
+        "bash",
+        vec![
+            "-c".to_string(),
+            "flatpak uninstall --user -y io.github.nolight132.sonora; flatpak remote-delete --user sonora 2>/dev/null || true".to_string(),
+        ],
+    )
+}
+
 const ESDE_DESKTOP_ENTRY: &str = "[Desktop Entry]\nName=ES-DE\nExec=%HOME%/AppImages/ES-DE_x64.AppImage\nIcon=%HOME%/AppImages/.icons/es-de.png\nType=Application\nCategories=Game;\nComment=Frontend for emulators with a modern interface\nX-AppImage-Integrate=true\n";
 
 #[tauri::command]
