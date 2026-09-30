@@ -4,6 +4,15 @@ Welcome and system setup application for Soplos Linux.
 
 It gives you one place to update the system, install drivers and kernels, harden security, pick applications, tune the desktop and optimize the machine for gaming.
 
+## Screenshots
+
+| | |
+|---|---|
+| ![Home](src-tauri/resources/screenshots/screenshot01.png) Home screen with system overview and quick links | ![Software](src-tauri/resources/screenshots/screenshot02.png) Software management with package managers and repositories |
+| ![Drivers](src-tauri/resources/screenshots/screenshot03.png) Drivers and hardware detection | ![Kernels](src-tauri/resources/screenshots/screenshot04.png) Kernel management and Soplos Kernels repository |
+| ![Security](src-tauri/resources/screenshots/screenshot05.png) Security and system protection tools | ![Recommended](src-tauri/resources/screenshots/screenshot06.png) Recommended applications by category |
+| ![Customization](src-tauri/resources/screenshots/screenshot07.png) Desktop customization tools | ![Gaming](src-tauri/resources/screenshots/screenshot08.png) Gaming center with optimizations and launchers |
+
 ## Architecture
 
 Version 3.0 is a ground-up rewrite of Soplos Welcome. The original app was written in Python 3 with GTK3 (PyGObject), the same skeleton every other Soplos GTK tool follows. This rewrite replaces that entire stack with Tauri 2: a Rust backend and a Svelte 4 + Tailwind CSS frontend, rendered through the system's WebKitGTK.
