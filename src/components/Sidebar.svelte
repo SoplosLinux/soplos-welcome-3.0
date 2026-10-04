@@ -14,8 +14,30 @@
   export let tabs: { id: string; icon: ComponentType; label: string }[];
   export let active: string;
   export let onSelect: (id: string) => void;
+  export let appVersion: string = "";
+  export let envInfo: { desktopEnvironment: string; displayProtocol: string } | null = null;
 
   const openAbout = getContext<() => void>("openAbout");
+
+  // Mapa de identificador interno → etiqueta visible
+  const DE_LABELS: Record<string, string> = {
+    gnome: "GNOME",
+    kde: "Plasma",
+    xfce: "Xfce",
+    unknown: "",
+  };
+  const PROTO_LABELS: Record<string, string> = {
+    wayland: "Wayland",
+    x11: "X11",
+    unknown: "",
+  };
+
+  $: deLabel = envInfo ? (DE_LABELS[envInfo.desktopEnvironment] ?? envInfo.desktopEnvironment) : "";
+  $: protoLabel = envInfo ? (PROTO_LABELS[envInfo.displayProtocol] ?? "") : "";
+  $: envLabel = [deLabel, protoLabel].filter(Boolean).join(" · ");
+  // "3.0.0-1-beta" → "3.0.0-beta"  (quita el número de revisión Debian del medio)
+  $: cleanVersion = appVersion.replace(/-\d+-/, "-");
+  $: footerLabel = [envLabel, cleanVersion].filter(Boolean).join(" · ") || "Soplos Welcome";
 
   let autostartEnabled = false;
 
@@ -102,7 +124,7 @@
         on:click={openAbout}
         title={$_("sidebar.aboutTooltip")}
       >
-        Soplos Welcome · 3.0.0-beta
+        {footerLabel}
       </button>
     </div>
   </div>

@@ -289,8 +289,13 @@
 
   async function refreshItemStatus(item: DriverItem) {
     if (!item.packages) return;
-    const firstPackage = item.packages.split(" ")[0];
-    installedMap[item.label] = await api.invoke<boolean>("is_apt_package_installed", { package: firstPackage });
+    // Items like Radeon, Bluetooth or DaVinci Extras list several packages —
+    // checking only the first one let the badge/toggle say "Installed" while
+    // the rest of the group was actually missing. All of them must be
+    // present for this to count as installed.
+    const packages = item.packages.split(" ").filter(Boolean);
+    const results = await Promise.all(packages.map((pkg) => api.invoke<boolean>("is_apt_package_installed", { package: pkg })));
+    installedMap[item.label] = results.every(Boolean);
     installedVersion++;
   }
 
@@ -323,6 +328,52 @@
     vboxInstalled = await api.invoke<boolean>("is_vbox_installed");
   }
 
+  interface PrimeStatus {
+    installed: boolean;
+    activeProfile: string;
+  }
+  let primeStatus: PrimeStatus | null = null;
+  async function refreshPrimeStatus() {
+    try {
+      primeStatus = await api.invoke<PrimeStatus>("get_prime_status");
+    } catch {
+      primeStatus = null;
+    }
+  }
+
+  async function switchPrimeProfile(profile: string) {
+    await runTracked("set_prime_profile", { profile });
+    await refreshPrimeStatus();
+  }
+
+  async function installNvidiaPrime() {
+    await runTracked("install_nvidia_prime");
+    await refreshPrimeStatus();
+  }
+
+  interface NvidiaUpdateStatus {
+    installedVersion: string;
+    latestVersion: string;
+    hasUpdate: boolean;
+  }
+  let checkingNvidiaUpdate = false;
+  let nvidiaUpdateStatus: NvidiaUpdateStatus | null = null;
+  let nvidiaUpdateError: string | null = null;
+  let nvidiaUpdateResultOpen = false;
+  async function runCheckNvidiaUpdate() {
+    checkingNvidiaUpdate = true;
+    nvidiaUpdateError = null;
+    nvidiaUpdateStatus = null;
+    try {
+      nvidiaUpdateStatus = await api.invoke<NvidiaUpdateStatus>("check_nvidia_update", { branch: "" });
+    } catch (e: unknown) {
+      nvidiaUpdateError = e instanceof Error ? e.message : String(e);
+    } finally {
+      checkingNvidiaUpdate = false;
+      nvidiaUpdateResultOpen = true;
+    }
+  }
+
   onMount(() => {
     refreshFamilyStatus(amdItems);
     refreshFamilyStatus(wifiItems);
@@ -332,6 +383,7 @@
     refreshOneapiStatus();
     refreshCuda12Status();
     refreshVboxStatus();
+    refreshPrimeStatus();
   });
 
   async function toggleItem(item: DriverItem) {
@@ -379,12 +431,13 @@
   }
 
   let wifiConfirm: { iface: string | null; driver: string } | null = null;
+  let wifiNoHardware = false;
 
   async function startWifiRepair() {
     const info = await api.invoke<{ iface: string | null; driver: string | null }>("detect_wifi_driver");
     if (!info.driver) {
       wifiConfirm = null;
-      alert($_("drivers.wifiRepair.noHardware"));
+      wifiNoHardware = true;
       return;
     }
     wifiConfirm = { iface: info.iface, driver: info.driver };
@@ -470,7 +523,7 @@
             {/if}
           {:else}
             <p class="text-[0.78rem] text-text">
-              {scan.vmDetection.driverStatus === "installed" ? "Guest Additions active." : "Guest Additions missing — install manually from Drivers → VM Tools."}
+              {scan.vmDetection.driverStatus === "installed" ? $_("drivers.guestToolsActive") : $_("drivers.guestToolsMissing")}
             </p>
           {/if}
         </div>
@@ -776,7 +829,17 @@
     </button>
 
     {#if expanded === "nvidia"}
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-4 pt-4 border-t border-border">
+      <div class="mt-4 pt-3 border-t border-border flex items-center justify-end gap-3">
+        <button
+          class="px-3 py-1.5 rounded border border-border bg-surface-2 hover:bg-surface text-text-bright text-[0.78rem] font-medium transition-colors shrink-0 disabled:opacity-50"
+          disabled={checkingNvidiaUpdate}
+          on:click={runCheckNvidiaUpdate}
+        >
+          {checkingNvidiaUpdate ? $_("drivers.checkingUpdate") : $_("drivers.checkNvidiaUpdate")}
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-3">
         {#each nvidiaBranches as branch}
           {@const branchDriverName = branch.kind === "cuda" ? `nvidia-driver-${branch.id}` : branch.id}
           {@const active = nvidiaGpu?.recommendedDriver === branchDriverName && nvidiaGpu?.driverStatus === "installed"}
@@ -854,6 +917,71 @@
       >
         {$_("drivers.uninstallNvidiaDrivers")}
       </button>
+
+      <div class="mt-4 pt-4 border-t border-border">
+        <div class="flex items-center justify-between gap-2 mb-2">
+          <div class="text-[0.7rem] font-semibold text-text-muted uppercase tracking-wide">
+            {$_("drivers.prime.title")}
+          </div>
+          <button
+            class="text-[0.72rem] text-primary hover:underline font-medium flex items-center gap-1"
+            on:click={onScanButtonClick}
+          >
+            {$_("drivers.prime.detectHybrid")}
+          </button>
+        </div>
+        <p class="text-[0.72rem] text-text mb-3">{$_("drivers.prime.subtitle")}</p>
+
+        {#if primeStatus && primeStatus.installed}
+          <p class="text-[0.72rem] text-primary mb-3">
+            {$_("drivers.prime.activeProfile", { values: { profile: primeStatus.activeProfile } })}
+          </p>
+          {@const profiles = [
+            { id: "nvidia", labelKey: "drivers.prime.profileNvidia", hintKey: "drivers.prime.hintNvidia" },
+            { id: "intel",  labelKey: "drivers.prime.profileIntel",  hintKey: "drivers.prime.hintIntel" },
+            { id: "amd",    labelKey: "drivers.prime.profileAmd",    hintKey: "drivers.prime.hintAmd" },
+            { id: "on-demand", labelKey: "drivers.prime.profileOnDemand", hintKey: "drivers.prime.hintOnDemand" },
+          ]}
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {#each profiles as p}
+              {@const active = primeStatus.activeProfile === p.id}
+              <button
+                class="text-left border rounded p-3 transition-colors {active
+                  ? 'border-primary bg-primary/10'
+                  : 'border-border hover:bg-surface-2'}"
+                on:click={() => switchPrimeProfile(p.id)}
+              >
+                <div class="flex items-center justify-between gap-2">
+                  <span class="text-[0.85rem] font-semibold text-text-bright">{$_(p.labelKey)}</span>
+                  {#if active}
+                    <span class="text-[0.68rem] px-2 py-0.5 rounded-full bg-success/15 text-success shrink-0">{$_("drivers.active")}</span>
+                  {/if}
+                </div>
+                <p class="text-[0.72rem] text-text mt-1">{$_(p.hintKey)}</p>
+              </button>
+            {/each}
+          </div>
+          <p class="text-[0.68rem] text-text-muted mt-2">{$_("drivers.prime.rebootRequired")}</p>
+        {:else}
+          <p class="text-[0.72rem] text-text-muted mb-2">{$_("drivers.prime.notInstalled")}</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <button
+              class="text-left border border-border rounded p-3 hover:bg-surface-2 transition-colors"
+              on:click={installNvidiaPrime}
+            >
+              <div class="text-[0.85rem] font-semibold text-text-bright">{$_("drivers.prime.installPackage")}</div>
+              <p class="text-[0.72rem] text-text mt-1">{$_("drivers.prime.installHint")}</p>
+            </button>
+            <button
+              class="text-left border border-border rounded p-3 hover:bg-surface-2 transition-colors"
+              on:click={() => switchPrimeProfile("offload")}
+            >
+              <div class="text-[0.85rem] font-semibold text-text-bright">PRIME Render Offload</div>
+              <p class="text-[0.72rem] text-text mt-1">{$_("drivers.prime.hintOnDemand")}</p>
+            </button>
+          </div>
+        {/if}
+      </div>
     {/if}
   </div>
 
@@ -1037,6 +1165,28 @@
     </div>
     <TerminalOutput fullWidth />
   </div>
+{/if}
+
+{#if nvidiaUpdateResultOpen}
+  <Modal variant="info" title={$_("drivers.checkNvidiaUpdate")} onClose={() => (nvidiaUpdateResultOpen = false)}>
+    {#if nvidiaUpdateError}
+      <p class="text-danger">{$_("drivers.updateCheckFailed")}</p>
+    {:else if nvidiaUpdateStatus?.hasUpdate}
+      <p class="text-primary font-semibold">
+        {$_("drivers.updateAvailable", { values: { version: nvidiaUpdateStatus.latestVersion } })}
+      </p>
+    {:else if nvidiaUpdateStatus && !nvidiaUpdateStatus.hasUpdate && nvidiaUpdateStatus.installedVersion}
+      <p class="text-success font-medium">{$_("drivers.latestVersionInstalled")}</p>
+    {:else if nvidiaUpdateStatus && !nvidiaUpdateStatus.installedVersion}
+      <p class="text-text-muted">{$_("drivers.noNvidiaDriverInstalled")}</p>
+    {/if}
+  </Modal>
+{/if}
+
+{#if wifiNoHardware}
+  <Modal variant="info" title={$_("drivers.wifiRepair.title")} onClose={() => (wifiNoHardware = false)}>
+    {$_("drivers.wifiRepair.noHardware")}
+  </Modal>
 {/if}
 
 {#if wifiConfirm}

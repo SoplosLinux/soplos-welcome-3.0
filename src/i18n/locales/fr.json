@@ -1,14 +1,38 @@
 {
   "app": {
     "tabs": {
-      "home": { "label": "Accueil", "title": "Bienvenue sur Soplos" },
-      "software": { "label": "Software", "title": "Software" },
-      "drivers": { "label": "Drivers", "title": "Drivers et matériel" },
-      "kernels": { "label": "Kernels", "title": "Kernels" },
-      "security": { "label": "Sécurité", "title": "Sécurité" },
-      "recommended": { "label": "Recommandés", "title": "Applications recommandées" },
-      "customization": { "label": "Personnalisation", "title": "Personnalisation" },
-      "gaming": { "label": "Gaming", "title": "Gaming" }
+      "home": {
+        "label": "Accueil",
+        "title": "Bienvenue sur Soplos"
+      },
+      "software": {
+        "label": "Software",
+        "title": "Software"
+      },
+      "drivers": {
+        "label": "Drivers",
+        "title": "Drivers et matériel"
+      },
+      "kernels": {
+        "label": "Kernels",
+        "title": "Kernels"
+      },
+      "security": {
+        "label": "Sécurité",
+        "title": "Sécurité"
+      },
+      "recommended": {
+        "label": "Recommandés",
+        "title": "Applications recommandées"
+      },
+      "customization": {
+        "label": "Personnalisation",
+        "title": "Personnalisation"
+      },
+      "gaming": {
+        "label": "Gaming",
+        "title": "Gaming"
+      }
     }
   },
   "sidebar": {
@@ -332,11 +356,26 @@
       "chooseHint": "Choisissez un paquet de noyau avec ce niveau d'architecture, ou inférieur, dans la liste ci-dessous."
     },
     "xanmod": {
-      "main": { "title": "Standard (Recommandé)", "hint": "Build à usage général. Performance équilibrée pour un usage quotidien." },
-      "rt": { "title": "RT (Temps réel)", "hint": "Build PREEMPT_RT. Latence minimale pour la production audio, le streaming et le jeu compétitif." },
-      "edge": { "title": "EDGE (Expérimental)", "hint": "Dernières fonctionnalités expérimentales. Peut être instable. Pour les tests uniquement.", "badge": "Non recommandé" },
-      "lts": { "title": "LTS (Longue durée)", "hint": "Support à long terme, mises à jour prudentes. Idéal pour la stabilité." }
-    }
+      "main": {
+        "title": "Standard (Recommandé)",
+        "hint": "Build à usage général. Performance équilibrée pour un usage quotidien."
+      },
+      "rt": {
+        "title": "RT (Temps réel)",
+        "hint": "Build PREEMPT_RT. Latence minimale pour la production audio, le streaming et le jeu compétitif."
+      },
+      "edge": {
+        "title": "EDGE (Expérimental)",
+        "hint": "Dernières fonctionnalités expérimentales. Peut être instable. Pour les tests uniquement.",
+        "badge": "Non recommandé"
+      },
+      "lts": {
+        "title": "LTS (Longue durée)",
+        "hint": "Support à long terme, mises à jour prudentes. Idéal pour la stabilité."
+      }
+    },
+    "debianKernels": "Noyaux officiels Debian",
+    "debianKernelsHint": "Versions officielles du noyau Linux maintenues par Debian"
   },
   "drivers": {
     "detecting": "Détection…",
@@ -357,6 +396,14 @@
     "virtualMachine": "Machine virtuelle",
     "vmType": "Type : {type}",
     "guestTools": "outils invités",
+    "guestToolsActive": "Outils invités actifs.",
+    "guestToolsMissing": "Outils invités manquants — installez-les manuellement depuis Pilotes → Outils VM.",
+    "checkNvidiaUpdate": "Rechercher des mises à jour",
+    "checkingUpdate": "Recherche de mises à jour…",
+    "updateAvailable": "Mise à jour disponible : v{version}",
+    "latestVersionInstalled": "Dernière version installée",
+    "noNvidiaDriverInstalled": "Aucun pilote NVIDIA installé",
+    "updateCheckFailed": "Impossible de contacter les serveurs NVIDIA",
     "guestAdditionsActive": "Guest Additions actives.",
     "guestAdditionsMissing": "Guest Additions manquantes — installez-les manuellement depuis Pilotes → Outils VM.",
     "graphicsCard": "Carte graphique — {vendor} {model}",
@@ -442,14 +489,8 @@
       "description": "Ceci décharge et recharge le module noyau Wi-Fi et redémarre NetworkManager. Votre connexion réseau sera brièvement interrompue.",
       "repair": "Réparer"
     },
-    "confirmBranch": {
-      "title": "Installer {label} ?",
-      "description": "Ceci supprime d'abord tout pilote NVIDIA existant, installe {label} et régénère l'initramfs. Un redémarrage du système sera requis ensuite."
-    },
-    "confirmUninstall": {
-      "title": "Désinstaller les pilotes NVIDIA ?",
-      "description": "Supprime tous les paquets NVIDIA et CUDA, les modules DKMS et les sources du dépôt. Un redémarrage du système sera requis ensuite."
-    },
+    "confirmBranch": { "title": "Installer {label} ?", "description": "Ceci supprime d'abord tout pilote NVIDIA existant, installe {label} et régénère l'initramfs. Un redémarrage du système sera requis ensuite." },
+    "confirmUninstall": { "title": "Désinstaller les pilotes NVIDIA ?", "description": "Supprime tous les paquets NVIDIA et CUDA, les modules DKMS et les sources du dépôt. Un redémarrage du système sera requis ensuite." },
     "rocm": {
       "installTitle": "Installer {name} ?",
       "openclName": "ROCm OpenCL",
@@ -459,6 +500,25 @@
       "sizeFull": "Téléchargement de plusieurs Go — cela peut prendre du temps.",
       "removeTitle": "Supprimer ROCm ?",
       "removeDescription": "Ceci supprimera tous les paquets ROCm et le dépôt AMD ROCm."
+    },
+    "prime": {
+      "title": "NVIDIA PRIME",
+      "subtitle": "Basculez entre le GPU intégré et le GPU dédié",
+      "notInstalled": "nvidia-prime n'est pas installé",
+      "installPackage": "Installer nvidia-prime",
+      "installHint": "Installe le paquet nvidia-prime requis pour basculer entre les GPU",
+      "activeProfile": "Profil actif : {profile}",
+      "profileNvidia": "NVIDIA (Dédié)",
+      "profileIntel": "Intel (Intégré)",
+      "profileAmd": "AMD (Intégré)",
+      "profileOnDemand": "À la demande (On-Demand)",
+      "hintNvidia": "Utilise le GPU NVIDIA pour tout. Performances maximales, consommation plus élevée.",
+      "hintIntel": "Utilise le GPU intégré Intel. Meilleure autonomie de batterie.",
+      "hintAmd": "Utilise le GPU intégré AMD. Meilleure autonomie de batterie.",
+      "hintOnDemand": "Utilise le GPU intégré par défaut. Lancez les apps avec prime-run pour utiliser NVIDIA.",
+      "detectHybrid": "Détecter la configuration hybride",
+      "detectHybridHint": "Vérifier si votre ordinateur portable dispose d'une configuration hybride Intel/AMD + NVIDIA",
+      "rebootRequired": "Un redémarrage du système est nécessaire pour appliquer la modification."
     }
   },
   "security": {
@@ -605,10 +665,7 @@
         "system-settings": { "label": "Configuration du système", "hint": "Tous les paramètres du système" }
       }
     },
-    "language": {
-      "title": "Langue",
-      "description": "Choisissez la langue d'affichage de l'application."
-    }
+    "language": { "title": "Langue", "description": "Choisissez la langue d'affichage de l'application." }
   },
   "home": {
     "title": "Bienvenue sur Soplos Linux",

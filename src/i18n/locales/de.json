@@ -1,14 +1,38 @@
 {
   "app": {
     "tabs": {
-      "home": { "label": "Start", "title": "Willkommen bei Soplos" },
-      "software": { "label": "Software", "title": "Software" },
-      "drivers": { "label": "Drivers", "title": "Drivers und Hardware" },
-      "kernels": { "label": "Kernels", "title": "Kernels" },
-      "security": { "label": "Sicherheit", "title": "Sicherheit" },
-      "recommended": { "label": "Empfohlen", "title": "Empfohlene Anwendungen" },
-      "customization": { "label": "Anpassung", "title": "Anpassung" },
-      "gaming": { "label": "Gaming", "title": "Gaming" }
+      "home": {
+        "label": "Start",
+        "title": "Willkommen bei Soplos"
+      },
+      "software": {
+        "label": "Software",
+        "title": "Software"
+      },
+      "drivers": {
+        "label": "Drivers",
+        "title": "Drivers und Hardware"
+      },
+      "kernels": {
+        "label": "Kernels",
+        "title": "Kernels"
+      },
+      "security": {
+        "label": "Sicherheit",
+        "title": "Sicherheit"
+      },
+      "recommended": {
+        "label": "Empfohlen",
+        "title": "Empfohlene Anwendungen"
+      },
+      "customization": {
+        "label": "Anpassung",
+        "title": "Anpassung"
+      },
+      "gaming": {
+        "label": "Gaming",
+        "title": "Gaming"
+      }
     }
   },
   "sidebar": {
@@ -332,11 +356,26 @@
       "chooseHint": "Wähle aus der Liste unten ein Kernel-Paket mit dieser oder einer niedrigeren Architekturebene."
     },
     "xanmod": {
-      "main": { "title": "Standard (Empfohlen)", "hint": "Build für allgemeine Zwecke. Ausgewogene Leistung für den Alltag." },
-      "rt": { "title": "RT (Echtzeit)", "hint": "PREEMPT_RT-Build. Minimale Latenz für Audioproduktion, Streaming und kompetitives Gaming." },
-      "edge": { "title": "EDGE (Experimentell)", "hint": "Neueste experimentelle Funktionen. Kann instabil sein. Nur zum Testen.", "badge": "Nicht empfohlen" },
-      "lts": { "title": "LTS (Langzeit)", "hint": "Langzeitunterstützung, konservative Updates. Am besten für Stabilität." }
-    }
+      "main": {
+        "title": "Standard (Empfohlen)",
+        "hint": "Build für allgemeine Zwecke. Ausgewogene Leistung für den Alltag."
+      },
+      "rt": {
+        "title": "RT (Echtzeit)",
+        "hint": "PREEMPT_RT-Build. Minimale Latenz für Audioproduktion, Streaming und kompetitives Gaming."
+      },
+      "edge": {
+        "title": "EDGE (Experimentell)",
+        "hint": "Neueste experimentelle Funktionen. Kann instabil sein. Nur zum Testen.",
+        "badge": "Nicht empfohlen"
+      },
+      "lts": {
+        "title": "LTS (Langzeit)",
+        "hint": "Langzeitunterstützung, konservative Updates. Am besten für Stabilität."
+      }
+    },
+    "debianKernels": "Offizielle Debian-Kernel",
+    "debianKernelsHint": "Offizielle Linux-Kernel-Builds von Debian"
   },
   "drivers": {
     "detecting": "Wird erkannt…",
@@ -357,6 +396,14 @@
     "virtualMachine": "Virtuelle Maschine",
     "vmType": "Typ: {type}",
     "guestTools": "Gast-Tools",
+    "guestToolsActive": "Gast-Tools aktiv.",
+    "guestToolsMissing": "Gast-Tools fehlen — manuell installieren über Treiber → VM-Tools.",
+    "checkNvidiaUpdate": "Nach Updates suchen",
+    "checkingUpdate": "Suche nach Updates…",
+    "updateAvailable": "Update verfügbar: v{version}",
+    "latestVersionInstalled": "Neueste Version installiert",
+    "noNvidiaDriverInstalled": "Kein NVIDIA-Treiber installiert",
+    "updateCheckFailed": "NVIDIA-Server nicht erreichbar",
     "guestAdditionsActive": "Guest Additions aktiv.",
     "guestAdditionsMissing": "Guest Additions fehlen — manuell installieren unter Treiber → VM-Tools.",
     "graphicsCard": "Grafikkarte — {vendor} {model}",
@@ -442,14 +489,8 @@
       "description": "Dies entlädt und lädt das WLAN-Kernelmodul neu und startet den NetworkManager neu. Deine Netzwerkverbindung wird kurz unterbrochen.",
       "repair": "Reparieren"
     },
-    "confirmBranch": {
-      "title": "{label} installieren?",
-      "description": "Dies entfernt zuerst jeden vorhandenen NVIDIA-Treiber, installiert {label} und erstellt die initramfs neu. Danach ist ein Systemneustart erforderlich."
-    },
-    "confirmUninstall": {
-      "title": "NVIDIA-Treiber deinstallieren?",
-      "description": "Entfernt alle NVIDIA- und CUDA-Pakete, DKMS-Module und Repository-Quellen. Danach ist ein Systemneustart erforderlich."
-    },
+    "confirmBranch": { "title": "{label} installieren?", "description": "Dies entfernt zuerst jeden vorhandenen NVIDIA-Treiber, installiert {label} und erstellt die initramfs neu. Danach ist ein Systemneustart erforderlich." },
+    "confirmUninstall": { "title": "NVIDIA-Treiber deinstallieren?", "description": "Entfernt alle NVIDIA- und CUDA-Pakete, DKMS-Module und Repository-Quellen. Danach ist ein Systemneustart erforderlich." },
     "rocm": {
       "installTitle": "{name} installieren?",
       "openclName": "ROCm OpenCL",
@@ -459,6 +500,25 @@
       "sizeFull": "Download von mehreren GB — das kann eine Weile dauern.",
       "removeTitle": "ROCm entfernen?",
       "removeDescription": "Dies entfernt alle ROCm-Pakete und das AMD-ROCm-Repository."
+    },
+    "prime": {
+      "title": "NVIDIA PRIME",
+      "subtitle": "Zwischen integrierter und dedizierter GPU wechseln",
+      "notInstalled": "nvidia-prime ist nicht installiert",
+      "installPackage": "nvidia-prime installieren",
+      "installHint": "Installiert das Paket nvidia-prime zum Umschalten zwischen Grafikprozessoren",
+      "activeProfile": "Aktives Profil: {profile}",
+      "profileNvidia": "NVIDIA (Dediziert)",
+      "profileIntel": "Intel (Integriert)",
+      "profileAmd": "AMD (Integriert)",
+      "profileOnDemand": "Auf Anfrage (On-Demand)",
+      "hintNvidia": "Verwendet die NVIDIA-GPU für alles. Maximale Leistung, höherer Stromverbrauch.",
+      "hintIntel": "Verwendet die integrierte Intel-GPU. Beste Akkulaufzeit.",
+      "hintAmd": "Verwendet die integrierte AMD-GPU. Beste Akkulaufzeit.",
+      "hintOnDemand": "Verwendet standardmäßig die integrierte GPU. Anwendungen mit prime-run starten.",
+      "detectHybrid": "Hybrid-Grafik erkennen",
+      "detectHybridHint": "Prüfen, ob Ihr Laptop über eine hybride Intel/AMD + NVIDIA Grafik verfügt",
+      "rebootRequired": "Ein Systemneustart ist erforderlich, um die Profiländerung anzuwenden."
     }
   },
   "security": {
@@ -605,10 +665,7 @@
         "system-settings": { "label": "Systemeinstellungen", "hint": "Alle Systemeinstellungen" }
       }
     },
-    "language": {
-      "title": "Sprache",
-      "description": "Wähle die Anzeigesprache der App."
-    }
+    "language": { "title": "Sprache", "description": "Wähle die Anzeigesprache der App." }
   },
   "home": {
     "title": "Willkommen bei Soplos Linux",

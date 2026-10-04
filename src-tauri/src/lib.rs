@@ -24,6 +24,7 @@ pub fn run() {
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_dialog::init())
         .invoke_handler(tauri::generate_handler![
+            commands::environment::get_environment_info,
             commands::system::get_system_info,
             commands::system::get_autostart_enabled,
             commands::system::set_autostart_enabled,
@@ -72,12 +73,19 @@ pub fn run() {
             commands::drivers::is_vbox_installed,
             commands::drivers::install_vbox_guest,
             commands::drivers::uninstall_vbox_guest,
+            commands::drivers::get_prime_status,
+            commands::drivers::set_prime_profile,
+            commands::drivers::install_nvidia_prime,
+            commands::drivers::check_nvidia_update,
             commands::hardware_scan::scan_hardware,
             commands::kernels::get_kernel_info,
             commands::kernels::is_kernel_in_use,
             commands::kernels::has_broken_xanmod_repo,
             commands::kernels::repair_xanmod_repo,
             commands::kernels::get_cpu_vendor,
+            commands::kernels::get_debian_kernels,
+            commands::kernels::install_debian_kernel,
+            commands::kernels::uninstall_debian_kernel,
             commands::kernels::get_xanmod_status,
             commands::kernels::install_xanmod,
             commands::kernels::uninstall_xanmod,

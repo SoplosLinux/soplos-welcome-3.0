@@ -5,7 +5,7 @@
   <vendor>Soplos Linux</vendor>
   <vendor_url>https://soplos.org</vendor_url>
 
-  <action id="org.soploslinux.welcome.run-privileged">
+  <action id="org.soplos.welcome.run-privileged">
     <description>Run a Soplos Welcome system maintenance action</description>
     <message>Authentication is required to make system changes from Soplos Welcome</message>
     <defaults>

@@ -1,14 +1,38 @@
 {
   "app": {
     "tabs": {
-      "home": { "label": "Início", "title": "Bem-vindo ao Soplos" },
-      "software": { "label": "Software", "title": "Software" },
-      "drivers": { "label": "Drivers", "title": "Drivers e hardware" },
-      "kernels": { "label": "Kernels", "title": "Kernels" },
-      "security": { "label": "Segurança", "title": "Segurança" },
-      "recommended": { "label": "Recomendados", "title": "Aplicações recomendadas" },
-      "customization": { "label": "Personalização", "title": "Personalização" },
-      "gaming": { "label": "Gaming", "title": "Gaming" }
+      "home": {
+        "label": "Início",
+        "title": "Bem-vindo ao Soplos"
+      },
+      "software": {
+        "label": "Software",
+        "title": "Software"
+      },
+      "drivers": {
+        "label": "Drivers",
+        "title": "Drivers e hardware"
+      },
+      "kernels": {
+        "label": "Kernels",
+        "title": "Kernels"
+      },
+      "security": {
+        "label": "Segurança",
+        "title": "Segurança"
+      },
+      "recommended": {
+        "label": "Recomendados",
+        "title": "Aplicações recomendadas"
+      },
+      "customization": {
+        "label": "Personalização",
+        "title": "Personalização"
+      },
+      "gaming": {
+        "label": "Gaming",
+        "title": "Gaming"
+      }
     }
   },
   "sidebar": {
@@ -332,11 +356,26 @@
       "chooseHint": "Escolhe um pacote de kernel com este nível de arquitetura, ou inferior, da lista abaixo."
     },
     "xanmod": {
-      "main": { "title": "Padrão (Recomendado)", "hint": "Build de uso geral. Desempenho equilibrado para o dia a dia." },
-      "rt": { "title": "RT (Tempo real)", "hint": "Build PREEMPT_RT. Latência mínima para produção de áudio, streaming e jogos competitivos." },
-      "edge": { "title": "EDGE (Experimental)", "hint": "Últimas funcionalidades experimentais. Pode ser instável. Apenas para testes.", "badge": "Não recomendado" },
-      "lts": { "title": "LTS (Longo prazo)", "hint": "Suporte de longo prazo, atualizações conservadoras. O melhor para estabilidade." }
-    }
+      "main": {
+        "title": "Padrão (Recomendado)",
+        "hint": "Build de uso geral. Desempenho equilibrado para o dia a dia."
+      },
+      "rt": {
+        "title": "RT (Tempo real)",
+        "hint": "Build PREEMPT_RT. Latência mínima para produção de áudio, streaming e jogos competitivos."
+      },
+      "edge": {
+        "title": "EDGE (Experimental)",
+        "hint": "Últimas funcionalidades experimentais. Pode ser instável. Apenas para testes.",
+        "badge": "Não recomendado"
+      },
+      "lts": {
+        "title": "LTS (Longo prazo)",
+        "hint": "Suporte de longo prazo, atualizações conservadoras. O melhor para estabilidade."
+      }
+    },
+    "debianKernels": "Kernels Oficiais Debian",
+    "debianKernelsHint": "Compilações oficiais do kernel Linux mantidas pelo Debian"
   },
   "drivers": {
     "detecting": "A detetar…",
@@ -357,6 +396,14 @@
     "virtualMachine": "Máquina virtual",
     "vmType": "Tipo: {type}",
     "guestTools": "ferramentas convidadas",
+    "guestToolsActive": "Ferramentas convidadas ativas.",
+    "guestToolsMissing": "Faltam as ferramentas convidadas — instala-as manualmente em Controladores → Ferramentas VM.",
+    "checkNvidiaUpdate": "Procurar atualizações",
+    "checkingUpdate": "A procurar atualizações…",
+    "updateAvailable": "Atualização disponível: v{version}",
+    "latestVersionInstalled": "Tens a versão mais recente instalada",
+    "noNvidiaDriverInstalled": "Não há nenhum controlador NVIDIA instalado",
+    "updateCheckFailed": "Não foi possível contactar os servidores da NVIDIA",
     "guestAdditionsActive": "Guest Additions ativas.",
     "guestAdditionsMissing": "Faltam as Guest Additions — instala-as manualmente em Drivers → Ferramentas VM.",
     "graphicsCard": "Placa gráfica — {vendor} {model}",
@@ -442,14 +489,8 @@
       "description": "Isto descarrega e recarrega o módulo do kernel Wi-Fi e reinicia o NetworkManager. A tua ligação de rede será brevemente interrompida.",
       "repair": "Reparar"
     },
-    "confirmBranch": {
-      "title": "Instalar {label}?",
-      "description": "Isto remove primeiro qualquer driver NVIDIA existente, instala {label} e regenera o initramfs. Depois será necessário reiniciar o sistema."
-    },
-    "confirmUninstall": {
-      "title": "Desinstalar os drivers NVIDIA?",
-      "description": "Remove todos os pacotes NVIDIA e CUDA, os módulos DKMS e as fontes do repositório. Depois será necessário reiniciar o sistema."
-    },
+    "confirmBranch": { "title": "Instalar {label}?", "description": "Isto remove primeiro qualquer driver NVIDIA existente, instala {label} e regenera o initramfs. Depois será necessário reiniciar o sistema." },
+    "confirmUninstall": { "title": "Desinstalar os drivers NVIDIA?", "description": "Remove todos os pacotes NVIDIA e CUDA, os módulos DKMS e as fontes do repositório. Depois será necessário reiniciar o sistema." },
     "rocm": {
       "installTitle": "Instalar {name}?",
       "openclName": "ROCm OpenCL",
@@ -459,6 +500,25 @@
       "sizeFull": "Descarga de vários GB — pode demorar algum tempo.",
       "removeTitle": "Remover o ROCm?",
       "removeDescription": "Isto removerá todos os pacotes ROCm e o repositório AMD ROCm."
+    },
+    "prime": {
+      "title": "NVIDIA PRIME",
+      "subtitle": "Alterne entre a GPU integrada e a GPU dedicada",
+      "notInstalled": "nvidia-prime não está instalado",
+      "installPackage": "Instalar nvidia-prime",
+      "installHint": "Instala o pacote nvidia-prime necessário para alternar entre GPUs",
+      "activeProfile": "Perfil ativo: {profile}",
+      "profileNvidia": "NVIDIA (Dedicada)",
+      "profileIntel": "Intel (Integrada)",
+      "profileAmd": "AMD (Integrada)",
+      "profileOnDemand": "Sob procura (On-Demand)",
+      "hintNvidia": "Usa a GPU NVIDIA para tudo. Desempenho máximo, maior consumo de bateria.",
+      "hintIntel": "Usa a GPU integrada Intel. Melhor autonomia de bateria.",
+      "hintAmd": "Usa a GPU integrada AMD. Melhor autonomia de bateria.",
+      "hintOnDemand": "Usa a GPU integrada por predefinição. Inicie apps com prime-run para usar a NVIDIA.",
+      "detectHybrid": "Detectar configuração híbrida",
+      "detectHybridHint": "Verifique se o seu portátil tem uma configuração gráfica híbrida Intel/AMD + NVIDIA",
+      "rebootRequired": "É necessário reiniciar o sistema para aplicar a alteração de perfil."
     }
   },
   "security": {
@@ -605,10 +665,7 @@
         "system-settings": { "label": "Definições do sistema", "hint": "Todas as definições do sistema" }
       }
     },
-    "language": {
-      "title": "Idioma",
-      "description": "Escolhe o idioma de apresentação da aplicação."
-    }
+    "language": { "title": "Idioma", "description": "Escolhe o idioma de apresentação da aplicação." }
   },
   "home": {
     "title": "Bem-vindo ao Soplos Linux",

@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "soplos-welcome",
-  "version": "3.0.0-1-beta",
-  "identifier": "org.soploslinux.welcome",
+  "version": "3.0.0-2-beta",
+  "identifier": "org.soplos.welcome",
   "build": {
     "beforeDevCommand": "npm run dev",
     "beforeBuildCommand": "npm run build",
@@ -58,8 +58,8 @@
         "depends": ["curl", "wget", "pkexec | policykit-1"],
         "desktopTemplate": "resources/debian/soplos-welcome.desktop.hbs",
         "files": {
-          "/usr/share/polkit-1/actions/org.soploslinux.welcome.policy": "resources/polkit/org.soploslinux.welcome.policy",
-          "/usr/share/metainfo/org.soploslinux.welcome.metainfo.xml": "resources/appstream/org.soploslinux.welcome.metainfo.xml",
+          "/usr/share/polkit-1/actions/org.soplos.welcome.policy": "resources/polkit/org.soplos.welcome.policy",
+          "/usr/share/metainfo/org.soplos.welcome.metainfo.xml": "resources/appstream/org.soplos.welcome.metainfo.xml",
           "/usr/share/doc/soplos-welcome/copyright": "resources/debian/copyright",
           "/usr/share/doc/soplos-welcome/screenshots/screenshot01.png": "resources/screenshots/screenshot01.png",
           "/usr/share/doc/soplos-welcome/screenshots/screenshot02.png": "resources/screenshots/screenshot02.png",

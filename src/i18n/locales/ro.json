@@ -1,14 +1,38 @@
 {
   "app": {
     "tabs": {
-      "home": { "label": "Acasă", "title": "Bine ai venit în Soplos" },
-      "software": { "label": "Software", "title": "Software" },
-      "drivers": { "label": "Drivers", "title": "Drivers și hardware" },
-      "kernels": { "label": "Kernels", "title": "Kernels" },
-      "security": { "label": "Securitate", "title": "Securitate" },
-      "recommended": { "label": "Recomandate", "title": "Aplicații recomandate" },
-      "customization": { "label": "Personalizare", "title": "Personalizare" },
-      "gaming": { "label": "Gaming", "title": "Gaming" }
+      "home": {
+        "label": "Acasă",
+        "title": "Bine ai venit în Soplos"
+      },
+      "software": {
+        "label": "Software",
+        "title": "Software"
+      },
+      "drivers": {
+        "label": "Drivers",
+        "title": "Drivers și hardware"
+      },
+      "kernels": {
+        "label": "Kernels",
+        "title": "Kernels"
+      },
+      "security": {
+        "label": "Securitate",
+        "title": "Securitate"
+      },
+      "recommended": {
+        "label": "Recomandate",
+        "title": "Aplicații recomandate"
+      },
+      "customization": {
+        "label": "Personalizare",
+        "title": "Personalizare"
+      },
+      "gaming": {
+        "label": "Gaming",
+        "title": "Gaming"
+      }
     }
   },
   "sidebar": {
@@ -332,11 +356,26 @@
       "chooseHint": "Alege un pachet de kernel cu acest nivel de arhitectură, sau mai mic, din lista de mai jos."
     },
     "xanmod": {
-      "main": { "title": "Standard (Recomandat)", "hint": "Build de uz general. Performanță echilibrată pentru uz zilnic." },
-      "rt": { "title": "RT (Timp real)", "hint": "Build PREEMPT_RT. Latență minimă pentru producție audio, streaming și gaming competitiv." },
-      "edge": { "title": "EDGE (Experimental)", "hint": "Cele mai noi funcții experimentale. Poate fi instabil. Doar pentru testare.", "badge": "Nerecomandat" },
-      "lts": { "title": "LTS (Suport îndelungat)", "hint": "Suport pe termen lung, actualizări conservatoare. Cel mai bun pentru stabilitate." }
-    }
+      "main": {
+        "title": "Standard (Recomandat)",
+        "hint": "Build de uz general. Performanță echilibrată pentru uz zilnic."
+      },
+      "rt": {
+        "title": "RT (Timp real)",
+        "hint": "Build PREEMPT_RT. Latență minimă pentru producție audio, streaming și gaming competitiv."
+      },
+      "edge": {
+        "title": "EDGE (Experimental)",
+        "hint": "Cele mai noi funcții experimentale. Poate fi instabil. Doar pentru testare.",
+        "badge": "Nerecomandat"
+      },
+      "lts": {
+        "title": "LTS (Suport îndelungat)",
+        "hint": "Suport pe termen lung, actualizări conservatoare. Cel mai bun pentru stabilitate."
+      }
+    },
+    "debianKernels": "Kernel-uri Oficiale Debian",
+    "debianKernelsHint": "Compilații oficiale ale kernelului Linux menținute de Debian"
   },
   "drivers": {
     "detecting": "Se detectează…",
@@ -357,6 +396,14 @@
     "virtualMachine": "Mașină virtuală",
     "vmType": "Tip: {type}",
     "guestTools": "instrumente guest",
+    "guestToolsActive": "Instrumentele guest sunt active.",
+    "guestToolsMissing": "Lipsesc instrumentele guest — instalează-le manual din Drivere → Instrumente VM.",
+    "checkNvidiaUpdate": "Caută actualizări",
+    "checkingUpdate": "Se caută actualizări…",
+    "updateAvailable": "Actualizare disponibilă: v{version}",
+    "latestVersionInstalled": "Ai instalată cea mai recentă versiune",
+    "noNvidiaDriverInstalled": "Niciun driver NVIDIA instalat",
+    "updateCheckFailed": "Nu s-a putut contacta serverele NVIDIA",
     "guestAdditionsActive": "Guest Additions active.",
     "guestAdditionsMissing": "Lipsesc Guest Additions — instalează-le manual din Drivere → Instrumente VM.",
     "graphicsCard": "Placă video — {vendor} {model}",
@@ -442,14 +489,8 @@
       "description": "Aceasta descarcă și reîncarcă modulul de kernel Wi-Fi și repornește NetworkManager. Conexiunea ta de rețea va fi întreruptă pentru scurt timp.",
       "repair": "Repară"
     },
-    "confirmBranch": {
-      "title": "Instalezi {label}?",
-      "description": "Aceasta elimină mai întâi orice driver NVIDIA existent, instalează {label} și regenerează initramfs. Ulterior va fi necesară repornirea sistemului."
-    },
-    "confirmUninstall": {
-      "title": "Dezinstalezi driverele NVIDIA?",
-      "description": "Elimină toate pachetele NVIDIA și CUDA, modulele DKMS și sursele repository-ului. Ulterior va fi necesară repornirea sistemului."
-    },
+    "confirmBranch": { "title": "Instalezi {label}?", "description": "Aceasta elimină mai întâi orice driver NVIDIA existent, instalează {label} și regenerează initramfs. Ulterior va fi necesară repornirea sistemului." },
+    "confirmUninstall": { "title": "Dezinstalezi driverele NVIDIA?", "description": "Elimină toate pachetele NVIDIA și CUDA, modulele DKMS și sursele repository-ului. Ulterior va fi necesară repornirea sistemului." },
     "rocm": {
       "installTitle": "Instalezi {name}?",
       "openclName": "ROCm OpenCL",
@@ -459,6 +500,25 @@
       "sizeFull": "Descărcare de câțiva GB — poate dura o vreme.",
       "removeTitle": "Elimini ROCm?",
       "removeDescription": "Aceasta va elimina toate pachetele ROCm și repository-ul AMD ROCm."
+    },
+    "prime": {
+      "title": "NVIDIA PRIME",
+      "subtitle": "Comutați între GPU-ul integrat și cel dedicat",
+      "notInstalled": "nvidia-prime nu este instalat",
+      "installPackage": "Instalează nvidia-prime",
+      "installHint": "Instalează pachetul nvidia-prime necesar pentru comutarea între GPU-uri",
+      "activeProfile": "Profil activ: {profile}",
+      "profileNvidia": "NVIDIA (Dedicat)",
+      "profileIntel": "Intel (Integrat)",
+      "profileAmd": "AMD (Integrat)",
+      "profileOnDemand": "La cerere (On-Demand)",
+      "hintNvidia": "Utilizează GPU-ul NVIDIA pentru tot. Performanță maximă, consum mai mare de energie.",
+      "hintIntel": "Utilizează GPU-ul integrat Intel. Cea mai bună autonomie a bateriei.",
+      "hintAmd": "Utilizează GPU-ul integrat AMD. Cea mai bună autonomie a bateriei.",
+      "hintOnDemand": "Utilizează GPU-ul integrat implicit. Lansați aplicațiile cu prime-run pentru NVIDIA.",
+      "detectHybrid": "Detectează configurația hibridă",
+      "detectHybridHint": "Verificați dacă laptopul dvs. are o configurație grafică hibridă Intel/AMD + NVIDIA",
+      "rebootRequired": "Este necesară repornirea sistemului pentru a aplica modificarea profilului."
     }
   },
   "security": {
@@ -605,10 +665,7 @@
         "system-settings": { "label": "Setări de sistem", "hint": "Toate setările de sistem" }
       }
     },
-    "language": {
-      "title": "Limbă",
-      "description": "Alege limba de afișare a aplicației."
-    }
+    "language": { "title": "Limbă", "description": "Alege limba de afișare a aplicației." }
   },
   "home": {
     "title": "Bine ai venit în Soplos Linux",

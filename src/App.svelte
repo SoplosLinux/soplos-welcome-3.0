@@ -1,7 +1,9 @@
 <script lang="ts">
-  import { setContext, type ComponentType } from "svelte";
+  import { setContext, onMount, type ComponentType } from "svelte";
   import { getCurrentWindow } from "@tauri-apps/api/window";
+  import { getVersion } from "@tauri-apps/api/app";
   import { _ } from "svelte-i18n";
+  import { api } from "./lib/api";
   import { isRunning, progressFraction } from "./lib/progress";
   import Sidebar from "./components/Sidebar.svelte";
   import Header from "./components/Header.svelte";
@@ -50,6 +52,17 @@
   };
 
   let active = "home";
+  let appVersion = "";
+  let envInfo: { desktopEnvironment: string; displayProtocol: string } | null = null;
+
+  onMount(async () => {
+    try {
+      appVersion = await getVersion();
+    } catch { appVersion = ""; }
+    try {
+      envInfo = await api.invoke("get_environment_info");
+    } catch { envInfo = null; }
+  });
 
   function select(id: string) {
     active = id;
@@ -92,7 +105,7 @@
 <svelte:window on:keydown={handleKeydown} />
 
 <div class="flex h-screen overflow-hidden">
-  <Sidebar {tabs} {active} onSelect={select} />
+  <Sidebar {tabs} {active} onSelect={select} {appVersion} {envInfo} />
 
   <div class="flex-1 flex flex-col overflow-hidden min-w-0">
     {#if active !== "home"}

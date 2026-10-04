@@ -1,14 +1,38 @@
 {
   "app": {
     "tabs": {
-      "home": { "label": "Home", "title": "Welcome to Soplos" },
-      "software": { "label": "Software", "title": "Software" },
-      "drivers": { "label": "Drivers", "title": "Drivers and hardware" },
-      "kernels": { "label": "Kernels", "title": "Kernels" },
-      "security": { "label": "Security", "title": "Security" },
-      "recommended": { "label": "Recommended", "title": "Recommended applications" },
-      "customization": { "label": "Customization", "title": "Customization" },
-      "gaming": { "label": "Gaming", "title": "Gaming" }
+      "home": {
+        "label": "Home",
+        "title": "Welcome to Soplos"
+      },
+      "software": {
+        "label": "Software",
+        "title": "Software"
+      },
+      "drivers": {
+        "label": "Drivers",
+        "title": "Drivers and hardware"
+      },
+      "kernels": {
+        "label": "Kernels",
+        "title": "Kernels"
+      },
+      "security": {
+        "label": "Security",
+        "title": "Security"
+      },
+      "recommended": {
+        "label": "Recommended",
+        "title": "Recommended applications"
+      },
+      "customization": {
+        "label": "Customization",
+        "title": "Customization"
+      },
+      "gaming": {
+        "label": "Gaming",
+        "title": "Gaming"
+      }
     }
   },
   "sidebar": {
@@ -332,11 +356,26 @@
       "chooseHint": "Choose a kernel package with this architecture level, or lower, from the list below."
     },
     "xanmod": {
-      "main": { "title": "Standard (Recommended)", "hint": "General purpose build. Balanced performance for everyday use." },
-      "rt": { "title": "RT (Real-Time)", "hint": "PREEMPT_RT build. Minimal latency for audio production, streaming and competitive gaming." },
-      "edge": { "title": "EDGE (Experimental)", "hint": "Latest experimental features. May be unstable. For testing only.", "badge": "Not recommended" },
-      "lts": { "title": "LTS (Long-Term)", "hint": "Long-term support, conservative updates. Best for stability." }
-    }
+      "main": {
+        "title": "Standard (Recommended)",
+        "hint": "General purpose build. Balanced performance for everyday use."
+      },
+      "rt": {
+        "title": "RT (Real-Time)",
+        "hint": "PREEMPT_RT build. Minimal latency for audio production, streaming and competitive gaming."
+      },
+      "edge": {
+        "title": "EDGE (Experimental)",
+        "hint": "Latest experimental features. May be unstable. For testing only.",
+        "badge": "Not recommended"
+      },
+      "lts": {
+        "title": "LTS (Long-Term)",
+        "hint": "Long-term support, conservative updates. Best for stability."
+      }
+    },
+    "debianKernels": "Debian Official Kernels",
+    "debianKernelsHint": "Official Linux kernel builds maintained by Debian"
   },
   "drivers": {
     "detecting": "Detecting…",
@@ -357,6 +396,14 @@
     "virtualMachine": "Virtual Machine",
     "vmType": "Type: {type}",
     "guestTools": "guest tools",
+    "guestToolsActive": "Guest tools active.",
+    "guestToolsMissing": "Guest tools missing — install manually from Drivers → VM Tools.",
+    "checkNvidiaUpdate": "Check for updates",
+    "checkingUpdate": "Checking for updates…",
+    "updateAvailable": "Update available: v{version}",
+    "latestVersionInstalled": "Latest version installed",
+    "noNvidiaDriverInstalled": "No NVIDIA driver installed",
+    "updateCheckFailed": "Could not reach NVIDIA servers",
     "guestAdditionsActive": "Guest Additions active.",
     "guestAdditionsMissing": "Guest Additions missing — install manually from Drivers → VM Tools.",
     "graphicsCard": "Graphics Card — {vendor} {model}",
@@ -365,6 +412,25 @@
     "hybridGraphics": "Hybrid Graphics",
     "integrated": "Integrated: {name}",
     "dedicated": "Dedicated: {name}",
+    "prime": {
+      "title": "NVIDIA PRIME",
+      "subtitle": "Switch between integrated and dedicated GPU",
+      "notInstalled": "nvidia-prime not installed",
+      "installPackage": "Install nvidia-prime",
+      "installHint": "Installs the nvidia-prime package required to switch between GPUs",
+      "activeProfile": "Active profile: {profile}",
+      "profileNvidia": "NVIDIA (Dedicated)",
+      "profileIntel": "Intel (Integrated)",
+      "profileAmd": "AMD (Integrated)",
+      "profileOnDemand": "On-Demand",
+      "hintNvidia": "Uses the NVIDIA GPU for everything. Maximum performance, higher power consumption.",
+      "hintIntel": "Uses the Intel integrated GPU. Best battery life.",
+      "hintAmd": "Uses the AMD integrated GPU. Best battery life.",
+      "hintOnDemand": "Uses the integrated GPU by default. Launch apps with prime-run to use NVIDIA.",
+      "detectHybrid": "Detect Hybrid Setup",
+      "detectHybridHint": "Check if your laptop has a hybrid Intel/AMD + NVIDIA graphics setup",
+      "rebootRequired": "A system restart is required to apply the profile change."
+    },
     "wifi": "Wi-Fi",
     "audio": "Audio",
     "bluetooth": "Bluetooth",
@@ -442,14 +508,8 @@
       "description": "This unloads and reloads the Wi-Fi kernel module and restarts NetworkManager. Your network connection will be briefly interrupted.",
       "repair": "Repair"
     },
-    "confirmBranch": {
-      "title": "Install {label}?",
-      "description": "This removes any existing NVIDIA driver first, installs {label}, and regenerates the initramfs. A system restart will be required afterwards."
-    },
-    "confirmUninstall": {
-      "title": "Uninstall NVIDIA drivers?",
-      "description": "Removes all NVIDIA and CUDA packages, DKMS modules and repository sources. A system restart will be required afterwards."
-    },
+    "confirmBranch": { "title": "Install {label}?", "description": "This removes any existing NVIDIA driver first, installs {label}, and regenerates the initramfs. A system restart will be required afterwards." },
+    "confirmUninstall": { "title": "Uninstall NVIDIA drivers?", "description": "Removes all NVIDIA and CUDA packages, DKMS modules and repository sources. A system restart will be required afterwards." },
     "rocm": {
       "installTitle": "Install {name}?",
       "openclName": "ROCm OpenCL",
@@ -605,10 +665,7 @@
         "system-settings": { "label": "System Settings", "hint": "All system settings" }
       }
     },
-    "language": {
-      "title": "Language",
-      "description": "Choose the app's display language."
-    }
+    "language": { "title": "Language", "description": "Choose the app's display language." }
   },
   "home": {
     "title": "Welcome to Soplos Linux",

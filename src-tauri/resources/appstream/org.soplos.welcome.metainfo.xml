@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-  <id>org.soploslinux.welcome</id>
+  <id>org.soplos.welcome</id>
   <pkgname>soplos-welcome</pkgname>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0-or-later</project_license>
-  <project_group>org.soploslinux</project_group>
+  <project_group>org.soplos</project_group>
 
   <name>Soplos Welcome</name>
   <summary>Welcome screen for Soplos Linux</summary>
@@ -18,7 +18,7 @@
     </p>
   </description>
 
-  <launchable type="desktop-id">org.soploslinux.welcome.desktop</launchable>
+  <launchable type="desktop-id">org.soplos.welcome.desktop</launchable>
 
   <screenshots>
     <screenshot type="default">
@@ -61,7 +61,7 @@
 
   <url type="homepage">https://soplos.org</url>
 
-  <developer id="org.soploslinux">
+  <developer id="org.soplos">
     <name>Sergi Perich</name>
   </developer>
 

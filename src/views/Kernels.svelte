@@ -109,6 +109,31 @@
     xanmodStatus = await api.invoke<XanmodStatus>("get_xanmod_status");
   }
 
+  interface DebianKernelPackage {
+    packageName: string;
+    label: string;
+    description: string;
+    installed: boolean;
+    inUse: boolean;
+  }
+
+  let debianKernels: DebianKernelPackage[] = [];
+  let debianExpanded = false;
+
+  async function refreshDebianKernels() {
+    debianKernels = await api.invoke<DebianKernelPackage[]>("get_debian_kernels");
+  }
+
+  async function toggleDebianKernel(pkg: DebianKernelPackage) {
+    if (pkg.installed && pkg.inUse) {
+      infoMessage = $_("kernels.cannotUninstallLiquorix");
+      return;
+    }
+    await runTracked(pkg.installed ? "uninstall_debian_kernel" : "install_debian_kernel", { package: pkg.packageName });
+    await refreshDebianKernels();
+    await refreshKernelInfo();
+  }
+
   onMount(() => {
     refreshKernelInfo();
     refreshBrokenRepo();
@@ -116,6 +141,7 @@
     refreshKernelInstaller();
     refreshLiquorix();
     refreshXanmod();
+    refreshDebianKernels();
     refreshRepoStatus();
   });
 
@@ -359,6 +385,44 @@
       </div>
     </div>
 
+    <!-- Debian Official Kernels -->
+    <div class="bg-surface border border-border rounded p-4">
+      <div class="text-[0.7rem] font-semibold text-text-muted uppercase tracking-wide mb-2">{$_("kernels.debianKernels")}</div>
+      <button class="w-full flex items-center justify-between gap-3" on:click={() => (debianExpanded = !debianExpanded)}>
+        <div class="text-left">
+          <p class="text-[0.85rem] font-semibold text-text-bright">{$_("kernels.debianKernels")}</p>
+          <p class="text-[0.72rem] text-text">{$_("kernels.debianKernelsHint")}</p>
+        </div>
+        <ChevronDown size={18} class="text-text-muted transition-transform {debianExpanded ? 'rotate-180' : ''}" />
+      </button>
+
+      {#if debianExpanded}
+        <div class="flex flex-col gap-2 mt-4 pt-4 border-t border-border">
+          {#each debianKernels as pkg}
+            <button
+              class="text-left border rounded p-3 transition-colors border-border hover:bg-surface-2"
+              on:click={() => toggleDebianKernel(pkg)}
+            >
+              <div class="flex items-center justify-between gap-2 flex-wrap">
+                <span class="text-[0.85rem] font-semibold text-text-bright">{pkg.label}</span>
+                <span
+                  class="text-[0.68rem] px-2 py-0.5 rounded-full shrink-0 {pkg.installed
+                    ? 'bg-success/15 text-success'
+                    : 'bg-surface-2 text-text'}"
+                >
+                  {pkg.inUse && pkg.installed ? $_("kernels.inUseBadge") : pkg.installed ? $_("drivers.badge.installed") : $_("drivers.badge.notInstalled")}
+                </span>
+              </div>
+              <p class="text-[0.72rem] text-text mt-1">{pkg.description}</p>
+              <p class="text-[0.68rem] text-primary mt-1">
+                {pkg.installed ? $_("drivers.clickToUninstall") : $_("drivers.clickToInstall")}
+              </p>
+            </button>
+          {/each}
+        </div>
+      {/if}
+    </div>
+
     <!-- XanMod (expandable, Drivers-style) -->
     <div class="bg-surface border border-border rounded p-4">
       <div class="text-[0.7rem] font-semibold text-text-muted uppercase tracking-wide mb-2">{$_("kernels.xanmodVariantsTitle")}</div>
@@ -566,7 +630,7 @@
 {/if}
 
 {#if infoMessage}
-  <Modal variant="warning" maxWidth={400} onClose={() => (infoMessage = "")}>
+  <Modal variant="info" maxWidth={400} onClose={() => (infoMessage = "")}>
     <p class="whitespace-pre-line text-text-bright">{infoMessage}</p>
   </Modal>
 {/if}

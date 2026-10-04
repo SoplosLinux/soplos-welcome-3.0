@@ -367,7 +367,12 @@ pub fn preview_clean_kernels() -> CleanKernelsPreview {
         if pkg.is_empty() || !pkg.contains("linux-image-") {
             continue;
         }
-        if meta_patterns.iter().any(|p| pkg.contains(p)) && !pkg.chars().any(|c| c.is_ascii_digit()) {
+        // Skip the unversioned metapackages themselves (e.g. "linux-image-amd64",
+        // which always depends on the latest real numbered kernel) so they never
+        // get mixed into the version comparison below. Must be an exact match:
+        // these names already contain digits ("amd64", "686"), so a substring +
+        // "no digits in the name" check never actually filters anything out.
+        if meta_patterns.contains(&pkg.as_str()) {
             continue;
         }
         installed.push(pkg);
@@ -815,6 +820,78 @@ echo "Updating {package}..."
 RUNNING=$(uname -r)
 dpkg -l 'linux-image-*{suffix}' 2>/dev/null | awk '/^ii/{{print $2}}' | sort -V | head -n -1 | grep -v "$RUNNING" | xargs -r apt purge -y 2>/dev/null || true
 echo "Update complete."
+"#
+    );
+    Ok(start_pkexec_job(script))
+}
+
+// === Debian Official Kernels ===
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DebianKernelPackage {
+    pub package_name: String,
+    pub label: String,
+    pub description: String,
+    pub installed: bool,
+    pub in_use: bool,
+}
+
+#[tauri::command]
+pub fn get_debian_kernels() -> Vec<DebianKernelPackage> {
+    let running = run_stdout("uname", &["-r"]);
+    let debian_meta = [
+        ("linux-image-amd64", "Debian Linux Standard (amd64)", "Standard 64-bit official Debian kernel"),
+        ("linux-image-rt-amd64", "Debian Linux PREEMPT_RT (amd64)", "Real-time low latency 64-bit official Debian kernel"),
+    ];
+
+    let mut result = Vec::new();
+    for (pkg, label, desc) in debian_meta {
+        let is_installed = Command::new("dpkg-query")
+            .args(["-W", "-f=${Status}", pkg])
+            .output()
+            .ok()
+            .map(|o| String::from_utf8_lossy(&o.stdout).contains("installed"))
+            .unwrap_or(false);
+        let in_use = is_installed && running.contains("amd64") && !running.contains("soplos") && !running.contains("liquorix") && !running.contains("xanmod");
+        result.push(DebianKernelPackage {
+            package_name: pkg.to_string(),
+            label: label.to_string(),
+            description: desc.to_string(),
+            installed: is_installed,
+            in_use,
+        });
+    }
+    result
+}
+
+#[tauri::command]
+pub fn install_debian_kernel(package: String) -> Result<u64, String> {
+    if !package.starts_with("linux-image-") || !is_valid_pkg_name(&package) {
+        return Err(format!("Invalid package name: {package}"));
+    }
+    let script = format!(
+        r#"set -e
+echo "Installing Debian official kernel {package}..."
+apt update -q || true
+apt install -y {package}
+echo "Debian kernel {package} installed."
+echo "IMPORTANT: Restart the system to boot into the new kernel."
+"#
+    );
+    Ok(start_pkexec_job(script))
+}
+
+#[tauri::command]
+pub fn uninstall_debian_kernel(package: String) -> Result<u64, String> {
+    if !package.starts_with("linux-image-") || !is_valid_pkg_name(&package) {
+        return Err(format!("Invalid package name: {package}"));
+    }
+    let script = format!(
+        r#"set -e
+echo "Uninstalling Debian official kernel {package}..."
+apt purge -y {package}
+echo "Debian kernel {package} uninstalled."
 "#
     );
     Ok(start_pkexec_job(script))

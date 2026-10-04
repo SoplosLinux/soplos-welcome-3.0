@@ -991,6 +991,7 @@ echo "IMPORTANT: Restart the system to apply the changes."
     Ok(start_pkexec_job(script))
 }
 
+
 #[tauri::command]
 pub fn uninstall_vbox_guest() -> u64 {
     let script = r#"
@@ -1012,3 +1013,260 @@ echo "VirtualBox Guest Additions removal completed."
     .to_string();
     start_pkexec_job(script)
 }
+
+// ── NVIDIA PRIME ─────────────────────────────────────────────────────────────
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PrimeStatus {
+    /// Whether the nvidia-prime package is installed.
+    pub installed: bool,
+    /// Current active profile: "nvidia", "intel", "amd" or "on-demand".
+    /// Empty string when nvidia-prime is not installed.
+    pub active_profile: String,
+}
+
+#[tauri::command]
+pub fn get_prime_status() -> PrimeStatus {
+    let installed = is_package_installed("nvidia-prime");
+    if !installed {
+        return PrimeStatus { installed: false, active_profile: String::new() };
+    }
+    let active_profile = Command::new("prime-select")
+        .arg("query")
+        .output()
+        .ok()
+        .filter(|o| o.status.success())
+        .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_lowercase())
+        .unwrap_or_default();
+    PrimeStatus { installed, active_profile }
+}
+
+/// Switches the active PRIME profile or configures hybrid graphics modes. `profile` must be one of:
+/// "nvidia", "intel", "amd", "on-demand", "offload".
+#[tauri::command]
+pub fn set_prime_profile(profile: String) -> u64 {
+    let mode = if profile == "on-demand" { "offload" } else { profile.as_str() };
+    match mode {
+        "offload" => {
+            let script = r#"echo "=== Configuring PRIME Render Offload ==="
+if command -v prime-select &>/dev/null; then
+    prime-select on-demand 2>/dev/null || true
+fi
+
+rm -f /etc/X11/xorg.conf.d/10-nvidia-prime.conf
+rm -f /etc/X11/xorg.conf
+rm -f /etc/environment.d/10-nvidia-primary.conf
+rm -f /etc/udev/rules.d/61-nvidia-prime.rules
+rm -f /etc/udev/rules.d/61-gdm-nvidia.rules
+
+cat > /usr/local/bin/prime-run << 'PRIMERUN'
+#!/bin/bash
+export __NV_PRIME_RENDER_OFFLOAD=1
+export __NV_PRIME_RENDER_OFFLOAD_PROVIDER=NVIDIA-G0
+export __GLX_VENDOR_LIBRARY_NAME=nvidia
+export __VK_LAYER_NV_optimus=NVIDIA_only
+export __EGL_VENDOR_LIBRARY_FILENAMES=/usr/share/glvnd/egl_vendor.d/10_nvidia.json
+export GBM_BACKEND=nvidia-drm
+exec "$@"
+PRIMERUN
+chmod +x /usr/local/bin/prime-run
+
+mkdir -p /usr/share/applications
+cat > /usr/share/applications/prime-run.desktop << 'DESKTOP'
+[Desktop Entry]
+Name=Run with NVIDIA GPU
+Comment=Run application using the NVIDIA GPU
+Exec=prime-run %f
+Icon=nvidia
+Terminal=false
+Type=Application
+NoDisplay=true
+DESKTOP
+
+echo "PRIME Render Offload configured."
+echo "Use 'prime-run <command>' to execute apps with NVIDIA."
+"#.to_string();
+            start_pkexec_job(script)
+        }
+        "nvidia" => {
+            let script = r#"echo "=== Configuring NVIDIA as Primary GPU ==="
+if command -v prime-select &>/dev/null; then
+    prime-select nvidia 2>/dev/null || true
+fi
+
+if ! grep -q "nvidia-drm.modeset=1" /etc/default/grub 2>/dev/null; then
+    echo "Adding nvidia-drm.modeset=1 to GRUB..."
+    sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="\([^"]*\)"/GRUB_CMDLINE_LINUX_DEFAULT="\1 nvidia-drm.modeset=1"/' /etc/default/grub
+    update-grub 2>/dev/null || true
+fi
+
+mkdir -p /etc/environment.d
+cat > /etc/environment.d/10-nvidia-primary.conf << 'ENVCONF'
+__EGL_VENDOR_LIBRARY_FILENAMES=/usr/share/glvnd/egl_vendor.d/10_nvidia.json
+__GLX_VENDOR_LIBRARY_NAME=nvidia
+ENVCONF
+
+mkdir -p /etc/X11/xorg.conf.d
+cat > /etc/X11/xorg.conf.d/10-nvidia-prime.conf << 'XORGCONF'
+Section "OutputClass"
+    Identifier "nvidia"
+    MatchDriver "nvidia-drm"
+    Driver "nvidia"
+    Option "AllowEmptyInitialConfiguration"
+    Option "PrimaryGPU" "yes"
+    ModulePath "/usr/lib/x86_64-linux-gnu/nvidia/xorg"
+EndSection
+XORGCONF
+
+echo "NVIDIA configured as Primary GPU."
+echo "IMPORTANT: Restart the system to apply changes."
+"#.to_string();
+            start_pkexec_job(script)
+        }
+        "intel" | "amd" => {
+            let script = format!(
+                r#"echo "=== Configuring Integrated GPU Mode ({target}) ==="
+if command -v prime-select &>/dev/null; then
+    prime-select {target} 2>/dev/null || true
+fi
+
+rm -f /etc/X11/xorg.conf.d/10-nvidia-prime.conf
+rm -f /etc/environment.d/10-nvidia-primary.conf
+
+echo "Integrated GPU mode ({target}) configured."
+echo "IMPORTANT: Restart the system to apply changes."
+"#,
+                target = mode
+            );
+            start_pkexec_job(script)
+        }
+        _ => 0,
+    }
+}
+
+/// Installs the nvidia-prime package so prime-select becomes available.
+#[tauri::command]
+pub fn install_nvidia_prime() -> u64 {
+    start_pkexec_job(
+        "apt-get install -y nvidia-prime\necho \"nvidia-prime installed.\"".to_string(),
+    )
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct NvidiaUpdateStatus {
+    pub installed_version: String,
+    pub latest_version: String,
+    pub has_update: bool,
+}
+
+/// Semantic version comparison for NVIDIA version strings like "580.100.00".
+/// Returns true if `a` is strictly greater than `b`.
+fn nvidia_ver_gt(a: &str, b: &str) -> bool {
+    let parse = |s: &str| -> Vec<u64> {
+        s.split('.').map(|p| p.parse::<u64>().unwrap_or(0)).collect()
+    };
+    let av = parse(a);
+    let bv = parse(b);
+    let len = av.len().max(bv.len());
+    for i in 0..len {
+        let ai = av.get(i).copied().unwrap_or(0);
+        let bi = bv.get(i).copied().unwrap_or(0);
+        if ai != bi {
+            return ai > bi;
+        }
+    }
+    false
+}
+
+/// Checks online if a newer NVIDIA driver release exists.
+/// Returns an error string on network/parse failure so the frontend can show a
+/// proper message instead of silently showing nothing.
+#[tauri::command]
+pub async fn check_nvidia_update(branch: String) -> Result<NvidiaUpdateStatus, String> {
+    // Detect installed version via nvidia-smi.
+    let installed = Command::new("nvidia-smi")
+        .arg("--query-gpu=driver_version")
+        .arg("--format=csv,noheader")
+        .output()
+        .ok()
+        .filter(|o| o.status.success())
+        .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_string())
+        .unwrap_or_default();
+
+    if installed.is_empty() {
+        return Ok(NvidiaUpdateStatus {
+            installed_version: String::new(),
+            latest_version: String::new(),
+            has_update: false,
+        });
+    }
+
+    // Determine major version to select the right repo.
+    let major = installed.split('.').next().unwrap_or("").to_string();
+    let target_prefix = if branch.is_empty() { major.clone() } else { branch.clone() };
+
+    // For 580 use debian12 repo; for 590/610 use debian13.
+    let repo = if target_prefix == "580" {
+        "debian12"
+    } else {
+        "debian13"
+    };
+    let url = format!(
+        "https://developer.download.nvidia.com/compute/cuda/repos/{repo}/x86_64/Packages"
+    );
+
+    // Fetch in a blocking thread so the async Tauri runtime is not stalled.
+    // The debian12 (580 branch) Packages index alone is ~8.8 MB, debian13
+    // ~1.9 MB — a 3 MB cap silently failed every debian12 check: ureq's
+    // limit() doesn't truncate, it returns Err(BodyExceedsLimit) once the
+    // body exceeds it (confirmed in ureq's own test suite), which the
+    // .ok() below turned into an empty body and a generic "network error"
+    // that had nothing to do with actual connectivity. 16 MB leaves
+    // headroom for the index to keep growing.
+    let body = tauri::async_runtime::spawn_blocking(move || -> Option<String> {
+        let config = ureq::Agent::config_builder()
+            .timeout_global(Some(std::time::Duration::from_secs(20)))
+            .build();
+        let agent = ureq::Agent::new_with_config(config);
+        let mut response = agent.get(&url).call().ok()?;
+        response
+            .body_mut()
+            .with_config()
+            .limit(16 * 1024 * 1024)
+            .read_to_string()
+            .ok()
+    })
+    .await
+    .ok()
+    .flatten()
+    .unwrap_or_default();
+
+    if body.is_empty() {
+        return Err("Network error: could not fetch NVIDIA package index".to_string());
+    }
+
+    let mut latest = installed.clone();
+    for line in body.lines() {
+        if line.starts_with("Version:") {
+            let ver = line.trim_start_matches("Version:").trim();
+            // Strip Debian package epoch/revision: "2:580.100.00-1" → "580.100.00"
+            let ver = ver.split(':').last().unwrap_or(ver);
+            let clean_ver = ver.split('-').next().unwrap_or(ver).trim();
+            if clean_ver.starts_with(&target_prefix) && nvidia_ver_gt(clean_ver, &latest) {
+                latest = clean_ver.to_string();
+            }
+        }
+    }
+
+    let has_update = latest != installed;
+    Ok(NvidiaUpdateStatus {
+        installed_version: installed,
+        latest_version: latest,
+        has_update,
+    })
+}
+
+
+
