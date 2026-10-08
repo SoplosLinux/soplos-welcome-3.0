@@ -66,6 +66,18 @@
   </developer>
 
   <releases>
+    <release version="3.0.0-3-beta" date="2026-10-08">
+      <description>
+        <p>New Recommended applications and several VirtualBox/Audacity/Patchy fixes.</p>
+        <ul>
+          <li>New recommended applications: the ArtCraft suite (VectorCraft, FilmCraft, EffectCraft, LightCraft, PrintCraft) and VMware Workstation Pro</li>
+          <li>Audacity now installs from the official AppImage, since Audacity 4 dropped Debian packaging</li>
+          <li>Patchy always installs the latest release and shows the current official icon</li>
+          <li>Fixed VirtualBox Extension Pack install failing with a name mismatch error</li>
+          <li>Waydroid moved to the Virtualization category and blocked on X11 sessions, which it cannot run on</li>
+        </ul>
+      </description>
+    </release>
     <release version="3.0.0-1-beta" date="2026-09-30">
       <description>
         <p>New recommended applications and a smaller installed package.</p>

@@ -17,15 +17,23 @@ fn work_dir_for(installer_path: &str) -> String {
     format!("{dir}/soplos-davinci-work")
 }
 
+// Non-async Tauri commands run on the main GTK thread, so a blocking native
+// file dialog there freezes the whole UI until it's closed (same class of
+// bug fixed in WebApp Manager's pick_icon_file / Welcome's
+// pick_vmware_installer). spawn_blocking moves the wait off the main thread.
 #[tauri::command]
-pub fn pick_davinci_installer(app: tauri::AppHandle) -> Option<String> {
-    app.dialog()
-        .file()
-        .set_title("Select DaVinci Resolve Installer")
-        .add_filter("DaVinci Resolve Installer", &["zip", "run"])
-        .blocking_pick_file()
-        .and_then(|fp| fp.into_path().ok())
-        .map(|p| p.to_string_lossy().to_string())
+pub async fn pick_davinci_installer(app: tauri::AppHandle) -> Option<String> {
+    tauri::async_runtime::spawn_blocking(move || {
+        app.dialog()
+            .file()
+            .set_title("Select DaVinci Resolve Installer")
+            .add_filter("DaVinci Resolve Installer", &["zip", "run"])
+            .blocking_pick_file()
+            .and_then(|fp| fp.into_path().ok())
+            .map(|p| p.to_string_lossy().to_string())
+    })
+    .await
+    .unwrap_or(None)
 }
 
 #[tauri::command]
@@ -290,4 +298,24 @@ fi
 #[tauri::command]
 pub fn run_davinci_gpu_patch() -> u64 {
     start_pkexec_job(DAVINCI_GPU_PATCH_SCRIPT.to_string())
+}
+
+// makeresolvedeb produces a real apt package (named after whatever the
+// downloaded installer identifies itself as, e.g. "resolve" for the free
+// edition or "resolve-studio" for the paid one) — not matched against a
+// single hardcoded name here, since either can be installed depending on
+// what the user downloaded. Found dynamically instead of guessing.
+#[tauri::command]
+pub fn uninstall_davinci() -> u64 {
+    start_pkexec_job(
+        r#"set -e
+PKGS=$(dpkg-query -W -f='${Package}\n' 2>/dev/null | grep -i '^resolve' || true)
+if [ -z "$PKGS" ]; then
+    echo "No DaVinci Resolve package found installed via apt."
+    exit 1
+fi
+apt-get remove -y $PKGS
+echo "DaVinci Resolve uninstalled.""#
+            .to_string(),
+    )
 }

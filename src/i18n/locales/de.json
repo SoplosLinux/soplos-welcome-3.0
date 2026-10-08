@@ -88,6 +88,7 @@
     "appsCount": "{count} Apps",
     "official": "Offiziell",
     "installing": "Wird installiert…",
+    "uninstalling": "Wird deinstalliert…",
     "updateTo": "Aktualisieren auf {version}",
     "installedVersion": "Installiert: {version}",
     "version": "Version {version}",
@@ -102,6 +103,7 @@
     "deselectAll": "Auswahl aufheben",
     "selectedCount": "{count, plural, one {# Programm ausgewählt} other {# Programme ausgewählt}}",
     "applySelected": "Auf Auswahl anwenden",
+    "waydroidNeedsWayland": "Waydroid benötigt eine Wayland-Sitzung — dieses System läuft derzeit mit X11.",
     "davinci": {
       "title": "DaVinci Resolve installieren",
       "body": "DaVinci Resolve erfordert aus Lizenzgründen einen manuellen Download.\n\n1. Gehe auf blackmagicdesign.com und lade die Linux-Version (ZIP) herunter.\n2. Klicke auf Weiter, um die heruntergeladene Datei auszuwählen.\n3. Daraus wird ein Debian-Paket erstellt und installiert.",
@@ -114,6 +116,11 @@
       "gpuHint": "Installiert OpenCL-Treiber und Firmware und patcht den Starter, damit DaVinci Resolve auf integrierter AMD- oder Intel-Grafik läuft.",
       "skip": "Überspringen",
       "apply": "Auswahl anwenden"
+    },
+    "vmware": {
+      "title": "Installation von VMware Workstation Pro",
+      "body": "VMware Workstation Pro erfordert aus Lizenzgründen einen manuellen Download.\n\n1. Gehe zu broadcom.com und lade den Linux-Installer (.bundle) herunter.\n2. Klicke auf Weiter, um die heruntergeladene Datei auszuwählen.\n3. Wir installieren ihn und richten die VMware-Kernelmodule von Soplos (vmmon/vmnet) ein, damit sie bei jedem Kernel-Update weiter funktionieren.",
+      "installed": "VMware Workstation Pro wurde erfolgreich installiert."
     },
     "license": {
       "acceptInstall": "Akzeptieren und installieren",
@@ -169,6 +176,7 @@
       "genoffice": "Open-Source-Office-Suite mit KI: Docs, Sheets, Slides, PDF, HTML und Markdown",
       "adobe-reader": "PDF-Betrachter von Adobe",
       "jopdf": "PDF-Editor: Anmerkungen, Signaturen, Formulare ausfüllen und PDFs zusammenführen",
+      "printcraft": "Acrobat-Alternative, geschrieben in Rust",
       "vlc-media-player": "Universeller Medienplayer",
       "mpv": "Minimalistischer und leistungsstarker Medienplayer",
       "kodi": "Open-Source-Mediacenter",
@@ -189,6 +197,8 @@
       "zrythm": "Freie Open-Source-Audio-Workstation",
       "ardour": "Professionelle DAW für Aufnahme, Bearbeitung und Mischung",
       "concat": "Freier Open-Source-Videoeditor mit lokaler KI-Untertitelung und nativer Rust-Engine",
+      "filmcraft": "Premiere-Pro-Alternative, geschrieben in Rust",
+      "effectcraft": "After-Effects-Alternative, geschrieben in Rust",
       "glassy-music": "Angepasster YouTube-Music-Desktop-Client mit Liedtexten, Werbeblocker und Shader-Effekten",
       "orchard": "Desktop-Client für Power-User von YouTube Music mit intelligentem Crossfade, Equalizer und Discord-Präsenz",
       "sonora": "Nativer Musik-Streaming-Client für Apple Music, Spotify, YouTube Music, Deezer und lokale Dateien",
@@ -196,7 +206,10 @@
       "krita": "Professionelles digitales Malprogramm",
       "affinity-suite": "Professionelle Suite für Fotobearbeitung, Design und Layout",
       "fog-panther": "Professioneller Bildeditor",
-      "patchy": "Open-Source-Bildeditor mit Fokus auf PSD-Kompatibilität und Photoshop-ähnliche Arbeitsabläufe",
+      "patchy": "Open-Source-Bildeditor mit PSD-Kompatibilität",
+      "photocraft": "Photoshop-Alternative, geschrieben in Rust",
+      "vectorcraft": "Illustrator-Alternative, geschrieben in Rust",
+      "lightcraft": "Lightroom-Alternative, geschrieben in Rust",
       "inkscape": "Professioneller Vektorgrafik-Editor",
       "blender": "Vollständige, kostenlose 3D-Erstellungssuite",
       "darktable": "Virtueller Leuchttisch für die Fotografie",
@@ -240,6 +253,7 @@
       "nomachine": "Remote-Desktop-Client für den Zugriff auf NoMachine-Server",
       "virtualbox": "Vollständiger Hypervisor für virtuelle Maschinen von Oracle",
       "virtualbox-extension-pack": "USB-2.0/3.0-Unterstützung, RDP, PXE-Boot und Festplattenverschlüsselung für VirtualBox",
+      "vmware-workstation-pro": "Virtualisierungs-Hypervisor von Broadcom, mit bereits integrierten Soplos-Kernelmodulen",
       "virt-manager": "Grafisches Werkzeug zur Verwaltung virtueller Maschinen mit libvirt/QEMU",
       "gnome-boxes": "Einfacher Betrachter für virtuelle Maschinen und Remote-Desktops in GNOME"
     }

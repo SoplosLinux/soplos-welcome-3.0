@@ -2,6 +2,28 @@
 
 All notable changes to Soplos Welcome are documented in this file.
 
+## [3.0.0-3-beta] - 2026-10-08
+
+### Added
+
+- New Recommended applications: the ArtCraft suite (VectorCraft, FilmCraft, EffectCraft, LightCraft and PrintCraft — clean-room Rust rewrites of Illustrator, Premiere Pro, After Effects, Lightroom and Acrobat), and VMware Workstation Pro.
+- VMware Workstation Pro install flow: pick the Broadcom bundle you already downloaded, run its official installer, then automatically install and build Soplos's own vmmon/vmnet kernel modules so VMware keeps working across kernel updates. Full uninstall included.
+- DaVinci Resolve: uninstall support (previously install-only).
+- New app icon (the "S" mark) for Soplos Welcome itself.
+
+### Changed
+
+- Patchy now always installs the latest upstream release instead of a version pinned at v1.00, and its icon was updated to the current official logo.
+- Audacity switched from the (now discontinued) Debian package to the official AppImage, since Audacity 4 dropped .deb packaging entirely. Icon updated to the real one embedded in the official AppImage.
+- Waydroid moved from the Developer category to Virtualization, where it belongs, and is now blocked from installing on an X11 session (it requires Wayland) instead of silently failing.
+
+### Fixed
+
+- VirtualBox Extension Pack install: a `wget` probe for a per-file checksum that VirtualBox's own download server doesn't publish was silently killing the whole script under `set -e`; fixed in the shared download helper.
+- VirtualBox Extension Pack install: the downloaded file is now saved under the exact name VBoxManage expects, fixing a "name mismatch" install failure.
+- VirtualBox install: now prints a clear completion message instead of leaving the terminal on the last raw apt output line.
+- The VMware and DaVinci Resolve file pickers no longer freeze the whole window while the native file dialog is open.
+
 ## [3.0.0-1-beta] - 2026-09-30
 
 - New Recommended applications: Concat, Glassy Music, Orchard and Sonora.

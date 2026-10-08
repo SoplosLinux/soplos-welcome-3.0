@@ -10,3 +10,4 @@ pub mod search;
 pub mod security;
 pub mod software;
 pub mod system;
+pub mod vmware;

@@ -53,7 +53,12 @@ fn detect_virt_via_systemd() -> bool {
 pub const VERIFY_DOWNLOAD_SH: &str = r#"verify_and_download() {
   local url="$1" dest="$2"
   wget -q -O "$dest" "$url"
-  wget -q -O "$dest.sha256" "$url.sha256" 2>/dev/null
+  # Most providers 404 the ".sha256" probe (no per-file checksum published),
+  # and wget exits non-zero on that — which silently kills any caller that
+  # runs under `set -e` (e.g. install_vbox_extpack) before the presence
+  # check below even runs. The probe missing is an expected, handled case,
+  # not a real failure, so it must not be allowed to abort the script.
+  wget -q -O "$dest.sha256" "$url.sha256" 2>/dev/null || true
   # Some providers (e.g. GitLab's package_files download proxy) don't 404 an
   # unknown ".sha256" suffix — they just re-serve the original file, so a
   # multi-megabyte binary can land here looking like a "checksum". A real

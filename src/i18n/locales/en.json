@@ -88,6 +88,7 @@
     "appsCount": "{count} apps",
     "official": "Official",
     "installing": "Installing…",
+    "uninstalling": "Uninstalling…",
     "updateTo": "Update to {version}",
     "installedVersion": "Installed: {version}",
     "version": "Version {version}",
@@ -102,6 +103,7 @@
     "deselectAll": "Deselect All",
     "selectedCount": "{count, plural, one {# program selected} other {# programs selected}}",
     "applySelected": "Apply to Selected",
+    "waydroidNeedsWayland": "Waydroid requires a Wayland session — this system is currently running X11.",
     "davinci": {
       "title": "DaVinci Resolve Installation",
       "body": "DaVinci Resolve requires manual download due to licensing.\n\n1. Go to blackmagicdesign.com and download the Linux version (ZIP).\n2. Click Continue to select the downloaded file.\n3. We will convert it to a Debian package and install it.",
@@ -114,6 +116,11 @@
       "gpuHint": "Installs OpenCL drivers, firmware and patches the launcher so DaVinci Resolve works on integrated AMD or Intel graphics.",
       "skip": "Skip",
       "apply": "Apply Selected"
+    },
+    "vmware": {
+      "title": "VMware Workstation Pro installation",
+      "body": "VMware Workstation Pro requires a manual download for licensing reasons.\n\n1. Go to broadcom.com and download the Linux installer (.bundle).\n2. Press Continue to select the downloaded file.\n3. We'll install it and set up Soplos's VMware kernel modules (vmmon/vmnet) so they keep working across kernel updates.",
+      "installed": "VMware Workstation Pro was installed successfully."
     },
     "license": {
       "acceptInstall": "Accept and install",
@@ -169,6 +176,7 @@
       "genoffice": "Open-source AI office suite: Docs, Sheets, Slides, PDF, HTML and Markdown",
       "adobe-reader": "Adobe PDF reader",
       "jopdf": "PDF editor: annotate, sign, fill forms and merge PDFs",
+      "printcraft": "Clean-room Acrobat alternative written in Rust",
       "vlc-media-player": "Universal media player",
       "mpv": "Minimalist and powerful media player",
       "kodi": "Open-source media center",
@@ -189,6 +197,8 @@
       "zrythm": "Free and open-source digital audio workstation",
       "ardour": "Professional recording, editing and mixing DAW",
       "concat": "Free, open-source video editor with local AI captioning and a native Rust engine",
+      "filmcraft": "Clean-room Premiere Pro alternative written in Rust",
+      "effectcraft": "Clean-room After Effects alternative written in Rust",
       "glassy-music": "Customized YouTube Music desktop client with lyrics, ad blocking and shader effects",
       "orchard": "Power-user desktop client for YouTube Music with smart crossfade, equalizer and Discord presence",
       "sonora": "Native music streaming client for Apple Music, Spotify, YouTube Music, Deezer and local files",
@@ -196,7 +206,10 @@
       "krita": "Professional digital painting program",
       "affinity-suite": "Professional photo editing, design and publishing suite",
       "fog-panther": "Professional image editor",
-      "patchy": "Open-source image editor focused on PSD compatibility and Photoshop-like workflows",
+      "patchy": "Open-source image editor with PSD compatibility",
+      "photocraft": "Clean-room Photoshop alternative written in Rust",
+      "vectorcraft": "Clean-room Illustrator alternative written in Rust",
+      "lightcraft": "Clean-room Lightroom alternative written in Rust",
       "inkscape": "Professional vector graphics editor",
       "blender": "Complete and free 3D creation suite",
       "darktable": "Virtual lighttable for photography",
@@ -240,6 +253,7 @@
       "nomachine": "Remote desktop client for accessing NoMachine servers",
       "virtualbox": "Full-featured virtual machine hypervisor by Oracle",
       "virtualbox-extension-pack": "USB 2.0/3.0, RDP, PXE boot and disk encryption support for VirtualBox",
+      "vmware-workstation-pro": "Broadcom's virtual machine hypervisor, with Soplos's kernel modules already integrated",
       "virt-manager": "Graphical tool for managing virtual machines via libvirt/QEMU",
       "gnome-boxes": "Simple virtual machine and remote desktop viewer for GNOME"
     }

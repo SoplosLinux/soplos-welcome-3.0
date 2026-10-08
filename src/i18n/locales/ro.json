@@ -88,6 +88,7 @@
     "appsCount": "{count} aplicații",
     "official": "Oficial",
     "installing": "Se instalează…",
+    "uninstalling": "Se dezinstalează…",
     "updateTo": "Actualizează la {version}",
     "installedVersion": "Instalată: {version}",
     "version": "Versiunea {version}",
@@ -102,6 +103,7 @@
     "deselectAll": "Deselectează tot",
     "selectedCount": "{count, plural, one {# program selectat} few {# programe selectate} other {# de programe selectate}}",
     "applySelected": "Aplică pe selecție",
+    "waydroidNeedsWayland": "Waydroid are nevoie de o sesiune Wayland — acest sistem rulează momentan X11.",
     "davinci": {
       "title": "Instalarea DaVinci Resolve",
       "body": "DaVinci Resolve necesită o descărcare manuală din motive de licență.\n\n1. Mergi la blackmagicdesign.com și descarcă versiunea pentru Linux (ZIP).\n2. Apasă Continuă pentru a selecta fișierul descărcat.\n3. Va fi convertit într-un pachet Debian și instalat.",
@@ -114,6 +116,11 @@
       "gpuHint": "Instalează drivere OpenCL și firmware și modifică lansatorul pentru ca DaVinci Resolve să funcționeze pe grafică integrată AMD sau Intel.",
       "skip": "Omite",
       "apply": "Aplică selecția"
+    },
+    "vmware": {
+      "title": "Instalarea VMware Workstation Pro",
+      "body": "VMware Workstation Pro necesită o descărcare manuală din motive de licență.\n\n1. Mergi pe broadcom.com și descarcă instalatorul pentru Linux (.bundle).\n2. Apasă Continuă pentru a selecta fișierul descărcat.\n3. Îl vom instala și vom configura modulele de kernel VMware ale Soplos (vmmon/vmnet) ca să continue să funcționeze la fiecare actualizare de kernel.",
+      "installed": "VMware Workstation Pro a fost instalat cu succes."
     },
     "license": {
       "acceptInstall": "Acceptă și instalează",
@@ -169,6 +176,7 @@
       "genoffice": "Suită de birou open source cu IA: Docs, Sheets, Slides, PDF, HTML și Markdown",
       "adobe-reader": "Cititor PDF de la Adobe",
       "jopdf": "Editor PDF: adnotează, semnează, completează formulare și îmbină PDF-uri",
+      "printcraft": "Alternativă la Acrobat scrisă în Rust",
       "vlc-media-player": "Player multimedia universal",
       "mpv": "Player multimedia minimalist și puternic",
       "kodi": "Centru multimedia open source",
@@ -189,6 +197,8 @@
       "zrythm": "Stație de lucru audio digitală liberă și open source",
       "ardour": "DAW profesional de înregistrare, editare și mixaj",
       "concat": "Editor video liber și open source cu subtitrare prin IA locală și motor nativ în Rust",
+      "filmcraft": "Alternativă la Premiere Pro scrisă în Rust",
+      "effectcraft": "Alternativă la After Effects scrisă în Rust",
       "glassy-music": "Client desktop personalizat pentru YouTube Music cu versuri, blocare a reclamelor și efecte shader",
       "orchard": "Client desktop avansat pentru YouTube Music cu crossfade inteligent, egalizator și prezență Discord",
       "sonora": "Client nativ de streaming muzical pentru Apple Music, Spotify, YouTube Music, Deezer și fișiere locale",
@@ -196,7 +206,10 @@
       "krita": "Program profesional de pictură digitală",
       "affinity-suite": "Suită profesională de editare foto, design și machetare",
       "fog-panther": "Editor de imagini profesional",
-      "patchy": "Editor de imagini open source axat pe compatibilitatea PSD și pe fluxuri de lucru în stil Photoshop",
+      "patchy": "Editor de imagini open source compatibil cu PSD",
+      "photocraft": "Alternativă la Photoshop scrisă în Rust",
+      "vectorcraft": "Alternativă la Illustrator scrisă în Rust",
+      "lightcraft": "Alternativă la Lightroom scrisă în Rust",
       "inkscape": "Editor profesional de grafică vectorială",
       "blender": "Suită completă și gratuită de creare 3D",
       "darktable": "Masă de lumină virtuală pentru fotografie",
@@ -240,6 +253,7 @@
       "nomachine": "Client de desktop la distanță pentru accesarea serverelor NoMachine",
       "virtualbox": "Hipervizor complet de mașini virtuale de la Oracle",
       "virtualbox-extension-pack": "Suport USB 2.0/3.0, RDP, boot PXE și criptare de disc pentru VirtualBox",
+      "vmware-workstation-pro": "Hipervizor de mașini virtuale de la Broadcom, cu modulele de kernel Soplos deja integrate",
       "virt-manager": "Instrument grafic pentru gestionarea mașinilor virtuale cu libvirt/QEMU",
       "gnome-boxes": "Vizualizator simplu de mașini virtuale și desktopuri la distanță pentru GNOME"
     }

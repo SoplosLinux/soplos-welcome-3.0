@@ -86,6 +86,7 @@
         { name: "GenOffice", icon: "genoffice.png", kind: "custom", package: "genoffice", customInstall: "install_genoffice" },
         { name: "Adobe Reader", icon: "reader.png", kind: "flatpak", flatpak: "com.adobe.Reader" },
         { name: "JoPDF", icon: "jopdf.png", kind: "custom", package: "jopdf", customInstall: "install_jopdf" },
+        { name: "PrintCraft", icon: "printcraft.png", kind: "custom", package: "printcraft", customInstall: "install_printcraft", customUninstall: "uninstall_printcraft" },
       ],
     },
     {
@@ -126,10 +127,19 @@
         { name: "OpenShot", icon: "openshot.png", official: true, kind: "flatpak", flatpak: "org.openshot.OpenShot" },
         { name: "HandBrake", icon: "handbrake.png", official: true, kind: "flatpak", flatpak: "fr.handbrake.ghb" },
         { name: "Concat", icon: "concat.png", kind: "custom", package: "concat", customInstall: "install_concat", customUninstall: "uninstall_concat" },
+        { name: "FilmCraft", icon: "filmcraft.png", kind: "custom", package: "filmcraft", customInstall: "install_filmcraft", customUninstall: "uninstall_filmcraft" },
+        { name: "EffectCraft", icon: "effectcraft.png", kind: "custom", package: "effectcraft", customInstall: "install_effectcraft", customUninstall: "uninstall_effectcraft" },
         { name: "DaVinci Resolve", icon: "davinci-resolve.png", kind: "manual", checkPath: "/opt/resolve/bin/resolve" },
         { name: "Drift", icon: "drift.png", kind: "flatpak", flatpak: "org.cutwire.Drift" },
         { name: "Prism", icon: "prism.png", kind: "flatpak", flatpak: "org.cutwire.Prism" },
-        { name: "Audacity", icon: "audacity.png", official: true, kind: "apt", package: "audacity" },
+        {
+          name: "Audacity",
+          icon: "audacity.png",
+          kind: "custom",
+          checkPath: "~/AppImages/audacity-linux-x86_64.AppImage",
+          customInstall: "install_audacity",
+          customUninstall: "uninstall_audacity",
+        },
         { name: "KutEditor", icon: "kuteditor.png", official: true, kind: "apt", package: "kuteditor" },
         { name: "LMMS", icon: "lmms.png", kind: "flatpak", flatpak: "io.lmms.LMMS" },
         { name: "Mixxx", icon: "mixxx.png", official: true, kind: "apt", package: "mixxx" },
@@ -153,21 +163,16 @@
           customUninstall: "uninstall_affinity",
         },
         { name: "Fog Panther", icon: "pantherfog.png", kind: "flatpak", flatpak: "com.fogpanther.FogPanther" },
-        {
-          name: "Patchy",
-          icon: "patchy.png",
-                    kind: "custom",
-          badge: "Flatpak",
-          checkPath: "~/.local/share/flatpak/app/com.rtsoft.patchy",
-          customInstall: "install_patchy",
-          customUninstall: "uninstall_patchy",
-        },
+        { name: "Patchy", icon: "patchy.png", kind: "custom", badge: "Flatpak", checkPath: "~/.local/share/flatpak/app/com.rtsoft.patchy", customInstall: "install_patchy", customUninstall: "uninstall_patchy" },
+        { name: "PhotoCraft", icon: "photocraft.png", kind: "custom", package: "photocraft", customInstall: "install_photocraft", customUninstall: "uninstall_photocraft" },
         { name: "Inkscape", icon: "inkscape.png", official: true, kind: "apt", package: "inkscape" },
+        { name: "VectorCraft", icon: "vectorcraft.png", kind: "custom", package: "vectorcraft", customInstall: "install_vectorcraft", customUninstall: "uninstall_vectorcraft" },
         { name: "Blender", icon: "blender.png", official: true, kind: "apt", package: "blender" },
         { name: "darktable", icon: "darktable.png", official: true, kind: "apt", package: "darktable" },
         { name: "RapidRAW", icon: "rapidraw.png", kind: "flatpak", flatpak: "io.github.CyberTimon.RapidRAW" },
         { name: "RawTherapee", icon: "rawtherapee.png", official: true, kind: "apt", package: "rawtherapee" },
         { name: "ART", icon: "art.png", kind: "flatpak", flatpak: "us.pixls.art.ART" },
+        { name: "LightCraft", icon: "lightcraft.png", kind: "custom", package: "lightcraft", customInstall: "install_lightcraft", customUninstall: "uninstall_lightcraft" },
         { name: "Hugin", icon: "hugin.png", official: true, kind: "apt", package: "hugin" },
       ],
     },
@@ -184,14 +189,6 @@
         { name: "Geany", icon: "geany.png", official: true, kind: "apt", package: "geany" },
         { name: "Bluefish", icon: "bluefish.png", official: true, kind: "apt", package: "bluefish" },
         { name: "Postman", icon: "postman.png", kind: "flatpak", flatpak: "com.getpostman.Postman" },
-        {
-          name: "Waydroid",
-          icon: "waydroid.png",
-                    kind: "custom",
-          package: "waydroid",
-          customInstall: "install_waydroid",
-          customUninstall: "uninstall_waydroid",
-        },
       ],
     },
     {
@@ -277,14 +274,19 @@
           customUninstall: "uninstall_vbox_extpack",
           licenseConfirm: true,
         },
+        { name: "VMware Workstation Pro", icon: "vmware.png", kind: "manual", checkPath: "/usr/bin/vmware", customInstall: "install_vmware_bundle" },
         { name: "virt-manager", icon: "virtmanager.png", official: true, kind: "apt", package: "virt-manager" },
         { name: "GNOME Boxes", icon: "gnomeboxes.png", official: true, kind: "apt", package: "gnome-boxes" },
+        { name: "Waydroid", icon: "waydroid.png", kind: "custom", package: "waydroid", customInstall: "install_waydroid", customUninstall: "uninstall_waydroid" },
       ],
     },
   ];
 
   const installedMap: Record<string, boolean> = {};
   let installedVersion = 0;
+
+  let displayProtocol: string | null = null;
+  $: waydroidBlocked = displayProtocol === "x11";
 
   // Descriptions live in the i18n dictionaries under recommended.desc.<slug>,
   // where the slug is the lowercase app name with non-alphanumerics as "-".
@@ -351,13 +353,43 @@
     const key = pkgKey(catKey, pkg);
     const installed = installedMap[key];
 
+    if (!installed && pkg.customInstall === "install_waydroid" && waydroidBlocked) {
+      infoMessage = { key: "recommended.waydroidNeedsWayland" };
+      return;
+    }
+
     if (!installed && pkg.licenseConfirm) {
       licenseConfirmTarget = { catKey, pkg };
       return;
     }
 
     if (pkg.kind === "manual") {
-      davinciConfirmOpen = true;
+      const isVmware = pkg.customInstall === "install_vmware_bundle";
+      if (installed) {
+        if (isVmware) {
+          vmwareBusy = true;
+          try {
+            await runTracked("uninstall_vmware", undefined, { append });
+          } finally {
+            vmwareBusy = false;
+          }
+        } else {
+          davinciBusy = true;
+          try {
+            await runTracked("uninstall_davinci", undefined, { append });
+          } finally {
+            davinciBusy = false;
+          }
+        }
+        await refreshPkgStatus(catKey, pkg);
+        return;
+      }
+      if (isVmware) {
+        vmwareInstallTarget = { catKey, pkg };
+        vmwareConfirmOpen = true;
+      } else {
+        davinciConfirmOpen = true;
+      }
       return;
     }
 
@@ -448,6 +480,30 @@
     davinciPatchesOpen = false;
     davinciPatchesResolve?.(apply);
     davinciPatchesResolve = null;
+  }
+
+  // === VMware Workstation Pro (manual: pick the Broadcom .bundle the user
+  // already downloaded -> run its own installer -> install Soplos's
+  // vmmon/vmnet module builder on top, since VMware's own
+  // vmware-modconfig step is known to fail on systemd-based distros) ===
+  let vmwareConfirmOpen = false;
+  let vmwareBusy = false;
+  let vmwareInstallTarget: { catKey: string; pkg: RecPackage } | null = null;
+
+  async function startVmwareInstall() {
+    vmwareConfirmOpen = false;
+    const installerPath = await api.invoke<string | null>("pick_vmware_installer");
+    if (!installerPath) return;
+
+    vmwareBusy = true;
+    try {
+      if (!(await runTracked("install_vmware_bundle", { installerPath }))) return;
+      await runTracked("install_vmware_modules", undefined, { append: true });
+      infoMessage = { key: "recommended.vmware.installed" };
+      if (vmwareInstallTarget) await refreshPkgStatus(vmwareInstallTarget.catKey, vmwareInstallTarget.pkg);
+    } finally {
+      vmwareBusy = false;
+    }
   }
 
   async function confirmLicenseInstall() {
@@ -570,8 +626,10 @@
   // Selectable in batch mode regardless of installed state — applyToSelected
   // runs togglePkg per item, which installs the not-yet-installed ones and
   // uninstalls the already-installed ones, same as a single click would.
-  function isSelectable(_catKey: string, pkg: RecPackage): boolean {
-    return pkg.kind !== "manual";
+  function isSelectable(catKey: string, pkg: RecPackage): boolean {
+    if (pkg.kind === "manual") return false;
+    if (pkg.customInstall === "install_waydroid" && waydroidBlocked && !installedMap[pkgKey(catKey, pkg)]) return false;
+    return true;
   }
 
   function toggleSelected(catKey: string, pkg: RecPackage) {
@@ -670,6 +728,19 @@
     }
 
     await refreshAntigravityStatus();
+
+    // Waydroid needs a Wayland compositor to work at all (it renders through
+    // wlr-layer-shell); Tyron is still X11-only for now, so installing it
+    // there would just leave a broken container nobody can launch. Checked
+    // here instead of only warning after the fact, same approach as
+    // grub-btrfs' is_btrfs_root() guard in soplos-grub-editor: read real
+    // system state once and use it to block the action, not just the button.
+    try {
+      const env = await api.invoke<{ displayProtocol: string }>("get_environment_info");
+      displayProtocol = env.displayProtocol;
+    } catch (error) {
+      console.error("Failed to read environment info", error);
+    }
   });
 </script>
 
@@ -770,19 +841,21 @@
                 <p class="text-[0.72rem] text-text mt-0.5">{$_(`recommended.desc.${slug(pkg.name)}`)}</p>
                 {#if !batchMode}
                   {#if pkg.kind === "manual"}
-                    {#if installed}
-                      <span class="mt-2 inline-block text-[0.68rem] px-2 py-0.5 rounded-full bg-success/15 text-success">{$_("drivers.badge.installed")}</span>
-                    {:else}
-                      <button
-                        class="mt-2 px-2.5 py-1.5 rounded bg-primary hover:bg-primary-hover text-text-bright text-[0.75rem] font-semibold disabled:opacity-60"
-                        disabled={davinciBusy}
-                        on:click={() => togglePkg(cat.key, pkg)}
-                      >
-                        {davinciBusy ? $_("recommended.installing") : $_("common.install")}
-                      </button>
-                    {/if}
+                    {@const isManualBusy = pkg.customInstall === "install_vmware_bundle" ? vmwareBusy : davinciBusy}
+                    <button
+                      class="mt-2 px-2.5 py-1.5 rounded text-[0.75rem] font-semibold disabled:opacity-60 {installed
+                        ? 'border border-danger text-danger hover:bg-danger/10'
+                        : 'bg-primary hover:bg-primary-hover text-text-bright'}"
+                      disabled={isManualBusy}
+                      on:click={() => togglePkg(cat.key, pkg)}
+                    >
+                      {isManualBusy
+                        ? $_(installed ? "recommended.uninstalling" : "recommended.installing")
+                        : $_(installed ? "common.uninstall" : "common.install")}
+                    </button>
                   {:else}
                     {@const isAntigravity = pkg.customInstall === "install_antigravity"}
+                    {@const isWaydroidBlocked = pkg.customInstall === "install_waydroid" && waydroidBlocked && !installed}
                     <div class="mt-2 flex items-center gap-2 flex-wrap">
                       {#if isAntigravity && installed && antigravityUpdateAvailable}
                         <button
@@ -793,14 +866,19 @@
                         </button>
                       {/if}
                       <button
-                        class="px-2.5 py-1.5 rounded text-[0.75rem] font-semibold {installed
+                        class="px-2.5 py-1.5 rounded text-[0.75rem] font-semibold disabled:opacity-50 disabled:cursor-not-allowed {installed
                           ? 'border border-danger text-danger hover:bg-danger/10'
                           : 'bg-primary hover:bg-primary-hover text-text-bright'}"
+                        disabled={isWaydroidBlocked}
+                        title={isWaydroidBlocked ? $_("recommended.waydroidNeedsWayland") : undefined}
                         on:click={() => togglePkg(cat.key, pkg)}
                       >
                         {installed ? $_("common.uninstall") : $_("common.install")}
                       </button>
                     </div>
+                    {#if isWaydroidBlocked}
+                      <p class="text-[0.65rem] text-warning mt-1">{$_("recommended.waydroidNeedsWayland")}</p>
+                    {/if}
                     {#if isAntigravity && installed && antigravityInstalledVersion}
                       <p class="text-[0.65rem] text-text-muted mt-1">
                         {antigravityUpdateAvailable
@@ -931,6 +1009,18 @@
     onConfirm={startDavinciInstall}
   >
     <p class="whitespace-pre-line text-text-muted">{$_("recommended.davinci.body")}</p>
+  </Modal>
+{/if}
+
+{#if vmwareConfirmOpen}
+  <Modal
+    variant="confirm"
+    title={$_("recommended.vmware.title")}
+    confirmLabel={$_("kernels.continue")}
+    onClose={() => (vmwareConfirmOpen = false)}
+    onConfirm={startVmwareInstall}
+  >
+    <p class="whitespace-pre-line text-text-muted">{$_("recommended.vmware.body")}</p>
   </Modal>
 {/if}
 

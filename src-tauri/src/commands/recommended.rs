@@ -3,7 +3,7 @@
 // generic shell executor (security plan point 1). Each script is fixed here
 // in Rust; the frontend only ever names a command, never sends script text.
 
-use super::software::{start_job, start_pkexec_job};
+use super::software::{failed_job, start_job, start_pkexec_job};
 use crate::utils::{VERIFY_DOWNLOAD_SH, WEBAPP_INSTALL_SH};
 
 // === Browsers ===
@@ -355,8 +355,19 @@ rm -f /tmp/cursor.deb"#
     ))
 }
 
+// Waydroid needs a Wayland compositor (wlr-layer-shell) to render at all.
+// Tyron is still X11-only for now, so this is checked here too, not just
+// greyed out in the frontend — the UI guard is the primary one (same
+// approach as grub-btrfs' is_btrfs_root() in soplos-grub-editor: read real
+// system state, don't just warn after the fact), this is the backstop in
+// case the command is ever reached another way.
 #[tauri::command]
 pub fn install_waydroid() -> u64 {
+    let session_type = std::env::var("XDG_SESSION_TYPE").unwrap_or_default().to_lowercase();
+    if session_type == "x11" {
+        return failed_job("Waydroid requires a Wayland session — this system is currently running X11.".to_string());
+    }
+
     start_pkexec_job(
         r#"curl -fsSL https://repo.waydro.id/waydroid.gpg -o /usr/share/keyrings/waydroid.gpg
 echo 'deb [signed-by=/usr/share/keyrings/waydroid.gpg] https://repo.waydro.id/ trixie main' > /etc/apt/sources.list.d/waydroid.list
@@ -412,7 +423,8 @@ if ! flatpak remotes --columns=name | grep -qx flathub; then
   flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 fi
 echo "Downloading Patchy..."
-verify_and_download "https://github.com/SethRobinson/Patchy/releases/download/v1.00/PatchyLinux.flatpak" /tmp/PatchyLinux.flatpak
+PATCHY_URL=$(curl -s https://api.github.com/repos/SethRobinson/Patchy/releases/latest | grep browser_download_url | grep PatchyLinux.flatpak | cut -d\" -f4)
+verify_and_download "$PATCHY_URL" /tmp/PatchyLinux.flatpak
 flatpak install --user -y --noninteractive --bundle /tmp/PatchyLinux.flatpak
 rm -f /tmp/PatchyLinux.flatpak
 echo "Patchy installed.""#
@@ -424,6 +436,25 @@ echo "Patchy installed.""#
 #[tauri::command]
 pub fn uninstall_patchy() -> u64 {
     start_job("bash", vec!["-c".to_string(), "flatpak uninstall --user -y com.rtsoft.patchy".to_string()])
+}
+
+// PhotoCraft ships a Debian package directly on its GitHub releases (no
+// Flathub, no PPA), so the same "ask the GitHub API for the newest release,
+// grab its .deb" pattern as Concat/Glassy Music above applies here.
+#[tauri::command]
+pub fn install_photocraft() -> u64 {
+    start_pkexec_job(format!(
+        r#"{VERIFY_DOWNLOAD_SH}
+PHOTOCRAFT_URL=$(curl -s https://api.github.com/repos/storytold/photocraft/releases/latest | grep browser_download_url | grep linux-x86_64.deb | cut -d\" -f4)
+verify_and_download "$PHOTOCRAFT_URL" /tmp/photocraft.deb
+apt install -y /tmp/photocraft.deb
+rm -f /tmp/photocraft.deb"#
+    ))
+}
+
+#[tauri::command]
+pub fn uninstall_photocraft() -> u64 {
+    start_pkexec_job("apt remove -y photocraft".to_string())
 }
 
 // Concat and Glassy Music are only published as GitHub Release .deb files
@@ -800,7 +831,8 @@ if ! grep -rq "trixie-security" /etc/apt/sources.list.d/*.sources /etc/apt/sourc
     printf 'Types: deb\nURIs: https://security.debian.org/debian-security/\nSuites: trixie-security\nComponents: main\nSigned-By: /usr/share/keyrings/debian-archive-keyring.gpg\n' > /etc/apt/sources.list.d/virtualbox-trixie-security.sources
 fi
 apt update
-apt install -y virtualbox-7.2"#
+apt install -y virtualbox-7.2
+echo "VirtualBox installed.""#
             .to_string(),
     )
 }
@@ -825,15 +857,16 @@ pub fn install_vbox_extpack() -> u64 {
     start_pkexec_job(format!(
         r#"set -e
 {VERIFY_DOWNLOAD_SH}
-VBOX_VERSION=$(VBoxManage --version 2>/dev/null | grep -oE '^[0-9]+\.[0-9]+\.[0-9]+')
+VBOX_VERSION=$(VBoxManage --version 2>/dev/null | grep -oE '^[0-9]+\.[0-9]+\.[0-9]+' || true)
 if [ -z "$VBOX_VERSION" ]; then
     echo "Could not detect an installed VirtualBox version. Install VirtualBox first."
     exit 1
 fi
 echo "Downloading the Extension Pack for VirtualBox $VBOX_VERSION..."
-verify_and_download "https://download.virtualbox.org/virtualbox/$VBOX_VERSION/Oracle_VirtualBox_Extension_Pack-$VBOX_VERSION.vbox-extpack" /tmp/vbox-extpack.vbox-extpack
-VBoxManage extpack install --replace --accept-license=eb31505e56e9b4d0fbca139104da41ac6f6b98f8e78968bdf01b1f3da3c4f9ae /tmp/vbox-extpack.vbox-extpack
-rm -f /tmp/vbox-extpack.vbox-extpack
+EXTPACK_FILE="/tmp/Oracle_VirtualBox_Extension_Pack-$VBOX_VERSION.vbox-extpack"
+verify_and_download "https://download.virtualbox.org/virtualbox/$VBOX_VERSION/Oracle_VirtualBox_Extension_Pack-$VBOX_VERSION.vbox-extpack" "$EXTPACK_FILE"
+VBoxManage extpack install --replace --accept-license=eb31505e56e9b4d0fbca139104da41ac6f6b98f8e78968bdf01b1f3da3c4f9ae "$EXTPACK_FILE"
+rm -f "$EXTPACK_FILE"
 echo "VirtualBox Extension Pack installed.""#
     ))
 }
@@ -841,5 +874,150 @@ echo "VirtualBox Extension Pack installed.""#
 #[tauri::command]
 pub fn uninstall_vbox_extpack() -> u64 {
     start_pkexec_job("VBoxManage extpack uninstall \"Oracle VirtualBox Extension Pack\"".to_string())
+}
+
+// === ArtCraft suite (Storytold) — clean-room Rust rewrites of Adobe apps,
+// same pattern as PhotoCraft above: resolve the newest GitHub release and
+// install its Linux .deb. ===
+
+#[tauri::command]
+pub fn install_vectorcraft() -> u64 {
+    start_pkexec_job(format!(
+        r#"{VERIFY_DOWNLOAD_SH}
+VECTORCRAFT_URL=$(curl -s https://api.github.com/repos/storytold/vectorcraft/releases/latest | grep browser_download_url | grep linux-x86_64.deb | cut -d\" -f4)
+verify_and_download "$VECTORCRAFT_URL" /tmp/vectorcraft.deb
+apt install -y /tmp/vectorcraft.deb
+rm -f /tmp/vectorcraft.deb"#
+    ))
+}
+
+#[tauri::command]
+pub fn uninstall_vectorcraft() -> u64 {
+    start_pkexec_job("apt remove -y vectorcraft".to_string())
+}
+
+#[tauri::command]
+pub fn install_filmcraft() -> u64 {
+    start_pkexec_job(format!(
+        r#"{VERIFY_DOWNLOAD_SH}
+FILMCRAFT_URL=$(curl -s https://api.github.com/repos/storytold/filmcraft/releases/latest | grep browser_download_url | grep linux-x86_64.deb | cut -d\" -f4)
+verify_and_download "$FILMCRAFT_URL" /tmp/filmcraft.deb
+apt install -y /tmp/filmcraft.deb
+rm -f /tmp/filmcraft.deb"#
+    ))
+}
+
+#[tauri::command]
+pub fn uninstall_filmcraft() -> u64 {
+    start_pkexec_job("apt remove -y filmcraft".to_string())
+}
+
+#[tauri::command]
+pub fn install_effectcraft() -> u64 {
+    start_pkexec_job(format!(
+        r#"{VERIFY_DOWNLOAD_SH}
+EFFECTCRAFT_URL=$(curl -s https://api.github.com/repos/storytold/effectcraft/releases/latest | grep browser_download_url | grep linux-x86_64.deb | cut -d\" -f4)
+verify_and_download "$EFFECTCRAFT_URL" /tmp/effectcraft.deb
+apt install -y /tmp/effectcraft.deb
+rm -f /tmp/effectcraft.deb"#
+    ))
+}
+
+#[tauri::command]
+pub fn uninstall_effectcraft() -> u64 {
+    start_pkexec_job("apt remove -y effectcraft".to_string())
+}
+
+#[tauri::command]
+pub fn install_lightcraft() -> u64 {
+    start_pkexec_job(format!(
+        r#"{VERIFY_DOWNLOAD_SH}
+LIGHTCRAFT_URL=$(curl -s https://api.github.com/repos/storytold/lightcraft/releases/latest | grep browser_download_url | grep linux-x86_64.deb | cut -d\" -f4)
+verify_and_download "$LIGHTCRAFT_URL" /tmp/lightcraft.deb
+apt install -y /tmp/lightcraft.deb
+rm -f /tmp/lightcraft.deb"#
+    ))
+}
+
+#[tauri::command]
+pub fn uninstall_lightcraft() -> u64 {
+    start_pkexec_job("apt remove -y lightcraft".to_string())
+}
+
+// The storytold/pdfcraft repo (an Acrobat clone) actually ships its builds
+// under the product name "PrintCraft" — confirmed from the real release
+// asset names (printcraft-*-linux-x86_64.deb) and the installed package's
+// own control file (Package: printcraft), not "pdfcraft". The GitHub repo
+// path below is still /pdfcraft because that's genuinely where the
+// releases live; only the package/product name differs.
+#[tauri::command]
+pub fn install_printcraft() -> u64 {
+    start_pkexec_job(format!(
+        r#"{VERIFY_DOWNLOAD_SH}
+PRINTCRAFT_URL=$(curl -s https://api.github.com/repos/storytold/pdfcraft/releases/latest | grep browser_download_url | grep linux-x86_64.deb | cut -d\" -f4)
+verify_and_download "$PRINTCRAFT_URL" /tmp/printcraft.deb
+apt install -y /tmp/printcraft.deb
+rm -f /tmp/printcraft.deb"#
+    ))
+}
+
+#[tauri::command]
+pub fn uninstall_printcraft() -> u64 {
+    start_pkexec_job("apt remove -y printcraft".to_string())
+}
+
+// Audacity 4 dropped its Debian package in favor of an official AppImage
+// only (confirmed on audacityteam.org/download/Linux and the GitHub
+// releases page — no .deb asset exists), so this follows the same
+// AppImage pattern as Double Commander above instead of apt. The release
+// tag changes per version (Audacity-X.Y.Z), so the asset URL is resolved
+// from the GitHub API rather than hardcoded, same as Concat/Glassy Music.
+const AUDACITY_DESKTOP_ENTRY: &str = "[Desktop Entry]\nType=Application\nName=Audacity\nExec=%HOME%/AppImages/audacity-linux-x86_64.AppImage\nIcon=%HOME%/AppImages/.icons/audacity.png\nCategories=AudioVideo;Audio;\nComment=Free, open source, cross-platform audio editor\nX-AppImage-Integrate=true\n";
+
+#[tauri::command]
+pub fn install_audacity(app: tauri::AppHandle) -> Result<u64, String> {
+    use tauri::Manager;
+    let icon = app
+        .path()
+        .resolve("resources/appimage-icons/audacity.png", tauri::path::BaseDirectory::Resource)
+        .map_err(|e| e.to_string())?
+        .to_string_lossy()
+        .into_owned();
+    Ok(start_job(
+        "bash",
+        vec![
+            "-c".to_string(),
+            format!(
+                r#"{VERIFY_DOWNLOAD_SH}
+mkdir -p "$HOME/AppImages/.icons"
+mkdir -p "$HOME/.local/share/applications"
+echo "Downloading Audacity..."
+AUDACITY_URL=$(curl -s https://api.github.com/repos/audacity/audacity/releases/latest | grep browser_download_url | grep linux-.*-x86_64.AppImage | cut -d\" -f4)
+verify_and_download "$AUDACITY_URL" "$HOME/AppImages/audacity-linux-x86_64.AppImage"
+chmod +x "$HOME/AppImages/audacity-linux-x86_64.AppImage"
+cp "{icon}" "$HOME/AppImages/.icons/audacity.png"
+printf '%s' '{AUDACITY_DESKTOP_ENTRY}' | sed "s|%HOME%|$HOME|g" > "$HOME/.local/share/applications/audacity.desktop"
+update-desktop-database "$HOME/.local/share/applications" 2>/dev/null || true
+echo "Audacity installed.""#
+            ),
+        ],
+    ))
+}
+
+#[tauri::command]
+pub fn uninstall_audacity() -> u64 {
+    start_job(
+        "bash",
+        vec![
+            "-c".to_string(),
+            r#"echo "Removing Audacity..."
+rm -f "$HOME/AppImages/audacity-linux-x86_64.AppImage"
+rm -f "$HOME/AppImages/.icons/audacity.png"
+rm -f "$HOME/.local/share/applications/audacity.desktop"
+update-desktop-database "$HOME/.local/share/applications" 2>/dev/null || true
+echo "Audacity removed.""#
+                .to_string(),
+        ],
+    )
 }
 

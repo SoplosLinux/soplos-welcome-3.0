@@ -150,7 +150,7 @@ fn self_exe_path() -> String {
         .unwrap_or_else(|_| "soplos-welcome".to_string())
 }
 
-fn failed_job(message: String) -> u64 {
+pub(crate) fn failed_job(message: String) -> u64 {
     let id = NEXT_JOB_ID.fetch_add(1, Ordering::SeqCst);
     jobs().as_mut().unwrap().insert(
         id,
