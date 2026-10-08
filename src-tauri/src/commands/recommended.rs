@@ -14,7 +14,8 @@ pub fn install_chrome() -> u64 {
         r#"{VERIFY_DOWNLOAD_SH}
 verify_and_download "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb" /tmp/google-chrome.deb
 apt install -y /tmp/google-chrome.deb
-rm -f /tmp/google-chrome.deb"#
+rm -f /tmp/google-chrome.deb
+echo "Google Chrome installed.""#
     ))
 }
 
@@ -25,7 +26,8 @@ pub fn install_brave() -> u64 {
 curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
 curl -fsSLo /etc/apt/sources.list.d/brave-browser-release.sources https://brave-browser-apt-release.s3.brave.com/brave-browser.sources
 apt update
-apt install -y brave-browser"#
+apt install -y brave-browser
+echo "Brave installed.""#
             .to_string(),
     )
 }
@@ -34,7 +36,8 @@ apt install -y brave-browser"#
 pub fn uninstall_brave() -> u64 {
     start_pkexec_job(
         r#"apt purge -y brave-browser
-rm -f /etc/apt/sources.list.d/brave-browser-release.sources /usr/share/keyrings/brave-browser-archive-keyring.gpg"#
+rm -f /etc/apt/sources.list.d/brave-browser-release.sources /usr/share/keyrings/brave-browser-archive-keyring.gpg
+echo "Brave removed.""#
             .to_string(),
     )
 }
@@ -46,7 +49,8 @@ pub fn install_zen_browser() -> u64 {
 ZEN_URL=$(curl -s https://api.github.com/repos/sh4r10/zen-browser-debian/releases/latest | grep browser_download_url | grep -v zip | grep -v tar | cut -d\" -f4)
 verify_and_download "$ZEN_URL" /tmp/zen-browser.deb
 apt install -y /tmp/zen-browser.deb
-rm -f /tmp/zen-browser.deb"#
+rm -f /tmp/zen-browser.deb
+echo "Zen Browser installed.""#
     ))
 }
 
@@ -57,7 +61,8 @@ pub fn install_helium() -> u64 {
 HELIUM_URL=$(curl -s https://api.github.com/repos/imputnet/helium-linux/releases/latest | grep browser_download_url | grep amd64.deb | cut -d\" -f4)
 verify_and_download "$HELIUM_URL" /tmp/helium.deb
 apt install -y /tmp/helium.deb
-rm -f /tmp/helium.deb"#
+rm -f /tmp/helium.deb
+echo "Helium installed.""#
     ))
 }
 
@@ -67,13 +72,14 @@ pub fn install_midori() -> u64 {
         r#"{VERIFY_DOWNLOAD_SH}
 verify_and_download "https://github.com/goastian/midori-desktop/releases/download/v11.6/midori_11.6-1_amd64.deb" /tmp/midori.deb
 apt install -y /tmp/midori.deb
-rm -f /tmp/midori.deb"#
+rm -f /tmp/midori.deb
+echo "Midori installed.""#
     ))
 }
 
 #[tauri::command]
 pub fn install_brave_origin() -> u64 {
-    start_pkexec_job("curl -fsS https://dl.brave.com/install.sh | FLAVOR=origin sh".to_string())
+    start_pkexec_job("curl -fsS https://dl.brave.com/install.sh | FLAVOR=origin sh && echo 'Brave Origin installed.'".to_string())
 }
 
 // === Office ===
@@ -84,7 +90,8 @@ pub fn install_genoffice() -> u64 {
         r#"{VERIFY_DOWNLOAD_SH}
 verify_and_download "https://genoffice.ai/download/linux-deb" /tmp/genoffice.deb
 apt install -y /tmp/genoffice.deb
-rm -f /tmp/genoffice.deb"#
+rm -f /tmp/genoffice.deb
+echo "GenOffice installed.""#
     ))
 }
 
@@ -94,13 +101,18 @@ pub fn install_jopdf() -> u64 {
         r#"{VERIFY_DOWNLOAD_SH}
 verify_and_download "https://cdn.jopdf.com/download/jopdf/jopdf-linux-amd64_setup.deb" /tmp/jopdf.deb
 apt install -y /tmp/jopdf.deb
-rm -f /tmp/jopdf.deb"#
+rm -f /tmp/jopdf.deb
+echo "JoPDF installed.""#
     ))
 }
 
 // === Graphics: Affinity Suite (AppImage, user-scoped) ===
 
-const AFFINITY_DESKTOP_ENTRY: &str = "[Desktop Entry]\nName=Affinity Suite\nExec=%HOME%/AppImages/Affinity-3.0.2-x86_64.AppImage\nIcon=%HOME%/AppImages/.icons/affinity.png\nType=Application\nCategories=Graphics;\nComment=Professional photo editing, design and publishing suite\nX-AppImage-Integrate=true\n";
+// X-AppImage-Version/-UpdateUrl let AppImage Manager's own update check
+// (api mode, since this is a GitHub project URL — see
+// soplos-appimage-manager-3.0's commands/updates.rs) work out of the box,
+// without the user having to fill them in by hand under Properties.
+const AFFINITY_DESKTOP_ENTRY: &str = "[Desktop Entry]\nName=Affinity Suite\nExec=%HOME%/AppImages/Affinity-3.0.2-x86_64.AppImage\nIcon=%HOME%/AppImages/.icons/affinity.png\nType=Application\nCategories=Graphics;\nComment=Professional photo editing, design and publishing suite\nX-AppImage-Version=3.0.2\nX-AppImage-UpdateUrl=https://github.com/ryzendew/Linux-Affinity-Installer\nX-AppImage-Integrate=true\n";
 
 #[tauri::command]
 pub fn install_affinity(app: tauri::AppHandle) -> Result<u64, String> {
@@ -211,7 +223,8 @@ pub fn install_vscode() -> u64 {
 wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor --yes > /usr/share/keyrings/packages.microsoft.gpg
 echo "deb [arch=amd64 signed-by=/usr/share/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" | tee /etc/apt/sources.list.d/vscode.list > /dev/null
 apt update
-apt install -y code"#
+apt install -y code
+echo "Visual Studio Code installed.""#
             .to_string(),
     )
 }
@@ -225,7 +238,8 @@ pub fn uninstall_vscode() -> u64 {
     // up following Microsoft's docs.
     start_pkexec_job(
         r#"apt purge -y code
-rm -f /etc/apt/sources.list.d/vscode.list"#
+rm -f /etc/apt/sources.list.d/vscode.list
+echo "Visual Studio Code removed.""#
             .to_string(),
     )
 }
@@ -331,7 +345,8 @@ mkdir -p /etc/apt/keyrings
 wget -qO /etc/apt/keyrings/sublimehq-pub.asc https://download.sublimetext.com/sublimehq-pub.gpg
 printf 'Types: deb\nURIs: https://download.sublimetext.com/\nSuites: apt/stable/\nSigned-By: /etc/apt/keyrings/sublimehq-pub.asc\n' > /etc/apt/sources.list.d/sublime-text.sources
 apt update
-apt install -y sublime-text"#
+apt install -y sublime-text
+echo "Sublime Text installed.""#
             .to_string(),
     )
 }
@@ -340,7 +355,8 @@ apt install -y sublime-text"#
 pub fn uninstall_sublime_text() -> u64 {
     start_pkexec_job(
         r#"apt purge -y sublime-text
-rm -f /etc/apt/sources.list.d/sublime-text.sources /etc/apt/keyrings/sublimehq-pub.asc"#
+rm -f /etc/apt/sources.list.d/sublime-text.sources /etc/apt/keyrings/sublimehq-pub.asc
+echo "Sublime Text removed.""#
             .to_string(),
     )
 }
@@ -351,7 +367,8 @@ pub fn install_cursor() -> u64 {
         r#"{VERIFY_DOWNLOAD_SH}
 verify_and_download "https://api2.cursor.sh/updates/download/golden/linux-x64-deb/cursor/0.43.3" /tmp/cursor.deb
 apt install -y /tmp/cursor.deb
-rm -f /tmp/cursor.deb"#
+rm -f /tmp/cursor.deb
+echo "Cursor installed.""#
     ))
 }
 
@@ -372,7 +389,8 @@ pub fn install_waydroid() -> u64 {
         r#"curl -fsSL https://repo.waydro.id/waydroid.gpg -o /usr/share/keyrings/waydroid.gpg
 echo 'deb [signed-by=/usr/share/keyrings/waydroid.gpg] https://repo.waydro.id/ trixie main' > /etc/apt/sources.list.d/waydroid.list
 apt update
-apt install -y waydroid"#
+apt install -y waydroid
+echo "Waydroid installed.""#
             .to_string(),
     )
 }
@@ -381,7 +399,8 @@ apt install -y waydroid"#
 pub fn uninstall_waydroid() -> u64 {
     start_pkexec_job(
         r#"apt purge -y waydroid 2>/dev/null || true
-rm -f /etc/apt/sources.list.d/waydroid.list /usr/share/keyrings/waydroid.gpg"#
+rm -f /etc/apt/sources.list.d/waydroid.list /usr/share/keyrings/waydroid.gpg
+echo "Waydroid removed.""#
             .to_string(),
     )
 }
@@ -395,7 +414,8 @@ pub fn install_geforcenow() -> u64 {
         vec![
             "-c".to_string(),
             r#"flatpak remote-add --user --if-not-exists GeForceNOW https://international.download.nvidia.com/GFNLinux/flatpak/geforcenow.flatpakrepo
-flatpak install --user -y GeForceNOW com.nvidia.geforcenow"#
+flatpak install --user -y GeForceNOW com.nvidia.geforcenow
+echo "GeForce NOW installed.""#
                 .to_string(),
         ],
     )
@@ -403,7 +423,7 @@ flatpak install --user -y GeForceNOW com.nvidia.geforcenow"#
 
 #[tauri::command]
 pub fn uninstall_geforcenow() -> u64 {
-    start_job("bash", vec!["-c".to_string(), "flatpak uninstall --user -y com.nvidia.geforcenow".to_string()])
+    start_job("bash", vec!["-c".to_string(), "flatpak uninstall --user -y com.nvidia.geforcenow && echo 'GeForce NOW removed.'".to_string()])
 }
 
 // Patchy is only published as a standalone .flatpak bundle on GitHub, not on
@@ -435,7 +455,7 @@ echo "Patchy installed.""#
 
 #[tauri::command]
 pub fn uninstall_patchy() -> u64 {
-    start_job("bash", vec!["-c".to_string(), "flatpak uninstall --user -y com.rtsoft.patchy".to_string()])
+    start_job("bash", vec!["-c".to_string(), "flatpak uninstall --user -y com.rtsoft.patchy && echo 'Patchy removed.'".to_string()])
 }
 
 // PhotoCraft ships a Debian package directly on its GitHub releases (no
@@ -448,13 +468,14 @@ pub fn install_photocraft() -> u64 {
 PHOTOCRAFT_URL=$(curl -s https://api.github.com/repos/storytold/photocraft/releases/latest | grep browser_download_url | grep linux-x86_64.deb | cut -d\" -f4)
 verify_and_download "$PHOTOCRAFT_URL" /tmp/photocraft.deb
 apt install -y /tmp/photocraft.deb
-rm -f /tmp/photocraft.deb"#
+rm -f /tmp/photocraft.deb
+echo "PhotoCraft installed.""#
     ))
 }
 
 #[tauri::command]
 pub fn uninstall_photocraft() -> u64 {
-    start_pkexec_job("apt remove -y photocraft".to_string())
+    start_pkexec_job("apt remove -y photocraft && echo 'PhotoCraft removed.'".to_string())
 }
 
 // Concat and Glassy Music are only published as GitHub Release .deb files
@@ -467,13 +488,14 @@ pub fn install_concat() -> u64 {
 CONCAT_URL=$(curl -s https://api.github.com/repos/jub0t/Concat/releases/latest | grep browser_download_url | grep linux-x86_64.deb | cut -d\" -f4)
 verify_and_download "$CONCAT_URL" /tmp/concat.deb
 apt install -y /tmp/concat.deb
-rm -f /tmp/concat.deb"#
+rm -f /tmp/concat.deb
+echo "Concat installed.""#
     ))
 }
 
 #[tauri::command]
 pub fn uninstall_concat() -> u64 {
-    start_pkexec_job("apt remove -y concat".to_string())
+    start_pkexec_job("apt remove -y concat && echo 'Concat removed.'".to_string())
 }
 
 #[tauri::command]
@@ -483,13 +505,14 @@ pub fn install_glassy_music() -> u64 {
 GLASSY_URL=$(curl -s https://api.github.com/repos/NanKillBro/glassy-music-nankill/releases/latest | grep browser_download_url | grep amd64.deb | cut -d\" -f4)
 verify_and_download "$GLASSY_URL" /tmp/glassy-music.deb
 apt install -y /tmp/glassy-music.deb
-rm -f /tmp/glassy-music.deb"#
+rm -f /tmp/glassy-music.deb
+echo "Glassy Music installed.""#
     ))
 }
 
 #[tauri::command]
 pub fn uninstall_glassy_music() -> u64 {
-    start_pkexec_job("apt remove -y glassy-music-nankill-mod".to_string())
+    start_pkexec_job("apt remove -y glassy-music-nankill-mod && echo 'Glassy Music removed.'".to_string())
 }
 
 // Orchard's own "stable" GitHub releases have shipped with an empty asset
@@ -525,7 +548,7 @@ echo "Orchard installed.""#
 
 #[tauri::command]
 pub fn uninstall_orchard() -> u64 {
-    start_job("bash", vec!["-c".to_string(), "flatpak uninstall --user -y dev.sfg.orchard".to_string()])
+    start_job("bash", vec!["-c".to_string(), "flatpak uninstall --user -y dev.sfg.orchard && echo 'Orchard removed.'".to_string()])
 }
 
 // Sonora publishes its own single-app Flatpak repo instead of using
@@ -537,7 +560,7 @@ pub fn install_sonora() -> u64 {
         "bash",
         vec![
             "-c".to_string(),
-            "flatpak install --user -y --noninteractive https://sonorahq.github.io/sonora/sonora.flatpakref".to_string(),
+            "flatpak install --user -y --noninteractive https://sonorahq.github.io/sonora/sonora.flatpakref && echo 'Sonora installed.'".to_string(),
         ],
     )
 }
@@ -548,12 +571,17 @@ pub fn uninstall_sonora() -> u64 {
         "bash",
         vec![
             "-c".to_string(),
-            "flatpak uninstall --user -y io.github.nolight132.sonora; flatpak remote-delete --user sonora 2>/dev/null || true".to_string(),
+            "flatpak uninstall --user -y io.github.nolight132.sonora; flatpak remote-delete --user sonora 2>/dev/null || true; echo 'Sonora removed.'".to_string(),
         ],
     )
 }
 
-const ESDE_DESKTOP_ENTRY: &str = "[Desktop Entry]\nName=ES-DE\nExec=%HOME%/AppImages/ES-DE_x64.AppImage\nIcon=%HOME%/AppImages/.icons/es-de.png\nType=Application\nCategories=Game;\nComment=Frontend for emulators with a modern interface\nX-AppImage-Integrate=true\n";
+// %VERSION% is filled in at install time (see ESDE_VERSION below) — the
+// download itself is resolved from GitLab's own "latest release" permalink
+// rather than a pinned package_files ID, after finding the hard way that a
+// pinned ID silently goes stale: the one this used to hardcode pointed at
+// 3.4.0 while upstream was already on 3.5.0.
+const ESDE_DESKTOP_ENTRY: &str = "[Desktop Entry]\nName=ES-DE\nExec=%HOME%/AppImages/ES-DE_x64.AppImage\nIcon=%HOME%/AppImages/.icons/es-de.png\nType=Application\nCategories=Game;\nComment=Frontend for emulators with a modern interface\nX-AppImage-Version=%VERSION%\nX-AppImage-UpdateUrl=https://gitlab.com/es-de/emulationstation-de\nX-AppImage-Integrate=true\n";
 
 #[tauri::command]
 pub fn install_esde(app: tauri::AppHandle) -> Result<u64, String> {
@@ -573,10 +601,13 @@ pub fn install_esde(app: tauri::AppHandle) -> Result<u64, String> {
 mkdir -p "$HOME/AppImages/.icons"
 mkdir -p "$HOME/.local/share/applications"
 echo "Downloading ES-DE..."
-verify_and_download "https://gitlab.com/es-de/emulationstation-de/-/package_files/246875981/download" "$HOME/AppImages/ES-DE_x64.AppImage"
+ESDE_RELEASE=$(curl -sL "https://gitlab.com/api/v4/projects/es-de%2Femulationstation-de/releases/permalink/latest")
+ESDE_URL=$(echo "$ESDE_RELEASE" | grep -oE '"name":"ES-DE_x64\.AppImage","url":"[^"]*"' | head -1 | cut -d'"' -f8)
+ESDE_VERSION=$(echo "$ESDE_RELEASE" | grep -oE '"tag_name":"[^"]*"' | head -1 | cut -d'"' -f4 | sed 's/^v//')
+verify_and_download "$ESDE_URL" "$HOME/AppImages/ES-DE_x64.AppImage"
 chmod +x "$HOME/AppImages/ES-DE_x64.AppImage"
 cp "{icon}" "$HOME/AppImages/.icons/es-de.png"
-printf '%s' '{ESDE_DESKTOP_ENTRY}' | sed "s|%HOME%|$HOME|g" > "$HOME/.local/share/applications/es-de.desktop"
+printf '%s' '{ESDE_DESKTOP_ENTRY}' | sed "s|%HOME%|$HOME|g; s|%VERSION%|$ESDE_VERSION|g" > "$HOME/.local/share/applications/es-de.desktop"
 update-desktop-database "$HOME/.local/share/applications" 2>/dev/null || true
 echo "ES-DE installed.""#
             ),
@@ -628,12 +659,12 @@ fi"#
 
 #[tauri::command]
 pub fn install_cpupower_gui() -> u64 {
-    start_pkexec_job("apt install -y cpupower-gui linux-cpupower".to_string())
+    start_pkexec_job("apt install -y cpupower-gui linux-cpupower && echo 'CPU Power installed.'".to_string())
 }
 
 #[tauri::command]
 pub fn uninstall_cpupower_gui() -> u64 {
-    start_pkexec_job("apt remove -y cpupower-gui linux-cpupower".to_string())
+    start_pkexec_job("apt remove -y cpupower-gui linux-cpupower && echo 'CPU Power removed.'".to_string())
 }
 
 #[tauri::command]
@@ -643,7 +674,8 @@ pub fn install_amdgpu_top() -> u64 {
 AMDGPU_TOP_URL=$(curl -s https://api.github.com/repos/Umio-Yasuno/amdgpu_top/releases/latest | grep browser_download_url | grep amd64.deb | grep -v without_gui | cut -d\" -f4)
 verify_and_download "$AMDGPU_TOP_URL" /tmp/amdgpu-top.deb
 apt install -y /tmp/amdgpu-top.deb
-rm -f /tmp/amdgpu-top.deb"#
+rm -f /tmp/amdgpu-top.deb
+echo "amdgpu_top installed.""#
     ))
 }
 
@@ -652,7 +684,9 @@ rm -f /tmp/amdgpu-top.deb"#
 // to control fans, hence Exec=pkexec) and a companion "WebApp" .desktop
 // entry that opens its local web UI (http://localhost:11987/) in whichever
 // browser is available, in app/kiosk mode with its own taskbar identity.
-const COOLERCONTROL_DESKTOP_ENTRY: &str = "[Desktop Entry]\nType=Application\nName=CoolerControl\nExec=pkexec %HOME%/AppImages/CoolerControlD-x86_64.AppImage\nTryExec=%HOME%/AppImages/CoolerControlD-x86_64.AppImage\nIcon=%HOME%/AppImages/.icons/coolercontrol.png\nCategories=System;\nComment=Fan and cooling control daemon\nX-AppImage-RunAsRoot=true\nX-AppImage-Integrate=true\n";
+// X-AppImage-Version/-UpdateUrl (GitLab project URL, api mode) let
+// AppImage Manager's own update check work without manual setup.
+const COOLERCONTROL_DESKTOP_ENTRY: &str = "[Desktop Entry]\nType=Application\nName=CoolerControl\nExec=pkexec %HOME%/AppImages/CoolerControlD-x86_64.AppImage\nTryExec=%HOME%/AppImages/CoolerControlD-x86_64.AppImage\nIcon=%HOME%/AppImages/.icons/coolercontrol.png\nCategories=System;\nComment=Fan and cooling control daemon\nX-AppImage-Version=4.1.0\nX-AppImage-UpdateUrl=https://gitlab.com/coolercontrol/coolercontrol\nX-AppImage-RunAsRoot=true\nX-AppImage-Integrate=true\n";
 
 const COOLERCONTROL_WEBAPP_ID: &str = "coolercontrol-ui-111987";
 
@@ -755,7 +789,13 @@ echo "CoolerControl removed.""#
 
 // === Files ===
 
-const DOUBLECMD_DESKTOP_ENTRY: &str = "[Desktop Entry]\nType=Application\nName=Double Commander\nExec=%HOME%/AppImages/doublecmd-gtk-latest-x86_64.AppImage\nIcon=%HOME%/AppImages/.icons/doublecmd.png\nCategories=FileManager;\nComment=Twin-panel file manager with advanced features\nX-AppImage-Integrate=true\n";
+// No X-AppImage-Version here on purpose: this OBS build is a rolling
+// "latest" with no version number anywhere, upstream or in the filename —
+// setting one would just be made up. X-AppImage-UpdateUrl points at the
+// same direct .appimage URL used to install it, which is exactly what
+// makes AppImage Manager pick "direct" mode (HEAD + Last-Modified
+// comparison) instead of the version-based "api" mode.
+const DOUBLECMD_DESKTOP_ENTRY: &str = "[Desktop Entry]\nType=Application\nName=Double Commander\nExec=%HOME%/AppImages/doublecmd-gtk-latest-x86_64.AppImage\nIcon=%HOME%/AppImages/.icons/doublecmd.png\nCategories=FileManager;\nComment=Twin-panel file manager with advanced features\nX-AppImage-UpdateUrl=https://download.opensuse.org/repositories/home:/Alexx2000/AppImage/doublecmd-gtk-latest-x86_64.AppImage\nX-AppImage-Integrate=true\n";
 
 #[tauri::command]
 pub fn install_doublecmd(app: tauri::AppHandle) -> Result<u64, String> {
@@ -841,7 +881,8 @@ echo "VirtualBox installed.""#
 pub fn uninstall_virtualbox() -> u64 {
     start_pkexec_job(
         r#"apt purge -y 'virtualbox-*' 2>/dev/null || true
-rm -f /etc/apt/sources.list.d/virtualbox.list /etc/apt/sources.list.d/virtualbox-trixie-security.sources /usr/share/keyrings/oracle-virtualbox-2016.gpg"#
+rm -f /etc/apt/sources.list.d/virtualbox.list /etc/apt/sources.list.d/virtualbox-trixie-security.sources /usr/share/keyrings/oracle-virtualbox-2016.gpg
+echo "VirtualBox removed.""#
             .to_string(),
     )
 }
@@ -873,7 +914,7 @@ echo "VirtualBox Extension Pack installed.""#
 
 #[tauri::command]
 pub fn uninstall_vbox_extpack() -> u64 {
-    start_pkexec_job("VBoxManage extpack uninstall \"Oracle VirtualBox Extension Pack\"".to_string())
+    start_pkexec_job("VBoxManage extpack uninstall \"Oracle VirtualBox Extension Pack\" && echo 'VirtualBox Extension Pack removed.'".to_string())
 }
 
 // === ArtCraft suite (Storytold) — clean-room Rust rewrites of Adobe apps,
@@ -887,13 +928,14 @@ pub fn install_vectorcraft() -> u64 {
 VECTORCRAFT_URL=$(curl -s https://api.github.com/repos/storytold/vectorcraft/releases/latest | grep browser_download_url | grep linux-x86_64.deb | cut -d\" -f4)
 verify_and_download "$VECTORCRAFT_URL" /tmp/vectorcraft.deb
 apt install -y /tmp/vectorcraft.deb
-rm -f /tmp/vectorcraft.deb"#
+rm -f /tmp/vectorcraft.deb
+echo "VectorCraft installed.""#
     ))
 }
 
 #[tauri::command]
 pub fn uninstall_vectorcraft() -> u64 {
-    start_pkexec_job("apt remove -y vectorcraft".to_string())
+    start_pkexec_job("apt remove -y vectorcraft && echo 'VectorCraft removed.'".to_string())
 }
 
 #[tauri::command]
@@ -903,13 +945,14 @@ pub fn install_filmcraft() -> u64 {
 FILMCRAFT_URL=$(curl -s https://api.github.com/repos/storytold/filmcraft/releases/latest | grep browser_download_url | grep linux-x86_64.deb | cut -d\" -f4)
 verify_and_download "$FILMCRAFT_URL" /tmp/filmcraft.deb
 apt install -y /tmp/filmcraft.deb
-rm -f /tmp/filmcraft.deb"#
+rm -f /tmp/filmcraft.deb
+echo "FilmCraft installed.""#
     ))
 }
 
 #[tauri::command]
 pub fn uninstall_filmcraft() -> u64 {
-    start_pkexec_job("apt remove -y filmcraft".to_string())
+    start_pkexec_job("apt remove -y filmcraft && echo 'FilmCraft removed.'".to_string())
 }
 
 #[tauri::command]
@@ -919,13 +962,14 @@ pub fn install_effectcraft() -> u64 {
 EFFECTCRAFT_URL=$(curl -s https://api.github.com/repos/storytold/effectcraft/releases/latest | grep browser_download_url | grep linux-x86_64.deb | cut -d\" -f4)
 verify_and_download "$EFFECTCRAFT_URL" /tmp/effectcraft.deb
 apt install -y /tmp/effectcraft.deb
-rm -f /tmp/effectcraft.deb"#
+rm -f /tmp/effectcraft.deb
+echo "EffectCraft installed.""#
     ))
 }
 
 #[tauri::command]
 pub fn uninstall_effectcraft() -> u64 {
-    start_pkexec_job("apt remove -y effectcraft".to_string())
+    start_pkexec_job("apt remove -y effectcraft && echo 'EffectCraft removed.'".to_string())
 }
 
 #[tauri::command]
@@ -935,13 +979,14 @@ pub fn install_lightcraft() -> u64 {
 LIGHTCRAFT_URL=$(curl -s https://api.github.com/repos/storytold/lightcraft/releases/latest | grep browser_download_url | grep linux-x86_64.deb | cut -d\" -f4)
 verify_and_download "$LIGHTCRAFT_URL" /tmp/lightcraft.deb
 apt install -y /tmp/lightcraft.deb
-rm -f /tmp/lightcraft.deb"#
+rm -f /tmp/lightcraft.deb
+echo "LightCraft installed.""#
     ))
 }
 
 #[tauri::command]
 pub fn uninstall_lightcraft() -> u64 {
-    start_pkexec_job("apt remove -y lightcraft".to_string())
+    start_pkexec_job("apt remove -y lightcraft && echo 'LightCraft removed.'".to_string())
 }
 
 // The storytold/pdfcraft repo (an Acrobat clone) actually ships its builds
@@ -957,13 +1002,14 @@ pub fn install_printcraft() -> u64 {
 PRINTCRAFT_URL=$(curl -s https://api.github.com/repos/storytold/pdfcraft/releases/latest | grep browser_download_url | grep linux-x86_64.deb | cut -d\" -f4)
 verify_and_download "$PRINTCRAFT_URL" /tmp/printcraft.deb
 apt install -y /tmp/printcraft.deb
-rm -f /tmp/printcraft.deb"#
+rm -f /tmp/printcraft.deb
+echo "PrintCraft installed.""#
     ))
 }
 
 #[tauri::command]
 pub fn uninstall_printcraft() -> u64 {
-    start_pkexec_job("apt remove -y printcraft".to_string())
+    start_pkexec_job("apt remove -y printcraft && echo 'PrintCraft removed.'".to_string())
 }
 
 // Audacity 4 dropped its Debian package in favor of an official AppImage
@@ -972,7 +1018,10 @@ pub fn uninstall_printcraft() -> u64 {
 // AppImage pattern as Double Commander above instead of apt. The release
 // tag changes per version (Audacity-X.Y.Z), so the asset URL is resolved
 // from the GitHub API rather than hardcoded, same as Concat/Glassy Music.
-const AUDACITY_DESKTOP_ENTRY: &str = "[Desktop Entry]\nType=Application\nName=Audacity\nExec=%HOME%/AppImages/audacity-linux-x86_64.AppImage\nIcon=%HOME%/AppImages/.icons/audacity.png\nCategories=AudioVideo;Audio;\nComment=Free, open source, cross-platform audio editor\nX-AppImage-Integrate=true\n";
+// %VERSION% is filled in at install time from the release actually
+// resolved (see AUDACITY_VERSION below) — there's no fixed value to hardcode
+// here since install_audacity always grabs whatever is currently latest.
+const AUDACITY_DESKTOP_ENTRY: &str = "[Desktop Entry]\nType=Application\nName=Audacity\nExec=%HOME%/AppImages/audacity-linux-x86_64.AppImage\nIcon=%HOME%/AppImages/.icons/audacity.png\nCategories=AudioVideo;Audio;\nComment=Free, open source, cross-platform audio editor\nX-AppImage-Version=%VERSION%\nX-AppImage-UpdateUrl=https://github.com/audacity/audacity\nX-AppImage-Integrate=true\n";
 
 #[tauri::command]
 pub fn install_audacity(app: tauri::AppHandle) -> Result<u64, String> {
@@ -993,10 +1042,11 @@ mkdir -p "$HOME/AppImages/.icons"
 mkdir -p "$HOME/.local/share/applications"
 echo "Downloading Audacity..."
 AUDACITY_URL=$(curl -s https://api.github.com/repos/audacity/audacity/releases/latest | grep browser_download_url | grep linux-.*-x86_64.AppImage | cut -d\" -f4)
+AUDACITY_VERSION=$(echo "$AUDACITY_URL" | grep -oE '[0-9]+\.[0-9]+(\.[0-9]+)?' | head -1)
 verify_and_download "$AUDACITY_URL" "$HOME/AppImages/audacity-linux-x86_64.AppImage"
 chmod +x "$HOME/AppImages/audacity-linux-x86_64.AppImage"
 cp "{icon}" "$HOME/AppImages/.icons/audacity.png"
-printf '%s' '{AUDACITY_DESKTOP_ENTRY}' | sed "s|%HOME%|$HOME|g" > "$HOME/.local/share/applications/audacity.desktop"
+printf '%s' '{AUDACITY_DESKTOP_ENTRY}' | sed "s|%HOME%|$HOME|g; s|%VERSION%|$AUDACITY_VERSION|g" > "$HOME/.local/share/applications/audacity.desktop"
 update-desktop-database "$HOME/.local/share/applications" 2>/dev/null || true
 echo "Audacity installed.""#
             ),

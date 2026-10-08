@@ -75,6 +75,9 @@
           <li>Patchy always installs the latest release and shows the current official icon</li>
           <li>Fixed VirtualBox Extension Pack install failing with a name mismatch error</li>
           <li>Waydroid moved to the Virtualization category and blocked on X11 sessions, which it cannot run on</li>
+          <li>AppImage-based entries now register their version and update URL automatically with Soplos AppImage Manager</li>
+          <li>Fixed ES-DE installing a stale pinned version instead of the latest release</li>
+          <li>Every install/uninstall action in Recommended now shows a clear completion message</li>
         </ul>
       </description>
     </release>

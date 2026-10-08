@@ -10,6 +10,7 @@ All notable changes to Soplos Welcome are documented in this file.
 - VMware Workstation Pro install flow: pick the Broadcom bundle you already downloaded, run its official installer, then automatically install and build Soplos's own vmmon/vmnet kernel modules so VMware keeps working across kernel updates. Full uninstall included.
 - DaVinci Resolve: uninstall support (previously install-only).
 - New app icon (the "S" mark) for Soplos Welcome itself.
+- AppImage-based Recommended entries (Affinity Suite, CoolerControl, Double Commander, Audacity, ES-DE) now write `X-AppImage-Version`/`X-AppImage-UpdateUrl` into the `.desktop` file they generate, so Soplos AppImage Manager's own update check works immediately without the user filling them in by hand under Properties. Double Commander, which has no real upstream version number, only gets the update URL (enabling AppImage Manager's date-based "direct" check instead of a fabricated version).
 
 ### Changed
 
@@ -23,6 +24,8 @@ All notable changes to Soplos Welcome are documented in this file.
 - VirtualBox Extension Pack install: the downloaded file is now saved under the exact name VBoxManage expects, fixing a "name mismatch" install failure.
 - VirtualBox install: now prints a clear completion message instead of leaving the terminal on the last raw apt output line.
 - The VMware and DaVinci Resolve file pickers no longer freeze the whole window while the native file dialog is open.
+- ES-DE install was pinned to a hardcoded GitLab package file ID that had gone stale (silently stuck on 3.4.0 while upstream was already on 3.5.0); now resolved dynamically from GitLab's release permalink, same as the GitHub-hosted entries.
+- 35 install/uninstall actions across the Recommended catalog never printed a completion message, leaving the terminal output on the last raw `apt`/`flatpak` line with no visible confirmation the job had actually finished — every one of them now ends with a clear "X installed."/"X removed." line.
 
 ## [3.0.0-1-beta] - 2026-09-30
 
