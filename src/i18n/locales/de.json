@@ -120,7 +120,9 @@
     "vmware": {
       "title": "Installation von VMware Workstation Pro",
       "body": "VMware Workstation Pro erfordert aus Lizenzgründen einen manuellen Download.\n\n1. Gehe zu broadcom.com und lade den Linux-Installer (.bundle) herunter.\n2. Klicke auf Weiter, um die heruntergeladene Datei auszuwählen.\n3. Wir installieren ihn und richten die VMware-Kernelmodule von Soplos (vmmon/vmnet) ein, damit sie bei jedem Kernel-Update weiter funktionieren.",
-      "installed": "VMware Workstation Pro wurde erfolgreich installiert."
+      "installed": "VMware Workstation Pro wurde erfolgreich installiert.",
+      "uninstallOpened": "Ein Terminal wurde geöffnet, um VMware Workstation Pro zu deinstallieren. Folge den dort angezeigten Anweisungen.",
+      "uninstallNoTerminal": "Ghostty konnte nicht geöffnet werden, um VMware Workstation Pro zu deinstallieren. Installiere Ghostty oder deinstalliere es manuell mit: sudo vmware-installer --uninstall-product vmware-workstation --console"
     },
     "license": {
       "acceptInstall": "Akzeptieren und installieren",

@@ -66,18 +66,54 @@ echo "soplos-vmware-modules installed.""#
     )))
 }
 
+const UNINSTALL_SCRIPT: &str = r#"pkexec sh -c 'vmware-installer --uninstall-product vmware-workstation --console; apt-get remove -y soplos-vmware-modules'
+echo
+read -p "Press Enter to close this window..." _"#;
+
 // VMware ships its own uninstaller (vmware-installer --uninstall-product),
-// which interactively asks twice whether to keep configuration files —
-// `yes no` auto-answers "no" (full removal) to both so it doesn't hang
-// waiting on a TTY that doesn't exist under pkexec. Runs without `set -e`:
-// a non-zero exit here (e.g. the product was already partially removed by
-// hand) shouldn't skip removing soplos-vmware-modules below.
+// documented as asking whether to keep configuration files. Confirmed live
+// (screenshot of a real run): the prompt text reaches Welcome's read-only
+// output panel fine, but nothing short of a real answer unblocks it — and
+// that panel has no way to send one back. Piping a guessed answer in
+// (`yes no | ...`) never worked either, most likely because the prompt
+// reads from /dev/tty directly rather than stdin.
+// Rather than keep guessing at vmware-installer's exact interactive
+// plumbing, this opens a real terminal running the uninstall under pkexec,
+// so whatever it asks is something the user can actually read and answer
+// themselves — same as running it by hand. That also means this one flow
+// bypasses Welcome's own job/output system entirely (no runTracked/
+// poll_job on the frontend): there's nothing to poll, this command's only
+// job is opening that window.
+// Ghostty ships by default on all three Soplos desktops, but a user can
+// still remove it, so it's tried first and `x-terminal-emulator` — the
+// Debian alternatives symlink that always points at whichever terminal is
+// actually configured as default, if any is installed — is the fallback,
+// rather than failing outright just because the one we assume is there
+// happens not to be. Only if neither exists does this give up.
+// The frontend has no way to know when the user is done in that window —
+// there's no job id, nothing to poll. So this spawns a plain OS thread that
+// waits on the terminal's child process (it only exits once the "Press
+// Enter to close" line is cleared) and emits a `vmware-uninstall-finished`
+// event once it does, so Recommended.svelte can refresh VMware's installed
+// status at the right time instead of right after the window merely opens.
 #[tauri::command]
-pub fn uninstall_vmware() -> u64 {
-    start_pkexec_job(
-        r#"yes no | vmware-installer --uninstall-product vmware-workstation --console || true
-apt-get remove -y soplos-vmware-modules || true
-echo "VMware Workstation Pro uninstalled.""#
-            .to_string(),
-    )
+pub fn uninstall_vmware(app: tauri::AppHandle) -> Result<(), String> {
+    use tauri::Emitter;
+
+    let args = ["-e", "sh", "-c", UNINSTALL_SCRIPT];
+    let child = match std::process::Command::new("ghostty").args(args).spawn() {
+        Ok(child) => child,
+        Err(ghostty_err) => std::process::Command::new("x-terminal-emulator")
+            .args(args)
+            .spawn()
+            .map_err(|fallback_err| format!("ghostty: {ghostty_err}; x-terminal-emulator: {fallback_err}"))?,
+    };
+
+    std::thread::spawn(move || {
+        let mut child = child;
+        let _ = child.wait();
+        let _ = app.emit("vmware-uninstall-finished", ());
+    });
+
+    Ok(())
 }

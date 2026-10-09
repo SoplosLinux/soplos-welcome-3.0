@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onMount, onDestroy } from "svelte";
+  import { listen, type UnlistenFn } from "@tauri-apps/api/event";
   import { _ } from "svelte-i18n";
   import { api } from "../lib/api";
   import { runTracked, terminalExpanded, terminalLines } from "../lib/progress";
@@ -338,7 +339,7 @@
     await refreshPkgStatus(catKey, pkg);
   }
 
-  let infoMessage: { key: string; name?: string } | null = null;
+  let infoMessage: { key: string; name?: string; variant?: "info" | "warning" } | null = null;
   let flatpakScopeChoice: { name: string; resolve: (scope: "user" | "system") => void } | null = null;
 
   function chooseFlatpakScope(name: string): Promise<"user" | "system"> {
@@ -367,11 +368,13 @@
       const isVmware = pkg.customInstall === "install_vmware_bundle";
       if (installed) {
         if (isVmware) {
-          vmwareBusy = true;
+          vmwareInstallTarget = { catKey, pkg };
           try {
-            await runTracked("uninstall_vmware", undefined, { append });
-          } finally {
-            vmwareBusy = false;
+            await api.invoke("uninstall_vmware");
+            infoMessage = { key: "recommended.vmware.uninstallOpened" };
+          } catch (error) {
+            console.error("Failed to open VMware uninstall terminal", error);
+            infoMessage = { key: "recommended.vmware.uninstallNoTerminal", variant: "warning" };
           }
         } else {
           davinciBusy = true;
@@ -489,6 +492,18 @@
   let vmwareConfirmOpen = false;
   let vmwareBusy = false;
   let vmwareInstallTarget: { catKey: string; pkg: RecPackage } | null = null;
+
+  // The uninstall terminal (see uninstall_vmware) runs detached from any
+  // job the frontend can poll — this is the only signal that it actually
+  // closed, so the "installed" badge isn't refreshed (and found stale)
+  // right as the window opens, before the user has even answered anything.
+  let unlistenVmwareUninstall: UnlistenFn | undefined;
+  onMount(async () => {
+    unlistenVmwareUninstall = await listen("vmware-uninstall-finished", async () => {
+      if (vmwareInstallTarget) await refreshPkgStatus(vmwareInstallTarget.catKey, vmwareInstallTarget.pkg);
+    });
+  });
+  onDestroy(() => unlistenVmwareUninstall?.());
 
   async function startVmwareInstall() {
     vmwareConfirmOpen = false;
@@ -984,7 +999,7 @@
 {/if}
 
 {#if infoMessage}
-  <Modal variant="info" maxWidth={420} onClose={() => (infoMessage = null)}>
+  <Modal variant={infoMessage.variant ?? "info"} maxWidth={420} onClose={() => (infoMessage = null)}>
     <p class="whitespace-pre-line">{$_(infoMessage.key, { values: { name: infoMessage.name ?? "" } })}</p>
   </Modal>
 {/if}

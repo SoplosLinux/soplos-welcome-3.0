@@ -120,7 +120,9 @@
     "vmware": {
       "title": "Instalarea VMware Workstation Pro",
       "body": "VMware Workstation Pro necesită o descărcare manuală din motive de licență.\n\n1. Mergi pe broadcom.com și descarcă instalatorul pentru Linux (.bundle).\n2. Apasă Continuă pentru a selecta fișierul descărcat.\n3. Îl vom instala și vom configura modulele de kernel VMware ale Soplos (vmmon/vmnet) ca să continue să funcționeze la fiecare actualizare de kernel.",
-      "installed": "VMware Workstation Pro a fost instalat cu succes."
+      "installed": "VMware Workstation Pro a fost instalat cu succes.",
+      "uninstallOpened": "S-a deschis un terminal pentru a dezinstala VMware Workstation Pro. Urmează instrucțiunile afișate acolo.",
+      "uninstallNoTerminal": "Nu s-a putut deschide Ghostty pentru a dezinstala VMware Workstation Pro. Instalează Ghostty, sau dezinstalează-l manual cu: sudo vmware-installer --uninstall-product vmware-workstation --console"
     },
     "license": {
       "acceptInstall": "Acceptă și instalează",
