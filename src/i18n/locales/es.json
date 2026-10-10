@@ -502,6 +502,7 @@
       "intelWifi": "Firmware para tarjetas inalámbricas Intel",
       "realtekWifi": "Firmware para tarjetas inalámbricas Realtek",
       "broadcomWifi": "Firmware para tarjetas inalámbricas Broadcom",
+      "broadcomWifiProprietary": "Controlador propietario para chips Broadcom sin driver libre (BCM4311, BCM4321, BCM43142...)",
       "repairWifi": "Recarga el driver y reinicia NetworkManager — arregla la conexión perdida tras reiniciar",
       "bluetoothHint": "Pila y herramientas Bluetooth",
       "vmwareTools": "Herramientas invitadas para máquinas virtuales VMware",

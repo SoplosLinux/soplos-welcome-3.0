@@ -489,6 +489,7 @@
       "intelWifi": "Firmware pour cartes sans fil Intel",
       "realtekWifi": "Firmware pour cartes sans fil Realtek",
       "broadcomWifi": "Firmware pour cartes sans fil Broadcom",
+      "broadcomWifiProprietary": "Pilote propriétaire pour les puces Broadcom sans pilote libre (BCM4311, BCM4321, BCM43142...)",
       "repairWifi": "Recharge le pilote et redémarre NetworkManager — corrige la perte de connexion après redémarrage",
       "bluetoothHint": "Pile et outils Bluetooth",
       "vmwareTools": "Outils invités pour les machines virtuelles VMware",

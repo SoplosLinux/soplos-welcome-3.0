@@ -508,6 +508,7 @@
       "intelWifi": "Firmware for Intel wireless cards",
       "realtekWifi": "Firmware for Realtek wireless cards",
       "broadcomWifi": "Firmware for Broadcom wireless cards",
+      "broadcomWifiProprietary": "Proprietary driver for Broadcom chips with no open driver (BCM4311, BCM4321, BCM43142...)",
       "repairWifi": "Reload the driver and restart NetworkManager — fixes connection lost after reboot",
       "bluetoothHint": "Bluetooth stack and tools",
       "vmwareTools": "Guest tools for VMware virtual machines",

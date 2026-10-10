@@ -489,6 +489,7 @@
       "intelWifi": "Прошивка для беспроводных карт Intel",
       "realtekWifi": "Прошивка для беспроводных карт Realtek",
       "broadcomWifi": "Прошивка для беспроводных карт Broadcom",
+      "broadcomWifiProprietary": "Проприетарный драйвер для чипов Broadcom без свободного драйвера (BCM4311, BCM4321, BCM43142...)",
       "repairWifi": "Перезагружает драйвер и перезапускает NetworkManager — устраняет потерю соединения после перезагрузки",
       "bluetoothHint": "Стек и инструменты Bluetooth",
       "vmwareTools": "Гостевые инструменты для виртуальных машин VMware",

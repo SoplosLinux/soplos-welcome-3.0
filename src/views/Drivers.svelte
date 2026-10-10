@@ -251,10 +251,11 @@
     { label: "Intel Wi-Fi", packages: "firmware-iwlwifi" },
     { label: "Realtek Wi-Fi", packages: "firmware-realtek" },
     { label: "Broadcom Wi-Fi", packages: "firmware-b43-installer" },
+    { label: "Broadcom Wi-Fi (proprietary)", packages: "broadcom-sta-dkms" },
     { label: "Repair Wi-Fi", special: "wifi-repair" },
     { label: "Bluetooth", packages: "bluetooth bluez bluez-tools blueman" },
   ];
-  const wifiItemHintKeys = ["intelWifi", "realtekWifi", "broadcomWifi", "repairWifi", "bluetoothHint"];
+  const wifiItemHintKeys = ["intelWifi", "realtekWifi", "broadcomWifi", "broadcomWifiProprietary", "repairWifi", "bluetoothHint"];
   let wifiItems: DriverItem[];
   $: wifiItems = wifiItemsBase.map((item, i) => ({ ...item, hint: $_(`drivers.items.${wifiItemHintKeys[i]}`) }));
 

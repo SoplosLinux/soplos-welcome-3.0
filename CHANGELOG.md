@@ -2,6 +2,13 @@
 
 All notable changes to Soplos Welcome are documented in this file.
 
+## [3.0.0-4-beta] - 2026-10-10
+
+### Fixed
+
+- Ralink/MediaTek Wi-Fi firmware install button did nothing: it offered `firmware-ralink`, which has no install candidate in Debian testing/forky. Switched to `firmware-mediatek`, which absorbed the Ralink firmware blobs after MediaTek's acquisition of Ralink.
+- Broadcom Wi-Fi chips with no open-source driver (BCM4311, BCM4321, BCM43142 and others) had no working install option — only the open `firmware-b43-installer` was offered, which doesn't cover them. Added a dedicated "Broadcom Wi-Fi (proprietary)" entry installing `broadcom-sta-dkms`.
+
 ## [3.0.0-3-beta] - 2026-10-08
 
 ### Added

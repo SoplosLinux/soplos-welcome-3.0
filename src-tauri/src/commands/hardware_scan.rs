@@ -172,7 +172,12 @@ fn identify_wifi_vendor(line_lower: &str) -> (Option<&'static str>, Option<&'sta
     } else if line_lower.contains("atheros") || line_lower.contains("qualcomm") {
         (Some("Atheros/Qualcomm"), Some("firmware-atheros"))
     } else if line_lower.contains("ralink") || line_lower.contains("mediatek") {
-        (Some("Ralink/MediaTek"), Some("firmware-ralink"))
+        // firmware-ralink has no candidate in Debian testing/forky — MediaTek
+        // bought Ralink and firmware-mediatek absorbed its blobs (rt2561.bin,
+        // rt2860.bin, rt2870.bin, rt3070.bin, etc.), confirmed via `apt-cache
+        // policy` and the real .deb's contents. Same fix already applied in
+        // 2.x.
+        (Some("Ralink/MediaTek"), Some("firmware-mediatek"))
     } else if line_lower.contains("marvell") {
         (Some("Marvell"), Some("firmware-libertas"))
     } else {

@@ -489,6 +489,7 @@
       "intelWifi": "Firmware pentru plăci wireless Intel",
       "realtekWifi": "Firmware pentru plăci wireless Realtek",
       "broadcomWifi": "Firmware pentru plăci wireless Broadcom",
+      "broadcomWifiProprietary": "Driver proprietar pentru cipuri Broadcom fără driver liber (BCM4311, BCM4321, BCM43142...)",
       "repairWifi": "Reîncarcă driverul și repornește NetworkManager — rezolvă pierderea conexiunii după repornire",
       "bluetoothHint": "Stivă și instrumente Bluetooth",
       "vmwareTools": "Instrumente guest pentru mașini virtuale VMware",

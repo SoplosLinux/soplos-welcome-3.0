@@ -489,6 +489,7 @@
       "intelWifi": "Firmware für Intel-WLAN-Karten",
       "realtekWifi": "Firmware für Realtek-WLAN-Karten",
       "broadcomWifi": "Firmware für Broadcom-WLAN-Karten",
+      "broadcomWifiProprietary": "Proprietärer Treiber für Broadcom-Chips ohne freien Treiber (BCM4311, BCM4321, BCM43142...)",
       "repairWifi": "Lädt den Treiber neu und startet den NetworkManager neu — behebt Verbindungsverlust nach Neustart",
       "bluetoothHint": "Bluetooth-Stack und -Tools",
       "vmwareTools": "Gast-Tools für VMware-VMs",

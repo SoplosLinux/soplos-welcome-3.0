@@ -489,6 +489,7 @@
       "intelWifi": "Firmware per schede wireless Intel",
       "realtekWifi": "Firmware per schede wireless Realtek",
       "broadcomWifi": "Firmware per schede wireless Broadcom",
+      "broadcomWifiProprietary": "Driver proprietario per chip Broadcom senza driver libero (BCM4311, BCM4321, BCM43142...)",
       "repairWifi": "Ricarica il driver e riavvia NetworkManager — risolve la perdita di connessione dopo il riavvio",
       "bluetoothHint": "Stack e strumenti Bluetooth",
       "vmwareTools": "Strumenti guest per macchine virtuali VMware",

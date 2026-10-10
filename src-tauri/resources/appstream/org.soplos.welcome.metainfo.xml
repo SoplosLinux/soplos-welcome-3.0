@@ -66,6 +66,15 @@
   </developer>
 
   <releases>
+    <release version="3.0.0-4-beta" date="2026-10-10">
+      <description>
+        <p>Fixed two non-working Wi-Fi firmware/driver install buttons in Drivers.</p>
+        <ul>
+          <li>Ralink/MediaTek Wi-Fi firmware button did nothing: switched from firmware-ralink (no install candidate) to firmware-mediatek</li>
+          <li>Added a working install option for Broadcom Wi-Fi chips with no open driver (BCM4311, BCM4321, BCM43142 and others) via broadcom-sta-dkms</li>
+        </ul>
+      </description>
+    </release>
     <release version="3.0.0-3-beta" date="2026-10-08">
       <description>
         <p>New Recommended applications and several VirtualBox/Audacity/Patchy fixes.</p>
