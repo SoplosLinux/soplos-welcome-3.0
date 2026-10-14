@@ -2,6 +2,17 @@
 
 All notable changes to Soplos Welcome are documented in this file.
 
+## [3.0.0-5-beta] - 2026-10-14
+
+### Added
+
+- New Recommended applications: ArtCraft Launcher (Storytold's own installer/updater for the whole Craft app suite), under "App management", and SoundCraft (the suite's audio editor), under Multimedia's audio apps.
+
+### Fixed
+
+- Security tab's "Soplos Sys Cleaner" entry launched the advanced program (`soplos-sys-cleaner`) instead of the basic one (`soplos-sys-cleaner-basic`) it's meant to open.
+- Recommended's multi-select action bar (select all / install / uninstall) covered the window's progress strip while a batch job was running, so progress was invisible in that mode even though it worked fine for single installs/uninstalls.
+
 ## [3.0.0-4-beta] - 2026-10-10
 
 ### Fixed

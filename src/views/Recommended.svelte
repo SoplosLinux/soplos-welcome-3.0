@@ -3,7 +3,7 @@
   import { listen, type UnlistenFn } from "@tauri-apps/api/event";
   import { _ } from "svelte-i18n";
   import { api } from "../lib/api";
-  import { runTracked, terminalExpanded, terminalLines } from "../lib/progress";
+  import { runTracked, terminalExpanded, terminalLines, isRunning } from "../lib/progress";
   import TerminalOutput from "../components/TerminalOutput.svelte";
   import Modal from "../components/Modal.svelte";
   import FlatpakScopeModal from "../components/FlatpakScopeModal.svelte";
@@ -142,6 +142,7 @@
           customUninstall: "uninstall_audacity",
         },
         { name: "KutEditor", icon: "kuteditor.png", official: true, kind: "apt", package: "kuteditor" },
+        { name: "SoundCraft", icon: "soundcraft.png", kind: "custom", package: "soundcraft", customInstall: "install_soundcraft", customUninstall: "uninstall_soundcraft" },
         { name: "LMMS", icon: "lmms.png", kind: "flatpak", flatpak: "io.lmms.LMMS" },
         { name: "Mixxx", icon: "mixxx.png", official: true, kind: "apt", package: "mixxx" },
         { name: "Bitwig Studio", icon: "bitwig-studio.png", kind: "flatpak", flatpak: "com.bitwig.BitwigStudio" },
@@ -200,6 +201,7 @@
         { name: "Flatseal", icon: "flatseal.png", kind: "flatpak", flatpak: "com.github.tchx84.Flatseal" },
         { name: "Gear Lever", icon: "gear-lever.png", kind: "flatpak", flatpak: "it.mijorus.gearlever" },
         { name: "Warehouse", icon: "warehouse.png", kind: "flatpak", flatpak: "io.github.flattool.Warehouse" },
+        { name: "ArtCraft Launcher", icon: "artcraft-launcher.png", kind: "custom", package: "artcraft-launcher", customInstall: "install_artcraft_launcher", customUninstall: "uninstall_artcraft_launcher" },
       ],
     },
     {
@@ -964,7 +966,7 @@
 {/if}
 
 {#if batchMode}
-  <div class="fixed bottom-0 left-0 right-0 bg-surface border-t border-border px-6 py-3 flex items-center gap-3 z-40">
+  <div class="fixed {$isRunning ? 'bottom-[6px]' : 'bottom-0'} left-[230px] right-0 bg-surface border-t border-border px-6 py-3 flex items-center gap-3 z-40">
     <button class="px-3 py-1.5 rounded border border-border text-text hover:bg-surface-2 text-[0.78rem]" on:click={selectAll}>
       {$_("recommended.selectAll")}
     </button>

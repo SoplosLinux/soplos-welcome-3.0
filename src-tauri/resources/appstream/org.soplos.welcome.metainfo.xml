@@ -66,6 +66,17 @@
   </developer>
 
   <releases>
+    <release version="3.0.0-5-beta" date="2026-10-14">
+      <description>
+        <p>New Recommended applications and two Welcome bug fixes.</p>
+        <ul>
+          <li>New recommended application: ArtCraft Launcher, Storytold's own installer/updater for the whole Craft app suite, under App management</li>
+          <li>New recommended application: SoundCraft, the Craft suite's audio editor, under Multimedia</li>
+          <li>Security tab's Soplos Sys Cleaner entry now opens the basic program instead of the advanced one</li>
+          <li>Fixed Recommended's multi-select action bar hiding the window's progress strip during batch installs/uninstalls</li>
+        </ul>
+      </description>
+    </release>
     <release version="3.0.0-4-beta" date="2026-10-10">
       <description>
         <p>Fixed two non-working Wi-Fi firmware/driver install buttons in Drivers.</p>

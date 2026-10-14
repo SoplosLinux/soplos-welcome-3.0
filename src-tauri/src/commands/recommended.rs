@@ -973,6 +973,23 @@ pub fn uninstall_effectcraft() -> u64 {
 }
 
 #[tauri::command]
+pub fn install_soundcraft() -> u64 {
+    start_pkexec_job(format!(
+        r#"{VERIFY_DOWNLOAD_SH}
+SOUNDCRAFT_URL=$(curl -s https://api.github.com/repos/storytold/soundcraft/releases/latest | grep browser_download_url | grep linux-x86_64.deb | cut -d\" -f4)
+verify_and_download "$SOUNDCRAFT_URL" /tmp/soundcraft.deb
+apt install -y /tmp/soundcraft.deb
+rm -f /tmp/soundcraft.deb
+echo "SoundCraft installed.""#
+    ))
+}
+
+#[tauri::command]
+pub fn uninstall_soundcraft() -> u64 {
+    start_pkexec_job("apt remove -y soundcraft && echo 'SoundCraft removed.'".to_string())
+}
+
+#[tauri::command]
 pub fn install_lightcraft() -> u64 {
     start_pkexec_job(format!(
         r#"{VERIFY_DOWNLOAD_SH}
@@ -1010,6 +1027,27 @@ echo "PrintCraft installed.""#
 #[tauri::command]
 pub fn uninstall_printcraft() -> u64 {
     start_pkexec_job("apt remove -y printcraft && echo 'PrintCraft removed.'".to_string())
+}
+
+// ArtCraft Launcher — Storytold's own installer/updater for the whole Craft
+// suite above. Release assets are named "artcraft-launcher-<ver>-linux-
+// x86_64.deb", so the same substring filter used for the other Craft apps
+// still matches.
+#[tauri::command]
+pub fn install_artcraft_launcher() -> u64 {
+    start_pkexec_job(format!(
+        r#"{VERIFY_DOWNLOAD_SH}
+ARTCRAFT_LAUNCHER_URL=$(curl -s https://api.github.com/repos/storytold/craft-launcher/releases/latest | grep browser_download_url | grep linux-x86_64.deb | cut -d\" -f4)
+verify_and_download "$ARTCRAFT_LAUNCHER_URL" /tmp/artcraft-launcher.deb
+apt install -y /tmp/artcraft-launcher.deb
+rm -f /tmp/artcraft-launcher.deb
+echo "ArtCraft Launcher installed.""#
+    ))
+}
+
+#[tauri::command]
+pub fn uninstall_artcraft_launcher() -> u64 {
+    start_pkexec_job("apt remove -y artcraft-launcher && echo 'ArtCraft Launcher removed.'".to_string())
 }
 
 // Audacity 4 dropped its Debian package in favor of an official AppImage

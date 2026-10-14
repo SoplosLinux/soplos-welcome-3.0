@@ -74,7 +74,7 @@
         { key: "bleachbit", label: "BleachBit", hintKey: "bleachbit", icon: "/assets/icons/security/bleachbit.png", kind: "apt", packages: "bleachbit", openCommand: "bleachbit" },
         { key: "stacer", label: "Stacer", hintKey: "stacer", icon: "/assets/icons/security/stacer.png", badgeKey: "alternative", kind: "custom", customCheckCmd: "is_stacer_installed", customInstallCmd: "install_stacer", customUninstallCmd: "uninstall_stacer", openCommand: "open_stacer" },
         { key: "sweeper", label: "Sweeper", hintKey: "sweeper", icon: "/assets/icons/security/sweeper.png", badgeKey: "kde", kind: "apt", packages: "sweeper", openCommand: "sweeper" },
-        { key: "soplos-sys-cleaner", label: "Soplos Sys Cleaner", hintKey: "soplosSysCleaner", icon: "/assets/icons/security/soplos-sys-cleaner.png", badgeKey: "recommended", kind: "apt", packages: "soplos-sys-cleaner", openCommand: "soplos-sys-cleaner" },
+        { key: "soplos-sys-cleaner", label: "Soplos Sys Cleaner", hintKey: "soplosSysCleaner", icon: "/assets/icons/security/soplos-sys-cleaner.png", badgeKey: "recommended", kind: "apt", packages: "soplos-sys-cleaner", openCommand: "soplos-sys-cleaner-basic" },
         { key: "kudu", label: "Kudu", hintKey: "kudu", icon: "/assets/icons/security/kudu.png", badgeKey: "alternative", kind: "custom", customCheckCmd: "is_kudu_installed", customInstallCmd: "install_kudu", customUninstallCmd: "uninstall_kudu", openCommand: "/opt/Kudu/kudu" },
       ],
     },
