@@ -154,6 +154,7 @@ export async function runTracked(
     return false;
   } finally {
     isRunning.set(false);
+    progressFraction.set(null);
   }
 }
 
@@ -206,5 +207,6 @@ export async function runConfirmableUpdate(
     return false;
   } finally {
     isRunning.set(false);
+    progressFraction.set(null);
   }
 }

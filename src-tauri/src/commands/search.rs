@@ -194,19 +194,9 @@ fn decode_jxl_to_png_data_uri(jxl_bytes: &[u8]) -> Option<String> {
     Some(format!("data:image/png;base64,{}", base64::engine::general_purpose::STANDARD.encode(&png_bytes)))
 }
 
-// === Flathub icons: their own API gives a direct PNG URL per app id — no
-// decoding needed, the frontend's <img> tag can load it straight away. ===
 
-fn resolve_flatpak_icon(app_id: &str) -> Option<String> {
-    let url = format!("https://flathub.org/api/v2/appstream/{app_id}");
-    let mut response = ureq::get(&url).call().ok()?;
-    let bytes = response.body_mut().read_to_vec().ok()?;
-    let json: serde_json::Value = serde_json::from_slice(&bytes).ok()?;
-    json.get("icon")?.as_str().map(|s| s.to_string())
-}
 
-#[tauri::command]
-pub fn search_apt(query: String) -> Vec<SearchResult> {
+fn search_apt_blocking(query: String) -> Vec<SearchResult> {
     let query = query.trim();
     if query.is_empty() {
         return vec![];
@@ -227,8 +217,19 @@ pub fn search_apt(query: String) -> Vec<SearchResult> {
                 icon: None,
             })
         })
-        .take(MAX_RESULTS)
         .collect();
+
+    // Sort by relevance: exact match first, then starts-with, then contains.
+    // apt-cache returns results in an arbitrary hash order; without sorting,
+    // searching "obs" can show unrelated packages before obs-studio.
+    let q_lower = query.to_lowercase();
+    results.sort_by_key(|r| {
+        let n = r.id.to_lowercase();
+        if n == q_lower { 0u8 }
+        else if n.starts_with(&q_lower) { 1 }
+        else { 2 }
+    });
+    results.truncate(MAX_RESULTS);
 
     let name_map = icon_name_map();
     let wanted: HashSet<&str> = results.iter().filter_map(|r| name_map.get(&r.id).map(|s| s.as_str())).collect();
@@ -241,11 +242,56 @@ pub fn search_apt(query: String) -> Vec<SearchResult> {
     results
 }
 
-#[tauri::command]
-pub fn search_flatpak(query: String) -> Vec<SearchResult> {
+fn http_agent() -> ureq::Agent {
+    ureq::Agent::config_builder()
+        .timeout_global(Some(std::time::Duration::from_secs(8)))
+        .build()
+        .into()
+}
+
+fn search_flathub_api(query: &str) -> Option<Vec<SearchResult>> {
+    let body = serde_json::to_vec(&serde_json::json!({ "query": query })).ok()?;
+    let mut response = http_agent()
+        .post("https://flathub.org/api/v2/search")
+        .header("Content-Type", "application/json")
+        .send(&body)
+        .ok()?;
+    let bytes = response.body_mut().read_to_vec().ok()?;
+    let json: serde_json::Value = serde_json::from_slice(&bytes).ok()?;
+    let hits = json.get("hits")?.as_array()?;
+    let mut results = Vec::new();
+    let mut seen = HashSet::new();
+    for hit in hits {
+        let id = hit.get("app_id")?.as_str()?.to_string();
+        if id.is_empty() || !seen.insert(id.clone()) {
+            continue;
+        }
+        let name = hit.get("name").and_then(|n| n.as_str()).unwrap_or(&id).to_string();
+        let description = hit.get("summary").and_then(|s| s.as_str()).unwrap_or("").to_string();
+        let icon = hit.get("icon").and_then(|i| i.as_str()).map(|s| s.to_string());
+        results.push(SearchResult {
+            name,
+            id,
+            description,
+            kind: "flatpak".to_string(),
+            icon,
+        });
+        if results.len() >= MAX_RESULTS {
+            break;
+        }
+    }
+    Some(results)
+}
+
+fn search_flatpak_blocking(query: String) -> Vec<SearchResult> {
     let query = query.trim();
     if query.is_empty() {
         return vec![];
+    }
+    if let Some(results) = search_flathub_api(query) {
+        if !results.is_empty() {
+            return results;
+        }
     }
     let output = match Command::new("flatpak")
         .args(["search", query, "--columns=name,application,description"])
@@ -254,14 +300,15 @@ pub fn search_flatpak(query: String) -> Vec<SearchResult> {
         Ok(o) if o.status.success() => o,
         _ => return vec![],
     };
-    let mut results: Vec<SearchResult> = String::from_utf8_lossy(&output.stdout)
+    let mut seen = HashSet::new();
+    String::from_utf8_lossy(&output.stdout)
         .lines()
         .filter_map(|line| {
             let mut parts = line.split('\t');
             let name = parts.next()?.trim().to_string();
             let id = parts.next()?.trim().to_string();
             let description = parts.next().unwrap_or("").trim().to_string();
-            if name.is_empty() || id.is_empty() || id == "-" {
+            if name.is_empty() || id.is_empty() || id == "-" || !seen.insert(id.clone()) {
                 return None;
             }
             Some(SearchResult {
@@ -273,10 +320,148 @@ pub fn search_flatpak(query: String) -> Vec<SearchResult> {
             })
         })
         .take(MAX_RESULTS)
-        .collect();
+        .collect()
+}
 
-    for r in &mut results {
-        r.icon = resolve_flatpak_icon(&r.id);
+fn search_snap_store(query: &str) -> Option<Vec<SearchResult>> {
+    let encoded: String = query
+        .bytes()
+        .map(|b| match b {
+            b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' | b'-' | b'_' | b'.' | b'~' => (b as char).to_string(),
+            _ => format!("%{b:02X}"),
+        })
+        .collect();
+    let url = format!("https://api.snapcraft.io/v2/snaps/find?q={encoded}&fields=media,summary,title");
+    let mut response = http_agent().get(&url).header("Snap-Device-Series", "16").call().ok()?;
+    let bytes = response.body_mut().read_to_vec().ok()?;
+    let json: serde_json::Value = serde_json::from_slice(&bytes).ok()?;
+    let results_arr = json.get("results")?.as_array()?;
+    let mut results = Vec::new();
+    let mut seen = HashSet::new();
+    for item in results_arr {
+        let name = item.get("name")?.as_str()?.to_string();
+        if name.is_empty() || !seen.insert(name.clone()) {
+            continue;
+        }
+        let snap = item.get("snap");
+        let title = snap
+            .and_then(|s| s.get("title"))
+            .and_then(|t| t.as_str())
+            .unwrap_or(&name)
+            .to_string();
+        let description = snap
+            .and_then(|s| s.get("summary"))
+            .and_then(|s| s.as_str())
+            .unwrap_or("")
+            .to_string();
+        let icon = snap
+            .and_then(|s| s.get("media"))
+            .and_then(|m| m.as_array())
+            .and_then(|arr| {
+                arr.iter().find(|m| m.get("type").and_then(|t| t.as_str()) == Some("icon"))
+            })
+            .and_then(|m| m.get("url"))
+            .and_then(|u| u.as_str())
+            .map(|s| s.to_string());
+
+        results.push(SearchResult {
+            name: title,
+            id: name,
+            description,
+            kind: "snap".to_string(),
+            icon,
+        });
+        if results.len() >= MAX_RESULTS {
+            break;
+        }
     }
-    results
+    Some(results)
+}
+
+fn search_snap_blocking(query: String) -> Vec<SearchResult> {
+    let query = query.trim();
+    if query.is_empty() {
+        return vec![];
+    }
+    if let Some(results) = search_snap_store(query) {
+        if !results.is_empty() {
+            return results;
+        }
+    }
+    let output = match Command::new("snap").args(["find", query]).output() {
+        Ok(o) if o.status.success() => o,
+        _ => return vec![],
+    };
+    let mut seen = HashSet::new();
+    String::from_utf8_lossy(&output.stdout)
+        .lines()
+        .skip(1) // header row
+        .filter_map(|line| {
+            let mut parts = line.split_whitespace();
+            let name = parts.next()?.to_string();
+            parts.next()?; // version
+            parts.next()?; // publisher
+            parts.next()?; // notes
+            let description = parts.collect::<Vec<_>>().join(" ");
+            if name.is_empty() || !seen.insert(name.clone()) {
+                return None;
+            }
+            Some(SearchResult { name: name.clone(), id: name, description, kind: "snap".to_string(), icon: None })
+        })
+        .take(MAX_RESULTS)
+        .collect()
+}
+
+// Tauri runs plain `fn` commands on the main thread, so these used to freeze
+// the whole UI (including the progress bar animation) for the entire search —
+// and the very first apt search also builds the DEP-11 icon index, which
+// decompresses tens of MB. Running them on the blocking pool keeps the window
+// responsive and lets the three searches actually run in parallel.
+macro_rules! async_search {
+    ($name:ident, $inner:ident) => {
+        #[tauri::command]
+        pub async fn $name(query: String) -> Vec<SearchResult> {
+            tauri::async_runtime::spawn_blocking(move || $inner(query))
+                .await
+                .unwrap_or_default()
+        }
+    };
+}
+
+async_search!(search_apt, search_apt_blocking);
+async_search!(search_flatpak, search_flatpak_blocking);
+async_search!(search_snap, search_snap_blocking);
+
+/// Builds the apt icon index in the background so the first real search
+/// doesn't pay for it.
+#[tauri::command]
+pub async fn prewarm_search() {
+    let _ = tauri::async_runtime::spawn_blocking(|| {
+        icon_name_map();
+    })
+    .await;
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_search_speeds() {
+        let t0 = std::time::Instant::now();
+        let apt = search_apt_blocking("obs".to_string());
+        let t_apt = t0.elapsed();
+
+        let t1 = std::time::Instant::now();
+        let flatpak = search_flatpak_blocking("obs".to_string());
+        let t_flatpak = t1.elapsed();
+
+        let t2 = std::time::Instant::now();
+        let snap = search_snap_blocking("obs".to_string());
+        let t_snap = t2.elapsed();
+
+        println!("APT ({} results): {:?}", apt.len(), t_apt);
+        println!("Flatpak ({} results): {:?}", flatpak.len(), t_flatpak);
+        println!("Snap ({} results): {:?}", snap.len(), t_snap);
+    }
 }

@@ -236,6 +236,8 @@ pub fn run() {
             commands::recommended::uninstall_vbox_extpack,
             commands::search::search_apt,
             commands::search::search_flatpak,
+            commands::search::search_snap,
+            commands::search::prewarm_search,
         ])
         .run(tauri::generate_context!())
         .expect("error while running Soplos Welcome");

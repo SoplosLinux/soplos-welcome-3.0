@@ -82,7 +82,8 @@
   },
   "recommended": {
     "hero": { "title": "Für dich empfohlen", "description": "Ausgewählte Anwendungen passend zu deiner Desktop-Umgebung." },
-    "searchPlaceholder": "Programme suchen... (Enter sucht auch in apt und Flathub)",
+    "searchPlaceholder": "Programme suchen... (Enter sucht auch in apt, Flathub und Snap)",
+    "clearSearch": "Suche löschen",
     "modeNormal": "Normaler Modus",
     "modeMultiple": "Mehrfachauswahl",
     "appsCount": "{count} Apps",

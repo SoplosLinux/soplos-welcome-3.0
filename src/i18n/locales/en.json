@@ -82,7 +82,8 @@
   },
   "recommended": {
     "hero": { "title": "Recommended for You", "description": "Curated applications based on your desktop environment." },
-    "searchPlaceholder": "Search programs... (Enter searches apt & Flathub too)",
+    "searchPlaceholder": "Search programs... (Enter searches apt, Flathub & Snap too)",
+    "clearSearch": "Clear search",
     "modeNormal": "Normal Mode",
     "modeMultiple": "Multiple Selection",
     "appsCount": "{count} apps",

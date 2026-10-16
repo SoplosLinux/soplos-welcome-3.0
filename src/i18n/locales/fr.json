@@ -82,7 +82,8 @@
   },
   "recommended": {
     "hero": { "title": "Recommandé pour vous", "description": "Applications sélectionnées selon votre environnement de bureau." },
-    "searchPlaceholder": "Rechercher des programmes... (Entrée cherche aussi dans apt et Flathub)",
+    "searchPlaceholder": "Rechercher des programmes... (Entrée cherche aussi dans apt, Flathub et Snap)",
+    "clearSearch": "Effacer la recherche",
     "modeNormal": "Mode normal",
     "modeMultiple": "Sélection multiple",
     "appsCount": "{count} apps",

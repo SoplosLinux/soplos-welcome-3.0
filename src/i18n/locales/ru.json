@@ -82,7 +82,8 @@
   },
   "recommended": {
     "hero": { "title": "Рекомендуем для вас", "description": "Приложения, подобранные с учётом вашей рабочей среды." },
-    "searchPlaceholder": "Поиск программ... (Enter ищет также в apt и Flathub)",
+    "searchPlaceholder": "Поиск программ... (Enter ищет также в apt, Flathub и Snap)",
+    "clearSearch": "Очистить поиск",
     "modeNormal": "Обычный режим",
     "modeMultiple": "Множественный выбор",
     "appsCount": "Приложений: {count}",

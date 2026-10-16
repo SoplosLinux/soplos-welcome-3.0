@@ -162,15 +162,36 @@
 
 <style>
   .progress-fill {
-    animation: progress-slide 1.1s ease-in-out infinite;
+    position: relative;
+    -webkit-animation: progress-slide 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    animation: progress-slide 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+
+  @-webkit-keyframes progress-slide {
+    0% {
+      left: -35%;
+      width: 35%;
+    }
+    50% {
+      width: 50%;
+    }
+    100% {
+      left: 100%;
+      width: 35%;
+    }
   }
 
   @keyframes progress-slide {
     0% {
-      transform: translateX(-100%);
+      left: -35%;
+      width: 35%;
+    }
+    50% {
+      width: 50%;
     }
     100% {
-      transform: translateX(300%);
+      left: 100%;
+      width: 35%;
     }
   }
 </style>

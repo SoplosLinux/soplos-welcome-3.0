@@ -12,6 +12,9 @@ All notable changes to Soplos Welcome are documented in this file.
 
 - Security tab's "Soplos Sys Cleaner" entry launched the advanced program (`soplos-sys-cleaner`) instead of the basic one (`soplos-sys-cleaner-basic`) it's meant to open.
 - Recommended's multi-select action bar (select all / install / uninstall) covered the window's progress strip while a batch job was running, so progress was invisible in that mode even though it worked fine for single installs/uninstalls.
+- Recommended's extended search (apt / Flathub / Snap) froze the whole window for a long time after pressing Enter, with the global progress bar showing but static. The three search commands ran on the UI's main thread; they now run on a background thread pool, so the window stays responsive and the bar animates while searching.
+- The first extended search also paid for building the apt icon index (decompressing the DEP-11 metadata); that index is now built in the background when the Recommended tab opens.
+- Flathub and Snap searches now time out after 8 seconds instead of potentially hanging, and the Snap query is URL-encoded so queries with spaces or special characters work.
 
 ## [3.0.0-4-beta] - 2026-10-10
 

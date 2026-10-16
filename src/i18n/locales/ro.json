@@ -82,7 +82,8 @@
   },
   "recommended": {
     "hero": { "title": "Recomandat pentru tine", "description": "Aplicații selectate în funcție de mediul tău desktop." },
-    "searchPlaceholder": "Caută programe... (Enter caută și în apt și Flathub)",
+    "searchPlaceholder": "Caută programe... (Enter caută și în apt, Flathub și Snap)",
+    "clearSearch": "Șterge căutarea",
     "modeNormal": "Mod normal",
     "modeMultiple": "Selecție multiplă",
     "appsCount": "{count} aplicații",
