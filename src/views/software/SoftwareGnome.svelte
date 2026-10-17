@@ -15,6 +15,11 @@
 
   const appsBase: Omit<SoftwareApp, "warning">[] = [
     { name: "Repo Selector", packages: "soplos-repo-selector", icon: "/assets/icons/software/reposelector.png" },
+    {
+      name: "Soplos Software Center",
+      packages: "soplos-software-center",
+      icon: "/assets/icons/software/soplos-software-center.png",
+    },
     { name: "Synaptic", packages: "synaptic", icon: "/assets/icons/software/synaptic.png" },
     { name: "Gdebi", packages: "gdebi gdebi-core", icon: "/assets/icons/software/gdebi.png" },
     {

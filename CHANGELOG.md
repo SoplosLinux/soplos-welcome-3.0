@@ -2,6 +2,12 @@
 
 All notable changes to Soplos Welcome are documented in this file.
 
+## [3.0.0-6-beta] - 2026-10-16
+
+### Added
+
+- Software tab: new "Soplos Software Center" entry next to Repo Selector (GNOME, Xfce and Plasma variants), installable/removable like the other store front-ends.
+
 ## [3.0.0-5-beta] - 2026-10-14
 
 ### Added

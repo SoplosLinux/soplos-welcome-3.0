@@ -1,6 +1,6 @@
 [package]
 name = "soplos-welcome"
-version = "3.0.0-5-beta"
+version = "3.0.0-6-beta"
 description = "Soplos Welcome"
 authors = ["Sergi Perich <info@soploslinux.com>"]
 license = "GPL-3.0-or-later"
