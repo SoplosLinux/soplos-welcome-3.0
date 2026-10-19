@@ -1,0 +1,49 @@
+.TH "SOPLOS-WELCOME" "1" "2026-10-19" "Soplos Linux" "User Commands"
+.SH NAME
+soplos-welcome \- Advanced welcome and system setup application for Soplos Linux
+.SH SYNOPSIS
+.B soplos-welcome
+[\fIOPTIONS\fR]
+.SH DESCRIPTION
+.B soplos-welcome
+is the primary welcome and system configuration application for Soplos Linux installations.
+Built with modern Tauri 2, Rust, and Svelte architecture, it provides an intuitive,
+beautiful, and secure interface for initial system personalization, hardware configuration,
+driver installation, kernel management, and software discovery:
+.IP \[bu] 2
+Complete hardware detection and driver management (NVIDIA, AMD, Wi-Fi, VM Tools).
+.IP \[bu]
+Recommended software management across APT, Flatpak, and AppImages.
+.IP \[bu]
+Kernel management and optimization (Liquorix, XanMod, Soplos Kernels).
+.IP \[bu]
+System security, backup tools, and firewall management.
+.IP \[bu]
+Desktop customization and font rendering tuning for XFCE, GNOME, and KDE Plasma.
+.IP \[bu]
+Gaming center with performance profiles, sysctl tuning, and game launchers.
+.SH OPTIONS
+.TP
+.B \-h, \-\-help
+Show summary of options.
+.SH FILES
+.TP
+.I /etc/xdg/autostart/org.soplos.welcome.desktop
+User autostart entry for automatic launch on session login.
+.TP
+.I /usr/share/polkit-1/actions/org.soplos.welcome.policy
+Polkit policy defining administrator privileges for driver and system operations.
+.TP
+.I ~/.config/soplos-welcome/
+User configuration directory.
+.SH AUTHOR
+Written by Sergi Perich <info@soploslinux.com> for the Soplos Linux project.
+.SH COPYRIGHT
+Copyright \(co 2026 Sergi Perich <info@soploslinux.com>.
+License: GPL-3.0-or-later <https://www.gnu.org/licenses/gpl-3.0.html>.
+.br
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+.SH SEE ALSO
+.BR soplos-store (1),
+.BR soplos-repo-selector (1)

@@ -2,6 +2,27 @@
 
 All notable changes to Soplos Welcome are documented in this file.
 
+## [3.0.0-9-beta] - 2026-10-19
+
+### Added
+
+- Added Unix manual page documentation (`soplos-welcome.1`) installed to `/usr/share/man/man1/`.
+- Full 8-language translations for desktop entry (`soplos-welcome.desktop.hbs`) and AppStream metainfo.
+- Standard Debian DEP-5 copyright documentation (`resources/debian/copyright`).
+- Building and compilation documentation in `README.md`.
+
+## [3.0.0-8-beta] - 2026-10-18
+
+### Fixed
+
+- Startup crash on Wayland (`Error 71 (Error de protocolo) dispatching to Wayland display`) when running on bare-metal hardware with NVIDIA/Nouveau drivers or following graphics driver changes: forced `WEBKIT_DISABLE_DMABUF_RENDERER=1` by default across all hardware.
+
+## [3.0.0-7-beta] - 2026-10-17
+
+### Changed
+
+- Software tab: "Soplos Software Center" renamed to "Soplos Store" (new name, package `soplos-store` and new icon) in the GNOME, Xfce and Plasma variants.
+
 ## [3.0.0-6-beta] - 2026-10-16
 
 ### Added

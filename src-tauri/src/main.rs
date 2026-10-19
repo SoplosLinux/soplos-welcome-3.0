@@ -11,9 +11,10 @@ fn main() {
         std::process::exit(soplos_welcome_lib::run_privileged_script_file(&args[2]));
     }
 
-    // WebKitGTK's DMA-BUF renderer can leave the window blank on virtual GPUs.
-    // Must be set before the webview initializes, so it happens here in main().
-    if soplos_welcome_lib::is_running_in_vm() {
+    // WebKitGTK's DMA-BUF renderer causes protocol errors (Error 71) on Wayland
+    // with NVIDIA/Nouveau drivers on physical hardware, as well as blank windows
+    // on virtual GPUs. Force it disabled by default on all hardware.
+    if std::env::var_os("WEBKIT_DISABLE_DMABUF_RENDERER").is_none() {
         std::env::set_var("WEBKIT_DISABLE_DMABUF_RENDERER", "1");
     }
 
