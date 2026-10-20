@@ -408,6 +408,31 @@ const NV_STRING_H_PATCH: &str = r#"--- a/nvidia/os-interface.c
  extern char *NVreg_TemporaryFilePath;
 "#;
 
+// Fixes dmem_cgroup_register_region() API change on Linux 7.3+:
+// kernel commit e11640b9cea4 ("cgroup/dmem: Introduce struct dmem_cgroup_init
+// for region initialization") changed the first argument from a bare u64 size
+// to a const struct dmem_cgroup_init *. NVIDIA 610 (open) passes size
+// directly, which GCC rejects with -Wint-conversion on kernel 7.3+.
+const NV_DMEM_CGROUP_INIT_PATCH: &str = r#"--- a/nvidia/os-interface.c
++++ b/nvidia/os-interface.c
+@@ -2818,7 +2818,17 @@
+ void* NV_API_CALL os_dmem_cgroup_register_region(NvU64 size, const char *name)
+ {
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(7, 3, 0)
++    struct dmem_cgroup_init init = {
++        .size = size,
++        .ops  = NULL,
++        .reclaim_priv = NULL,
++    };
++    void *region = dmem_cgroup_register_region(&init, name);
++#else
+     void *region = dmem_cgroup_register_region(size, name);
++#endif
+     if (IS_ERR(region))
+     {
+         return NULL;
+"#;
+
 const LLVM_DKMS_TOOLCHAIN: &str = r#"
 if grep -q "CONFIG_CC_IS_CLANG=y" "/boot/config-$(uname -r)" 2>/dev/null; then
     echo "This kernel was built with LLVM/Clang: installing the toolchain DKMS needs..."
@@ -418,6 +443,7 @@ fi
 pub(crate) fn nvidia_dkms_patch_commands() -> String {
     let mmap_patch = NV_MMAP_VMA_LOCK_PATCH.replace('\'', "'\\''");
     let string_h_patch = NV_STRING_H_PATCH.replace('\'', "'\\''");
+    let dmem_patch = NV_DMEM_CGROUP_INIT_PATCH.replace('\'', "'\\''");
 
     format!(
         "for NVIDIA_SRC in /usr/src/nvidia-*/; do \
@@ -445,6 +471,16 @@ pub(crate) fn nvidia_dkms_patch_commands() -> String {
         printf '%s' '{string_h_patch}' | patch --fuzz=5 -p1 -d \"$NV_ROOT\" && \
         echo \"NVIDIA string.h patch applied.\" || \
         echo \"Warning: NVIDIA string.h patch failed for ${{NV_ROOT}} - DKMS may fail.\"; \
+      fi; \
+      if grep -q 'NV_USE_DMEM_CGROUP_API' \"$NV_OSIF\" 2>/dev/null; then \
+        if grep -q 'dmem_cgroup_register_region(&init' \"$NV_OSIF\" 2>/dev/null; then \
+          echo \"NVIDIA dmem cgroup init patch already applied in ${{NV_ROOT}} - skipping.\"; \
+        elif grep -q 'dmem_cgroup_register_region(size' \"$NV_OSIF\" 2>/dev/null; then \
+          echo \"Applying NVIDIA dmem cgroup init patch to ${{NV_ROOT}}...\"; \
+          printf '%s' '{dmem_patch}' | patch --fuzz=5 -p1 -d \"$NV_ROOT\" && \
+          echo \"NVIDIA dmem cgroup init patch applied.\" || \
+          echo \"Warning: NVIDIA dmem cgroup init patch failed for ${{NV_ROOT}} - DKMS may fail.\"; \
+        fi; \
       fi; \
     fi; \
   done; \

@@ -189,6 +189,11 @@
   </developer>
 
   <releases>
+    <release version="3.0.1-beta" date="2026-10-20">
+      <description>
+        <p>Added NVIDIA DKMS compatibility patch for Linux 7.3+ kernels (Fix 5: dmem_cgroup_register_region API change in os-interface.c).</p>
+      </description>
+    </release>
     <release version="3.0.0-9-beta" date="2026-10-19">
       <description>
         <p>Full 8-language internationalization across desktop launchers and AppStream metadata.</p>

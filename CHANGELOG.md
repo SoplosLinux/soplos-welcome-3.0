@@ -2,6 +2,12 @@
 
 All notable changes to Soplos Welcome are documented in this file.
 
+## [3.0.1-beta] - 2026-10-20
+
+### Fixed
+
+- Added NVIDIA DKMS compatibility patch for Linux 7.3+ kernels (`NV_DMEM_CGROUP_INIT_PATCH`), resolving `dmem_cgroup_register_region` API signature changes on 610/Turing+ open modules.
+
 ## [3.0.0-9-beta] - 2026-10-19
 
 ### Added
