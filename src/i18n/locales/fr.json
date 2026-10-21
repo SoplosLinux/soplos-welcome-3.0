@@ -180,6 +180,9 @@
       "adobe-reader": "Lecteur PDF d'Adobe",
       "jopdf": "Éditeur PDF : annoter, signer, remplir des formulaires et fusionner des PDF",
       "printcraft": "Alternative à Acrobat écrite en Rust",
+      "wordcraft": "Alternative à Word écrite en Rust",
+      "gridcraft": "Alternative à Excel écrite en Rust",
+      "deckcraft": "Alternative à PowerPoint écrite en Rust",
       "vlc-media-player": "Lecteur multimédia universel",
       "mpv": "Lecteur multimédia minimaliste et puissant",
       "kodi": "Centre multimédia open source",
@@ -214,6 +217,8 @@
       "photocraft": "Alternative à Photoshop écrite en Rust",
       "vectorcraft": "Alternative à Illustrator écrite en Rust",
       "lightcraft": "Alternative à Lightroom écrite en Rust",
+      "designcraft": "Alternative à InDesign écrite en Rust",
+      "figcraft": "Alternative à Figma écrite en Rust",
       "inkscape": "Éditeur professionnel de graphiques vectoriels",
       "blender": "Suite complète et gratuite de création 3D",
       "darktable": "Table lumineuse virtuelle pour la photographie",
@@ -313,6 +318,8 @@
       "protonplus": "Gérez les outils de compatibilité Proton, Wine et Steam/Lutris",
       "ppsspp": "Émulateur PSP avec rendu de haute qualité",
       "geforcenow": "Cloud gaming NVIDIA — diffusez des jeux depuis le cloud",
+      "xodus-nexus": "Lanceur non officiel pour les jeux Xbox et Microsoft Store (Game Pass)",
+      "epic-games": "Lanceur officiel de l'Epic Games Store",
       "openrgb": "Contrôlez l'éclairage RGB des cartes mères, RAM, GPU et périphériques compatibles",
       "msi-keyboard-gui": "Configurez l'éclairage RGB du clavier MSI"
     }

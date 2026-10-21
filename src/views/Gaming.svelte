@@ -108,6 +108,26 @@
       customInstall: "install_geforcenow",
       customUninstall: "uninstall_geforcenow",
     },
+    {
+      key: "xodus-nexus",
+      name: "Xodus Nexus",
+      icon: "/assets/icons/gaming/xodus-nexus.png",
+      kind: "custom",
+      badgeKind: "appimage",
+      checkPath: "~/AppImages/Xodus-Nexus.AppImage",
+      customInstall: "install_xodus_nexus",
+      customUninstall: "uninstall_xodus_nexus",
+    },
+    {
+      key: "epic-games",
+      name: "Epic Games Launcher",
+      icon: "/assets/icons/gaming/epic-games-launcher.png",
+      kind: "custom",
+      badgeKind: "appimage",
+      checkPath: "~/AppImages/EpicGamesLauncher-x86_64.AppImage",
+      customInstall: "install_epic_games_launcher",
+      customUninstall: "uninstall_epic_games_launcher",
+    },
   ];
 
   const customizationApps: LauncherItem[] = [

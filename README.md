@@ -1,7 +1,11 @@
 # Soplos Welcome 3.0
 
-[![License: GPL-3.0+](https://img.shields.io/badge/License-GPL--3.0%2B-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Version](https://img.shields.io/badge/version-3.0.0--9--beta-green.svg)]()
+![Version](https://img.shields.io/badge/version-3.0.1--1--beta-blue)
+![License](https://img.shields.io/badge/license-GPL--3.0--or--later-green)
+![Platform](https://img.shields.io/badge/platform-Linux-lightgrey)
+![Tauri](https://img.shields.io/badge/Tauri-2-orange)
+![Rust](https://img.shields.io/badge/Rust-1.80+-orange)
+![Svelte](https://img.shields.io/badge/Svelte-4-red)
 
 Welcome and system setup application for Soplos Linux.
 
@@ -23,7 +27,7 @@ Version 3.0 is a ground-up rewrite of Soplos Welcome. The original app was writt
 - **Backend** (`src-tauri/`): one Rust module per section (`software.rs`, `drivers.rs`, `kernels.rs`, `security.rs`, `recommended.rs`, `customization.rs`, `gaming.rs`). Actions that need administrator rights run through `pkexec`, never as a long-lived root process; the privileged script itself is written to a temporary file and the same binary re-invokes itself to run it, rather than shelling out arbitrary strings. Long-running commands stream their output back to the interface through a job runner instead of blocking the UI.
 - **Frontend** (`src/`): one Svelte view per section, shared components (popups, the flatpak-scope choice, the language switcher), and the 8-language dictionaries under `src/i18n/`.
 - **Privileges**: administrator tasks invoke `/usr/share/polkit-1/actions/org.soplos.welcome.policy` via `pkexec`.
-- **Autostart**: session autostart entry managed through `/etc/xdg/autostart/org.soplos.welcome.desktop` and `~/.config/autostart/`.
+- **Autostart**: the session autostart entry is created or removed from the application, as `~/.config/autostart/org.soplos.welcome.desktop`.
 
 ## Installation
 

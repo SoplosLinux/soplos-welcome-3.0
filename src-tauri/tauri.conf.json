@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "soplos-welcome",
-  "version": "3.0.1-beta",
+  "version": "3.0.1-1-beta",
   "identifier": "org.soplos.welcome",
   "build": {
     "beforeDevCommand": "npm run dev",
@@ -53,7 +53,9 @@
       "resources/appimage-icons/coolercontrol.png",
       "resources/appimage-icons/doublecmd.png",
       "resources/appimage-icons/whatsapp.png",
-      "resources/appimage-icons/audacity.png"
+      "resources/appimage-icons/audacity.png",
+      "resources/appimage-icons/xodus-nexus.png",
+      "resources/appimage-icons/epic-games-launcher.png"
     ],
     "linux": {
       "deb": {
@@ -64,6 +66,7 @@
           "wget",
           "pkexec | policykit-1"
         ],
+        "changelog": "../CHANGELOG.md",
         "desktopTemplate": "resources/debian/soplos-welcome.desktop.hbs",
         "files": {
           "/usr/share/polkit-1/actions/org.soplos.welcome.policy": "resources/polkit/org.soplos.welcome.policy",
@@ -77,7 +80,7 @@
           "/usr/share/doc/soplos-welcome/screenshots/screenshot06.png": "resources/screenshots/screenshot06.png",
           "/usr/share/doc/soplos-welcome/screenshots/screenshot07.png": "resources/screenshots/screenshot07.png",
           "/usr/share/doc/soplos-welcome/screenshots/screenshot08.png": "resources/screenshots/screenshot08.png",
-          "/usr/share/man/man1/soplos-welcome.1": "resources/docs/soplos-welcome.1"
+          "/usr/share/man/man1/soplos-welcome.1.gz": "resources/docs/soplos-welcome.1.gz"
         }
       }
     }

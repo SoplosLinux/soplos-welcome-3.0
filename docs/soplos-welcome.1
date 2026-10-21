@@ -1,49 +1,105 @@
-.TH "SOPLOS-WELCOME" "1" "2026-10-19" "Soplos Linux" "User Commands"
+.TH "SOPLOS-WELCOME" "1" "2026-10-21" "Soplos Linux" "User Commands"
 .SH NAME
-soplos-welcome \- Advanced welcome and system setup application for Soplos Linux
+soplos-welcome \- Welcome and system setup application for Soplos Linux
 .SH SYNOPSIS
 .B soplos-welcome
 [\fIOPTIONS\fR]
 .SH DESCRIPTION
 .B soplos-welcome
-is the primary welcome and system configuration application for Soplos Linux installations.
-Built with modern Tauri 2, Rust, and Svelte architecture, it provides an intuitive,
-beautiful, and secure interface for initial system personalization, hardware configuration,
-driver installation, kernel management, and software discovery:
+is the welcome and system configuration application for Soplos Linux.
+Built with Tauri 2, Rust, and Svelte, it gives one place to update the system,
+install drivers and kernels, harden security, pick applications, tune the
+desktop and optimize the machine for gaming. It is organized in eight sections:
 .IP \[bu] 2
-Complete hardware detection and driver management (NVIDIA, AMD, Wi-Fi, VM Tools).
+.B Home:
+system overview, hardware specifications, display server (X11 or Wayland),
+desktop environment and quick action shortcuts.
 .IP \[bu]
-Recommended software management across APT, Flatpak, and AppImages.
+.B Software:
+APT, Flatpak (user, system or both scopes), Snap and Flathub management,
+system update and upgrade, and Flatpak runtime cleanup.
 .IP \[bu]
-Kernel management and optimization (Liquorix, XanMod, Soplos Kernels).
+.B Drivers:
+hardware detection with NVIDIA proprietary drivers, the CUDA toolkit,
+AMD ROCm, Intel oneAPI, Broadcom and MediaTek Wi-Fi firmware, and the
+VirtualBox and VMware guest and host tools.
 .IP \[bu]
-System security, backup tools, and firewall management.
+.B Kernels:
+the Soplos Kernels repository, XanMod and Liquorix kernels, removal of old
+unused kernels, and integration with Soplos Kernel Installer.
 .IP \[bu]
-Desktop customization and font rendering tuning for XFCE, GNOME, and KDE Plasma.
+.B Security:
+firewall management with UFW, antivirus scans with ClamAV, rootkit detection
+with rkhunter, VPN configuration and system hardening checks.
 .IP \[bu]
-Gaming center with performance profiles, sysctl tuning, and game launchers.
+.B Recommended:
+about 100 curated applications across 12 categories, with single or multiple
+selection for batch installation and removal, and extended search.
+.IP \[bu]
+.B Customization:
+desktop personalization tools for Xfce, GNOME and KDE Plasma, the wallpaper
+manager and font rendering presets.
+.IP \[bu]
+.B Gaming:
+game launchers (Steam, Heroic, Lutris, Bottles), GameMode, low-latency sysctl
+tuning, GPU optimizations and the MangoHud overlay.
+.P
+The interface is available in English, Spanish, German, French, Italian,
+Portuguese, Romanian and Russian. It starts in the system language and falls
+back to English.
+.P
+The window never runs as root. Administrator tasks are run through
+.BR pkexec (1)
+under the Polkit action declared by the package.
 .SH OPTIONS
 .TP
 .B \-h, \-\-help
 Show summary of options.
+.TP
+.B \-\-run-privileged-script \fIFILE\fR
+Internal Polkit-authenticated task: run the privileged script stored in
+.IR FILE .
+Used by the application itself through
+.BR pkexec (1)
+and not meant to be called by hand.
+.SH KEYBOARD SHORTCUTS
+.TP
+.B F1
+About dialog.
+.TP
+.B Ctrl+Q
+Quit the application.
+.TP
+.B Ctrl+Tab
+Next section.
+.TP
+.B Ctrl+Shift+Tab
+Previous section.
 .SH FILES
 .TP
-.I /etc/xdg/autostart/org.soplos.welcome.desktop
-User autostart entry for automatic launch on session login.
-.TP
 .I /usr/share/polkit-1/actions/org.soplos.welcome.policy
-Polkit policy defining administrator privileges for driver and system operations.
+Polkit policy defining the administrator privileges for driver and system operations.
 .TP
-.I ~/.config/soplos-welcome/
-User configuration directory.
+.I ~/.config/autostart/org.soplos.welcome.desktop
+Autostart entry created or removed from the application, to open it at session login.
+.TP
+.I ~/AppImages/
+Where AppImages installed from the Recommended section are stored.
+.TP
+.I ~/.local/share/applications/
+Desktop entries created for the applications installed from the Recommended section.
 .SH AUTHOR
 Written by Sergi Perich <info@soploslinux.com> for the Soplos Linux project.
 .SH COPYRIGHT
 Copyright \(co 2026 Sergi Perich <info@soploslinux.com>.
+.br
 License: GPL-3.0-or-later <https://www.gnu.org/licenses/gpl-3.0.html>.
 .br
 This is free software: you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
 .SH SEE ALSO
 .BR soplos-store (1),
-.BR soplos-repo-selector (1)
+.BR soplos-repo-selector (1),
+.BR soplos-sys-cleaner (1),
+.BR apt (8),
+.BR flatpak (1)

@@ -180,6 +180,9 @@
       "adobe-reader": "Cititor PDF de la Adobe",
       "jopdf": "Editor PDF: adnotează, semnează, completează formulare și îmbină PDF-uri",
       "printcraft": "Alternativă la Acrobat scrisă în Rust",
+      "wordcraft": "Alternativă la Word scrisă în Rust",
+      "gridcraft": "Alternativă la Excel scrisă în Rust",
+      "deckcraft": "Alternativă la PowerPoint scrisă în Rust",
       "vlc-media-player": "Player multimedia universal",
       "mpv": "Player multimedia minimalist și puternic",
       "kodi": "Centru multimedia open source",
@@ -214,6 +217,8 @@
       "photocraft": "Alternativă la Photoshop scrisă în Rust",
       "vectorcraft": "Alternativă la Illustrator scrisă în Rust",
       "lightcraft": "Alternativă la Lightroom scrisă în Rust",
+      "designcraft": "Alternativă la InDesign scrisă în Rust",
+      "figcraft": "Alternativă la Figma scrisă în Rust",
       "inkscape": "Editor profesional de grafică vectorială",
       "blender": "Suită completă și gratuită de creare 3D",
       "darktable": "Masă de lumină virtuală pentru fotografie",
@@ -313,6 +318,8 @@
       "protonplus": "Gestionează instrumentele de compatibilitate Proton, Wine și Steam/Lutris",
       "ppsspp": "Emulator PSP cu randare de înaltă calitate",
       "geforcenow": "Cloud gaming NVIDIA — transmite jocuri din cloud",
+      "xodus-nexus": "Lansator neoficial pentru jocurile Xbox și Microsoft Store (Game Pass)",
+      "epic-games": "Lansatorul oficial pentru Epic Games Store",
       "openrgb": "Controlează iluminarea RGB a plăcilor de bază, RAM-ului, GPU-urilor și perifericelor compatibile",
       "msi-keyboard-gui": "Configurează iluminarea RGB a tastaturii MSI"
     }

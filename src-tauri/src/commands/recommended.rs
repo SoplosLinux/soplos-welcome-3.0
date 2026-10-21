@@ -632,6 +632,133 @@ echo "ES-DE removed.""#
     )
 }
 
+// Xodus Nexus — an independent, unofficial Xbox / Microsoft Store game
+// launcher (Game Pass library) built on Xodus. The release publishes the
+// AppImage next to a "<name>.AppImage.sha512sum" file, which is checked here
+// because verify_and_download() only knows the ".sha256" convention. The file
+// is installed without its version in the name so an update replaces it.
+// The upstream desktop entry runs "AppRun --no-sandbox", so the flag is kept.
+const XODUS_DESKTOP_ENTRY: &str = "[Desktop Entry]\nName=Xodus Nexus\nExec=%HOME%/AppImages/Xodus-Nexus.AppImage --no-sandbox %U\nIcon=%HOME%/AppImages/.icons/xodus-nexus.png\nType=Application\nCategories=Game;\nComment=Xbox and Microsoft Store game launcher\nStartupWMClass=Xodus Nexus\nTerminal=false\nX-AppImage-Version=%VERSION%\nX-AppImage-UpdateUrl=https://github.com/domsvoboda/xodus-nexus\nX-AppImage-Integrate=true\n";
+
+#[tauri::command]
+pub fn install_xodus_nexus(app: tauri::AppHandle) -> Result<u64, String> {
+    use tauri::Manager;
+    let icon = app
+        .path()
+        .resolve("resources/appimage-icons/xodus-nexus.png", tauri::path::BaseDirectory::Resource)
+        .map_err(|e| e.to_string())?
+        .to_string_lossy()
+        .into_owned();
+    Ok(start_job(
+        "bash",
+        vec![
+            "-c".to_string(),
+            format!(
+                r#"set -e
+mkdir -p "$HOME/AppImages/.icons"
+mkdir -p "$HOME/.local/share/applications"
+echo "Downloading Xodus Nexus..."
+XODUS_RELEASE=$(curl -sL https://api.github.com/repos/domsvoboda/xodus-nexus/releases/latest)
+XODUS_URL=$(echo "$XODUS_RELEASE" | grep browser_download_url | grep 'x86_64.AppImage"' | head -1 | cut -d'"' -f4)
+XODUS_VERSION=$(echo "$XODUS_RELEASE" | grep '"tag_name"' | head -1 | cut -d'"' -f4 | sed 's/^v//')
+if [ -z "$XODUS_URL" ]; then
+    echo "Could not find the Xodus Nexus AppImage in the latest release."
+    exit 1
+fi
+XODUS_DEST="$HOME/AppImages/Xodus-Nexus.AppImage"
+wget -q -O "$XODUS_DEST.part" "$XODUS_URL"
+wget -q -O "$XODUS_DEST.sha512sum" "$XODUS_URL.sha512sum" 2>/dev/null || true
+if [ -s "$XODUS_DEST.sha512sum" ] && [ "$(wc -c < "$XODUS_DEST.sha512sum")" -le 1024 ] && grep -qE "^[0-9a-fA-F]{{128}}" "$XODUS_DEST.sha512sum"; then
+    if ! (cd "$HOME/AppImages" && echo "$(awk '{{print $1}}' "$XODUS_DEST.sha512sum")  $(basename "$XODUS_DEST.part")" | sha512sum -c - >/dev/null 2>&1); then
+        echo "Checksum verification failed for Xodus Nexus — aborting."
+        rm -f "$XODUS_DEST.part" "$XODUS_DEST.sha512sum"
+        exit 1
+    fi
+fi
+rm -f "$XODUS_DEST.sha512sum"
+mv "$XODUS_DEST.part" "$XODUS_DEST"
+chmod +x "$XODUS_DEST"
+cp "{icon}" "$HOME/AppImages/.icons/xodus-nexus.png"
+printf '%s' '{XODUS_DESKTOP_ENTRY}' | sed "s|%HOME%|$HOME|g; s|%VERSION%|$XODUS_VERSION|g" > "$HOME/.local/share/applications/xodus-nexus.desktop"
+update-desktop-database "$HOME/.local/share/applications" 2>/dev/null || true
+echo "Xodus Nexus installed.""#
+            ),
+        ],
+    ))
+}
+
+#[tauri::command]
+pub fn uninstall_xodus_nexus() -> u64 {
+    start_job(
+        "bash",
+        vec![
+            "-c".to_string(),
+            r#"echo "Removing Xodus Nexus..."
+rm -f "$HOME/AppImages/Xodus-Nexus.AppImage"
+rm -f "$HOME/AppImages/.icons/xodus-nexus.png"
+rm -f "$HOME/.local/share/applications/xodus-nexus.desktop"
+update-desktop-database "$HOME/.local/share/applications" 2>/dev/null || true
+echo "Xodus Nexus removed.""#
+                .to_string(),
+        ],
+    )
+}
+
+// Epic Games Launcher — Epic's own Linux AppImage. The URL always serves the
+// current build (it redirects to a versioned file on Epic's CDN), and Epic
+// publishes no checksum, so it is downloaded over HTTPS without one. The
+// desktop entry carries the com.epicgames.launcher URL scheme the launcher
+// registers itself for, so the browser login can hand control back to it.
+const EPIC_DESKTOP_ENTRY: &str = "[Desktop Entry]\nName=Epic Games Launcher\nExec=%HOME%/AppImages/EpicGamesLauncher-x86_64.AppImage %u\nIcon=%HOME%/AppImages/.icons/epic-games-launcher.png\nType=Application\nCategories=Game;\nComment=Epic Games Launcher\nStartupWMClass=EpicGamesLauncher\nMimeType=x-scheme-handler/com.epicgames.launcher;\nTerminal=false\n";
+
+#[tauri::command]
+pub fn install_epic_games_launcher(app: tauri::AppHandle) -> Result<u64, String> {
+    use tauri::Manager;
+    let icon = app
+        .path()
+        .resolve("resources/appimage-icons/epic-games-launcher.png", tauri::path::BaseDirectory::Resource)
+        .map_err(|e| e.to_string())?
+        .to_string_lossy()
+        .into_owned();
+    Ok(start_job(
+        "bash",
+        vec![
+            "-c".to_string(),
+            format!(
+                r#"{VERIFY_DOWNLOAD_SH}
+mkdir -p "$HOME/AppImages/.icons"
+mkdir -p "$HOME/.local/share/applications"
+echo "Downloading Epic Games Launcher..."
+EPIC_DEST="$HOME/AppImages/EpicGamesLauncher-x86_64.AppImage"
+verify_and_download "https://launcher-public-service-prod06.ol.epicgames.com/launcher/api/installer/download/EpicGamesLauncher-x86_64.AppImage" "$EPIC_DEST"
+chmod +x "$EPIC_DEST"
+cp "{icon}" "$HOME/AppImages/.icons/epic-games-launcher.png"
+printf '%s' '{EPIC_DESKTOP_ENTRY}' | sed "s|%HOME%|$HOME|g" > "$HOME/.local/share/applications/epic-games-launcher.desktop"
+update-desktop-database "$HOME/.local/share/applications" 2>/dev/null || true
+xdg-mime default epic-games-launcher.desktop x-scheme-handler/com.epicgames.launcher 2>/dev/null || true
+echo "Epic Games Launcher installed.""#
+            ),
+        ],
+    ))
+}
+
+#[tauri::command]
+pub fn uninstall_epic_games_launcher() -> u64 {
+    start_job(
+        "bash",
+        vec![
+            "-c".to_string(),
+            r#"echo "Removing Epic Games Launcher..."
+rm -f "$HOME/AppImages/EpicGamesLauncher-x86_64.AppImage"
+rm -f "$HOME/AppImages/.icons/epic-games-launcher.png"
+rm -f "$HOME/.local/share/applications/epic-games-launcher.desktop"
+update-desktop-database "$HOME/.local/share/applications" 2>/dev/null || true
+echo "Epic Games Launcher removed.""#
+                .to_string(),
+        ],
+    )
+}
+
 #[tauri::command]
 pub fn link_ppsspp_lutris_runner() -> u64 {
     start_job(
@@ -1027,6 +1154,91 @@ echo "PrintCraft installed.""#
 #[tauri::command]
 pub fn uninstall_printcraft() -> u64 {
     start_pkexec_job("apt remove -y printcraft && echo 'PrintCraft removed.'".to_string())
+}
+
+#[tauri::command]
+pub fn install_wordcraft() -> u64 {
+    start_pkexec_job(format!(
+        r#"{VERIFY_DOWNLOAD_SH}
+WORDCRAFT_URL=$(curl -s https://api.github.com/repos/storytold/wordcraft/releases/latest | grep browser_download_url | grep linux-x86_64.deb | cut -d\" -f4)
+verify_and_download "$WORDCRAFT_URL" /tmp/wordcraft.deb
+apt install -y /tmp/wordcraft.deb
+rm -f /tmp/wordcraft.deb
+echo "WordCraft installed.""#
+    ))
+}
+
+#[tauri::command]
+pub fn uninstall_wordcraft() -> u64 {
+    start_pkexec_job("apt remove -y wordcraft && echo 'WordCraft removed.'".to_string())
+}
+
+#[tauri::command]
+pub fn install_gridcraft() -> u64 {
+    start_pkexec_job(format!(
+        r#"{VERIFY_DOWNLOAD_SH}
+GRIDCRAFT_URL=$(curl -s https://api.github.com/repos/storytold/gridcraft/releases/latest | grep browser_download_url | grep linux-x86_64.deb | cut -d\" -f4)
+verify_and_download "$GRIDCRAFT_URL" /tmp/gridcraft.deb
+apt install -y /tmp/gridcraft.deb
+rm -f /tmp/gridcraft.deb
+echo "GridCraft installed.""#
+    ))
+}
+
+#[tauri::command]
+pub fn uninstall_gridcraft() -> u64 {
+    start_pkexec_job("apt remove -y gridcraft && echo 'GridCraft removed.'".to_string())
+}
+
+#[tauri::command]
+pub fn install_deckcraft() -> u64 {
+    start_pkexec_job(format!(
+        r#"{VERIFY_DOWNLOAD_SH}
+DECKCRAFT_URL=$(curl -s https://api.github.com/repos/storytold/deckcraft/releases/latest | grep browser_download_url | grep linux-x86_64.deb | cut -d\" -f4)
+verify_and_download "$DECKCRAFT_URL" /tmp/deckcraft.deb
+apt install -y /tmp/deckcraft.deb
+rm -f /tmp/deckcraft.deb
+echo "DeckCraft installed.""#
+    ))
+}
+
+#[tauri::command]
+pub fn uninstall_deckcraft() -> u64 {
+    start_pkexec_job("apt remove -y deckcraft && echo 'DeckCraft removed.'".to_string())
+}
+
+#[tauri::command]
+pub fn install_designcraft() -> u64 {
+    start_pkexec_job(format!(
+        r#"{VERIFY_DOWNLOAD_SH}
+DESIGNCRAFT_URL=$(curl -s https://api.github.com/repos/storytold/designcraft/releases/latest | grep browser_download_url | grep linux-x86_64.deb | cut -d\" -f4)
+verify_and_download "$DESIGNCRAFT_URL" /tmp/designcraft.deb
+apt install -y /tmp/designcraft.deb
+rm -f /tmp/designcraft.deb
+echo "DesignCraft installed.""#
+    ))
+}
+
+#[tauri::command]
+pub fn uninstall_designcraft() -> u64 {
+    start_pkexec_job("apt remove -y designcraft && echo 'DesignCraft removed.'".to_string())
+}
+
+#[tauri::command]
+pub fn install_figcraft() -> u64 {
+    start_pkexec_job(format!(
+        r#"{VERIFY_DOWNLOAD_SH}
+FIGCRAFT_URL=$(curl -s https://api.github.com/repos/storytold/figcraft/releases/latest | grep browser_download_url | grep linux-x86_64.deb | cut -d\" -f4)
+verify_and_download "$FIGCRAFT_URL" /tmp/figcraft.deb
+apt install -y /tmp/figcraft.deb
+rm -f /tmp/figcraft.deb
+echo "FigCraft installed.""#
+    ))
+}
+
+#[tauri::command]
+pub fn uninstall_figcraft() -> u64 {
+    start_pkexec_job("apt remove -y figcraft && echo 'FigCraft removed.'".to_string())
 }
 
 // ArtCraft Launcher — Storytold's own installer/updater for the whole Craft

@@ -77,11 +77,76 @@
     </p>
   </description>
 
+  <categories>
+    <category>System</category>
+    <category>Settings</category>
+  </categories>
+
+  <keywords>
+    <keyword>welcome</keyword>
+    <keyword>setup</keyword>
+    <keyword>config</keyword>
+    <keyword>drivers</keyword>
+    <keyword>software</keyword>
+    <keyword>gaming</keyword>
+    <keyword>kernels</keyword>
+    <keyword xml:lang="es">bienvenida</keyword>
+    <keyword xml:lang="es">configuración</keyword>
+    <keyword xml:lang="es">instalación</keyword>
+    <keyword xml:lang="es">drivers</keyword>
+    <keyword xml:lang="es">controladores</keyword>
+    <keyword xml:lang="es">software</keyword>
+    <keyword xml:lang="es">juegos</keyword>
+    <keyword xml:lang="es">kernels</keyword>
+    <keyword xml:lang="fr">accueil</keyword>
+    <keyword xml:lang="fr">configuration</keyword>
+    <keyword xml:lang="fr">installation</keyword>
+    <keyword xml:lang="fr">pilotes</keyword>
+    <keyword xml:lang="fr">logiciels</keyword>
+    <keyword xml:lang="fr">jeux</keyword>
+    <keyword xml:lang="fr">noyaux</keyword>
+    <keyword xml:lang="de">willkommen</keyword>
+    <keyword xml:lang="de">einrichtung</keyword>
+    <keyword xml:lang="de">konfiguration</keyword>
+    <keyword xml:lang="de">treiber</keyword>
+    <keyword xml:lang="de">software</keyword>
+    <keyword xml:lang="de">gaming</keyword>
+    <keyword xml:lang="de">kernel</keyword>
+    <keyword xml:lang="pt">bem-vindo</keyword>
+    <keyword xml:lang="pt">configuração</keyword>
+    <keyword xml:lang="pt">instalação</keyword>
+    <keyword xml:lang="pt">controladores</keyword>
+    <keyword xml:lang="pt">software</keyword>
+    <keyword xml:lang="pt">jogos</keyword>
+    <keyword xml:lang="pt">kernels</keyword>
+    <keyword xml:lang="it">benvenuto</keyword>
+    <keyword xml:lang="it">configurazione</keyword>
+    <keyword xml:lang="it">installazione</keyword>
+    <keyword xml:lang="it">driver</keyword>
+    <keyword xml:lang="it">software</keyword>
+    <keyword xml:lang="it">giochi</keyword>
+    <keyword xml:lang="it">kernel</keyword>
+    <keyword xml:lang="ro">bun venit</keyword>
+    <keyword xml:lang="ro">configurare</keyword>
+    <keyword xml:lang="ro">instalare</keyword>
+    <keyword xml:lang="ro">drivere</keyword>
+    <keyword xml:lang="ro">software</keyword>
+    <keyword xml:lang="ro">jocuri</keyword>
+    <keyword xml:lang="ro">kernel</keyword>
+    <keyword xml:lang="ru">добро пожаловать</keyword>
+    <keyword xml:lang="ru">настройка</keyword>
+    <keyword xml:lang="ru">установка</keyword>
+    <keyword xml:lang="ru">драйверы</keyword>
+    <keyword xml:lang="ru">программы</keyword>
+    <keyword xml:lang="ru">игры</keyword>
+    <keyword xml:lang="ru">ядра</keyword>
+  </keywords>
+
   <launchable type="desktop-id">org.soplos.welcome.desktop</launchable>
 
   <screenshots>
     <screenshot type="default">
-      <image>screenshot01.png</image>
+      <image>https://raw.githubusercontent.com/SoplosLinux/soplos-welcome-3.0/main/src-tauri/resources/screenshots/screenshot01.png</image>
       <caption>Home screen with system overview and quick links</caption>
       <caption xml:lang="es">Pantalla de inicio con información del sistema y accesos rápidos</caption>
       <caption xml:lang="en">Home screen with system overview and quick links</caption>
@@ -93,7 +158,7 @@
       <caption xml:lang="ru">Главный экран с обзором системы и быстрыми ссылками</caption>
     </screenshot>
     <screenshot>
-      <image>screenshot02.png</image>
+      <image>https://raw.githubusercontent.com/SoplosLinux/soplos-welcome-3.0/main/src-tauri/resources/screenshots/screenshot02.png</image>
       <caption>Software management with package managers and repositories</caption>
       <caption xml:lang="es">Gestión de software con gestores de paquetes y repositorios</caption>
       <caption xml:lang="en">Software management with package managers and repositories</caption>
@@ -105,7 +170,7 @@
       <caption xml:lang="ru">Управление программами с менеджерами пакетов и репозиториями</caption>
     </screenshot>
     <screenshot>
-      <image>screenshot03.png</image>
+      <image>https://raw.githubusercontent.com/SoplosLinux/soplos-welcome-3.0/main/src-tauri/resources/screenshots/screenshot03.png</image>
       <caption>Drivers and hardware detection</caption>
       <caption xml:lang="es">Controladores y detección de hardware</caption>
       <caption xml:lang="en">Drivers and hardware detection</caption>
@@ -117,7 +182,7 @@
       <caption xml:lang="ru">Драйверы и обнаружение оборудования</caption>
     </screenshot>
     <screenshot>
-      <image>screenshot04.png</image>
+      <image>https://raw.githubusercontent.com/SoplosLinux/soplos-welcome-3.0/main/src-tauri/resources/screenshots/screenshot04.png</image>
       <caption>Kernel management and Soplos Kernels repository</caption>
       <caption xml:lang="es">Gestión de núcleos y repositorio Soplos Kernels</caption>
       <caption xml:lang="en">Kernel management and Soplos Kernels repository</caption>
@@ -129,7 +194,7 @@
       <caption xml:lang="ru">Управление ядрами и репозиторий Soplos Kernels</caption>
     </screenshot>
     <screenshot>
-      <image>screenshot05.png</image>
+      <image>https://raw.githubusercontent.com/SoplosLinux/soplos-welcome-3.0/main/src-tauri/resources/screenshots/screenshot05.png</image>
       <caption>Security and system protection tools</caption>
       <caption xml:lang="es">Herramientas de seguridad y protección del sistema</caption>
       <caption xml:lang="en">Security and system protection tools</caption>
@@ -141,7 +206,7 @@
       <caption xml:lang="ru">Инструменты безопасности и защиты системы</caption>
     </screenshot>
     <screenshot>
-      <image>screenshot06.png</image>
+      <image>https://raw.githubusercontent.com/SoplosLinux/soplos-welcome-3.0/main/src-tauri/resources/screenshots/screenshot06.png</image>
       <caption>Recommended applications by category</caption>
       <caption xml:lang="es">Aplicaciones recomendadas por categoría</caption>
       <caption xml:lang="en">Recommended applications by category</caption>
@@ -153,7 +218,7 @@
       <caption xml:lang="ru">Рекомендуемые приложения по категориям</caption>
     </screenshot>
     <screenshot>
-      <image>screenshot07.png</image>
+      <image>https://raw.githubusercontent.com/SoplosLinux/soplos-welcome-3.0/main/src-tauri/resources/screenshots/screenshot07.png</image>
       <caption>Desktop customization tools</caption>
       <caption xml:lang="es">Herramientas de personalización del escritorio</caption>
       <caption xml:lang="en">Desktop customization tools</caption>
@@ -165,7 +230,7 @@
       <caption xml:lang="ru">Инструменты настройки рабочего стола</caption>
     </screenshot>
     <screenshot>
-      <image>screenshot08.png</image>
+      <image>https://raw.githubusercontent.com/SoplosLinux/soplos-welcome-3.0/main/src-tauri/resources/screenshots/screenshot08.png</image>
       <caption>Gaming center with optimizations and launchers</caption>
       <caption xml:lang="es">Centro de juegos con optimizaciones y lanzadores</caption>
       <caption xml:lang="en">Gaming center with optimizations and launchers</caption>
@@ -189,6 +254,13 @@
   </developer>
 
   <releases>
+    <release version="3.0.1-1-beta" date="2026-10-22">
+      <description>
+        <p>Added the NVIDIA DKMS patches for kernels 7.2+: Fix 6 for the Debian 550 driver and Fix 7 for the 590 open modules.</p>
+        <p>Fixed the Linux 7.3+ dmem cgroup patch (Fix 5), which was never applied because of a malformed hunk header, and the driver install order so the patches are applied before the first DKMS build can abort the script.</p>
+        <p>Added the Xodus Nexus (Xbox and Microsoft Store) and Epic Games launchers to Gaming, and the WordCraft, GridCraft, DeckCraft, DesignCraft and FigCraft apps to Recommended.</p>
+      </description>
+    </release>
     <release version="3.0.1-beta" date="2026-10-20">
       <description>
         <p>Added NVIDIA DKMS compatibility patch for Linux 7.3+ kernels (Fix 5: dmem_cgroup_register_region API change in os-interface.c).</p>

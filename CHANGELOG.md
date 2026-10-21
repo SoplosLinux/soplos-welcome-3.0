@@ -2,6 +2,32 @@
 
 All notable changes to Soplos Welcome are documented in this file.
 
+## [3.0.1-1-beta] - 2026-10-22
+
+### Added
+
+- Drivers: NVIDIA DKMS patch for the Debian 550 driver on Linux 7.2+ (`NV_550_KERNEL72_COMPAT_PATCH`, Fix 6). NVIDIA 550.163.01 no longer built on kernels 7.2+: `linux/of_gpio.h` and `strncpy()` were removed from the kernel and `struct drm_atomic_state` became `struct drm_atomic_commit`. It is applied only when the source tree still has the 550 text and `patch --dry-run` succeeds.
+- Drivers: NVIDIA DKMS patch for the 590 open modules on Linux 7.2+ (`NV_590_KERNEL72_COMPAT_PATCH`, Fix 7). It carries the Fix 6 changes and backports the `nvidia-uvm` changes NVIDIA 610 already has (`page_free` renamed `folio_free`, three-argument `zone_device_page_init()`) through two `conftest.sh` probes. Both patches build all five modules against `7.3.0-soplos-bore-ntsync-v4` and `7.2.11-soplos-bore-ntsync-v4`.
+- Gaming launchers: Xodus Nexus, an unofficial Xbox and Microsoft Store (Game Pass) launcher, and the official Epic Games Launcher. Both are AppImages installed in `~/AppImages` with a user `.desktop` entry, like ES-DE, and need no root. Xodus Nexus resolves the latest GitHub release and checks the `.sha512sum` file the project publishes; the Epic Games Launcher is downloaded from Epic's own installer URL, which publishes no checksum, and its entry registers the `com.epicgames.launcher` URL scheme. The icons come from the upstream projects, and the descriptions are in the eight languages.
+- Recommended apps: the rest of the ArtCraft suite by Storytold that ships a Linux package. WordCraft, GridCraft and DeckCraft (Word, Excel and PowerPoint alternatives) go in Office, and DesignCraft and FigCraft (InDesign and Figma alternatives) go in Graphics. They install the newest `linux-x86_64.deb` of their GitHub release, like the other Craft apps, with descriptions in the eight languages. CADCraft is left out because there is no CAD section, and AniCraft because it has no published release yet.
+- `CHANGELOG.md` is installed as `/usr/share/doc/soplos-welcome/changelog.gz`.
+- AppStream metainfo: categories and keywords in the eight languages, the same ones as the desktop entry.
+- The Debian copyright now credits the third-party material the package ships: the DaVinci Resolve package creator `makeresolvedeb` by Daniel Tufvesson (distributed by its author without a license statement), the VirtualBox 7.2.10 Guest Additions by Oracle, the application logos in `appimage-icons`, and the `soplos-vmware-modules` package, which holds only Soplos build and kernel-hook scripts and no VMware code. Lucide (ISC), used for the interface icons, is declared too.
+- README: version, license, platform, Tauri, Rust and Svelte badges.
+
+### Changed
+
+- Manual page rewritten: the eight sections, the languages, the privilege model, the internal `--run-privileged-script` option, keyboard shortcuts and files. It is installed compressed, as `/usr/share/man/man1/soplos-welcome.1.gz`.
+
+### Fixed
+
+- Drivers: the `NV_DMEM_CGROUP_INIT_PATCH` added in 3.0.1-beta was never applied. Its hunk header declared 7 old and 17 new lines while the body has 6 and 15, so `patch` rejected it as malformed and the install script only printed a warning. The header is corrected (`@@ -2818,6 +2818,15 @@`); it now applies to NVIDIA 610.57.04 and the module builds against the Linux 7.3 headers.
+- Drivers: the repository install and the CUDA install applied the DKMS patches after `apt install`, but the driver package builds its DKMS module while dpkg configures it, so that first build ran on unpatched sources and, with `set -e`, a failure there aborted the script before any patch was applied. The install now tolerates that failure, applies the patches, runs `dpkg --configure -a` and repeats the install; in the CUDA install this happens before the repository is removed.
+- AppStream metainfo: the screenshots were bare file names instead of web addresses, so software centers could not show them and the file did not validate. They now use their `raw.githubusercontent.com` address.
+- Debian copyright: the `Source` field pointed to `soplos-welcome` and now points to the `soplos-welcome-3.0` repository.
+- Manual page and README no longer mention `~/.config/soplos-welcome/` (never used by the application) or a system-wide autostart entry in `/etc/xdg/autostart/` (the package only creates the user one, `~/.config/autostart/org.soplos.welcome.desktop`).
+- README version badge was still at `3.0.0-9-beta`.
+
 ## [3.0.1-beta] - 2026-10-20
 
 ### Fixed

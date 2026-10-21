@@ -180,6 +180,9 @@
       "adobe-reader": "Программа для просмотра PDF от Adobe",
       "jopdf": "Редактор PDF: заметки, подписи, заполнение форм и объединение PDF",
       "printcraft": "Альтернатива Acrobat, написанная на Rust",
+      "wordcraft": "Альтернатива Word, написанная на Rust",
+      "gridcraft": "Альтернатива Excel, написанная на Rust",
+      "deckcraft": "Альтернатива PowerPoint, написанная на Rust",
       "vlc-media-player": "Универсальный медиаплеер",
       "mpv": "Минималистичный и мощный медиаплеер",
       "kodi": "Медиацентр с открытым исходным кодом",
@@ -214,6 +217,8 @@
       "photocraft": "Альтернатива Photoshop, написанная на Rust",
       "vectorcraft": "Альтернатива Illustrator, написанная на Rust",
       "lightcraft": "Альтернатива Lightroom, написанная на Rust",
+      "designcraft": "Альтернатива InDesign, написанная на Rust",
+      "figcraft": "Альтернатива Figma, написанная на Rust",
       "inkscape": "Профессиональный редактор векторной графики",
       "blender": "Полный бесплатный пакет для 3D-графики",
       "darktable": "Виртуальный световой стол для фотографии",
@@ -313,6 +318,8 @@
       "protonplus": "Управление средствами совместимости Proton, Wine и Steam/Lutris",
       "ppsspp": "Эмулятор PSP с высококачественной отрисовкой",
       "geforcenow": "Облачный гейминг NVIDIA — игры по потоку из облака",
+      "xodus-nexus": "Неофициальный лаунчер игр Xbox и Microsoft Store (Game Pass)",
+      "epic-games": "Официальный лаунчер Epic Games Store",
       "openrgb": "Управление RGB-подсветкой поддерживаемых материнских плат, ОЗУ, видеокарт и периферии",
       "msi-keyboard-gui": "Настройка RGB-подсветки клавиатуры MSI"
     }
