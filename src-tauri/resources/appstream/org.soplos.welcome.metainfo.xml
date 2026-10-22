@@ -254,6 +254,12 @@
   </developer>
 
   <releases>
+    <release version="3.0.1-2-beta" date="2026-10-22">
+      <description>
+        <p>Fixed the gaming wallpapers installation, which copied nothing in the three desktops while reporting success.</p>
+        <p>OpenRGB is now installed from Debian together with its udev rules and the i2c-dev module, so it can reach the USB and I2C devices.</p>
+      </description>
+    </release>
     <release version="3.0.1-1-beta" date="2026-10-22">
       <description>
         <p>Added the NVIDIA DKMS patches for kernels 7.2+: Fix 6 for the Debian 550 driver and Fix 7 for the 590 open modules.</p>

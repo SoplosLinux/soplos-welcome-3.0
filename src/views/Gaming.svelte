@@ -131,7 +131,16 @@
   ];
 
   const customizationApps: LauncherItem[] = [
-    { key: "openrgb", name: "OpenRGB", icon: "/assets/icons/gaming/openrgb.png", kind: "flatpak", flatpakId: "org.openrgb.OpenRGB" },
+    {
+      key: "openrgb",
+      name: "OpenRGB",
+      icon: "/assets/icons/gaming/openrgb.png",
+      kind: "custom",
+      badgeKind: "apt",
+      checkPath: "/usr/bin/openrgb",
+      customInstall: "install_openrgb",
+      customUninstall: "uninstall_openrgb",
+    },
     { key: "msi-keyboard-gui", name: "MSI Keyboard RGB", icon: "/assets/icons/gaming/msi-keyboard.png", kind: "apt", package: "msi-keyboard-gui" },
   ];
 

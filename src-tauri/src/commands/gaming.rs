@@ -491,7 +491,8 @@ pub fn install_gaming_wallpapers(app: tauri::AppHandle, desktop: String) -> Resu
     let xfce_block = if is_xfce {
         r#"echo "Creating XFCE symlinks..."
 mkdir -p /usr/share/backgrounds/xfce
-for file in "$DEST"/*.{jpg,jpeg,png,webp,JPG,JPEG,PNG,WEBP}; do
+for file in "$DEST"/*; do
+    is_image "$file" || continue
     [ -f "$file" ] || continue
     filename=$(basename "$file")
     ln -sf "$DEST/$filename" "/usr/share/backgrounds/xfce/$filename"
@@ -509,7 +510,8 @@ mkdir -p /usr/share/gnome-background-properties
     echo '<?xml version="1.0" encoding="UTF-8"?>'
     echo '<!DOCTYPE wallpapers SYSTEM "gnome-wp-list.dtd">'
     echo '<wallpapers>'
-    for file in "$DEST"/*.{jpg,jpeg,png,webp,JPG,JPEG,PNG,WEBP}; do
+    for file in "$DEST"/*; do
+        is_image "$file" || continue
         [ -f "$file" ] || continue
         filename=$(basename "$file")
         name="${filename%.*}"
@@ -526,23 +528,40 @@ mkdir -p /usr/share/gnome-background-properties
         ""
     };
 
+    // The script runs under `sh` (dash), which has no brace expansion, so the
+    // image extensions are matched with `case` instead of a `*.{jpg,png}` glob.
+    let image_fn = r#"is_image() {
+    case "$1" in
+        *.jpg|*.jpeg|*.png|*.webp|*.JPG|*.JPEG|*.PNG|*.WEBP) return 0 ;;
+    esac
+    return 1
+}
+"#;
+
     let script = format!(
         r#"set -e
 DEST="{dest_dir}"
 TMPDIR=$(mktemp -d)
 trap 'rm -rf "$TMPDIR"' EXIT
-
+{image_fn}
 echo "Extracting wallpapers..."
 tar -xf "{archive}" -C "$TMPDIR"
 
 echo "Installing wallpapers to $DEST..."
 mkdir -p "$DEST"
-for file in "$TMPDIR"/*.{{jpg,jpeg,png,webp,JPG,JPEG,PNG,WEBP}}; do
+COUNT=0
+for file in "$TMPDIR"/*; do
+    is_image "$file" || continue
     [ -f "$file" ] || continue
     cp "$file" "$DEST/"
+    COUNT=$((COUNT + 1))
 done
+if [ "$COUNT" -eq 0 ]; then
+    echo "ERROR: no wallpapers were found in the archive."
+    exit 1
+fi
 
-{xfce_block}{gnome_block}echo "Gaming wallpapers installed to $DEST."
+{xfce_block}{gnome_block}echo "Gaming wallpapers installed to $DEST ($COUNT files)."
 "#
     );
     Ok(start_pkexec_job(script))

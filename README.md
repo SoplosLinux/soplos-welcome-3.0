@@ -1,6 +1,6 @@
 # Soplos Welcome 3.0
 
-![Version](https://img.shields.io/badge/version-3.0.1--1--beta-blue)
+![Version](https://img.shields.io/badge/version-3.0.1--2--beta-blue)
 ![License](https://img.shields.io/badge/license-GPL--3.0--or--later-green)
 ![Platform](https://img.shields.io/badge/platform-Linux-lightgrey)
 ![Tauri](https://img.shields.io/badge/Tauri-2-orange)

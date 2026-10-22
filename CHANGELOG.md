@@ -2,6 +2,16 @@
 
 All notable changes to Soplos Welcome are documented in this file.
 
+## [3.0.1-2-beta] - 2026-10-22
+
+### Changed
+
+- Gaming: OpenRGB is now installed from Debian together with its udev rules, instead of as a Flatpak. The Debian package ships no rules, and a Flatpak cannot give the host access to the USB and I2C devices, so the installer generates them with `openrgb --print-udev-rules` into `/etc/udev/rules.d/60-openrgb.rules`, loads the `i2c-dev` module now and at every boot (`/etc/modules-load.d/soplos-openrgb.conf`) and reloads udev. If OpenRGB does not generate its rules the installation fails with a clear message. Removing it also removes the rules and the module file. An OpenRGB already installed as a Flatpak is not detected by the card.
+
+### Fixed
+
+- Gaming: installing the wallpapers did nothing in the three desktops while reporting success. The privileged scripts run under `sh` (dash), which has no brace expansion, so `*.{jpg,png,...}` stayed literal and no file matched. The image extensions are now matched with `case`, the XFCE links and the GNOME list use the same match, and the script fails with an error if the archive holds no image.
+
 ## [3.0.1-1-beta] - 2026-10-22
 
 ### Added

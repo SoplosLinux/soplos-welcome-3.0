@@ -192,6 +192,8 @@ pub fn run() {
             commands::recommended::uninstall_waydroid,
             commands::recommended::install_geforcenow,
             commands::recommended::uninstall_geforcenow,
+            commands::recommended::install_openrgb,
+            commands::recommended::uninstall_openrgb,
             commands::recommended::install_xodus_nexus,
             commands::recommended::uninstall_xodus_nexus,
             commands::recommended::install_epic_games_launcher,
