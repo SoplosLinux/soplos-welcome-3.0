@@ -2,6 +2,12 @@
 
 All notable changes to Soplos Welcome are documented in this file.
 
+## [3.0.1-3-beta] - 2026-10-23
+
+### Added
+
+- The window follows the light or dark theme of the desktop. It starts in the theme of the desktop and notices when it changes. The theme is read from the XDG portal and, when that says nothing, from each desktop: the colors of `kdeglobals` on Plasma, the name of the GTK theme on Xfce (a guess from words such as "dark") and the color scheme of GNOME. The button of the sidebar still switches the theme and keeps what it chose; switching to the theme the desktop has goes back to following it.
+
 ## [3.0.1-2-beta] - 2026-10-22
 
 ### Changed
