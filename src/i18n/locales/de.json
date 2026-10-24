@@ -466,6 +466,17 @@
     "familyWifi": "WLAN & weitere Treiber",
     "familyVm": "VM-Tools",
     "soon": "Demnächst",
+    "mac": {
+      "title": "Apple Mac",
+      "nothing": "Für diesen Mac wird nichts Besonderes angeboten.",
+      "installed": "Installiert",
+      "notInstalled": "Nicht installiert",
+      "hint": {
+        "mbpfan": "Lüftersteuerung für MacBooks.",
+        "tlp": "Akku- und Energieverwaltung für Laptops. Es kollidiert mit power-profiles-daemon: Die Installation bricht ab, wenn dein Desktop es nutzt.",
+        "facetimehd": "Treiber der FaceTime-HD-Kamera, ein experimentelles Community-Projekt. Er wird auf deinem Rechner gebaut, die Kamera-Firmware wird von Apple geladen."
+      }
+    },
     "noPrinterDetected": "Kein Drucker erkannt",
     "printerDriversLabel": "Druckertreiber",
     "printerDriversHint": "Treiber für USB- und Netzwerkdrucker",

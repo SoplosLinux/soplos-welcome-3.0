@@ -466,6 +466,17 @@
     "familyWifi": "Wi-Fi e outros drivers",
     "familyVm": "Ferramentas VM",
     "soon": "Brevemente",
+    "mac": {
+      "title": "Apple Mac",
+      "nothing": "Não se oferece nada em particular para este Mac.",
+      "installed": "Instalado",
+      "notInstalled": "Não instalado",
+      "hint": {
+        "mbpfan": "Controlo das ventoinhas dos MacBook.",
+        "tlp": "Gestão de bateria e energia para portáteis. Entra em conflito com o power-profiles-daemon: a instalação pára se o teu ambiente de trabalho o usar.",
+        "facetimehd": "Controlador da câmara FaceTime HD, um projeto da comunidade experimental. É compilado no teu computador e o firmware da câmara é descarregado da Apple."
+      }
+    },
     "noPrinterDetected": "Não foi detetada nenhuma impressora",
     "printerDriversLabel": "Drivers de impressora",
     "printerDriversHint": "Drivers para impressoras USB e de rede",

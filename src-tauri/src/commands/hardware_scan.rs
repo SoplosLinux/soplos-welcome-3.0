@@ -383,6 +383,62 @@ fn detect_vm(installed: &[String]) -> VmInfo {
     }
 }
 
+// One thing a Mac can have installed: "mbpfan", "tlp" or "facetimehd".
+// `removable` is whether a package of the system holds it, which is what
+// apt can remove.
+#[derive(Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MacItem {
+    id: String,
+    installed: bool,
+    removable: bool,
+}
+
+#[derive(Clone, Serialize, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct MacInfo {
+    is_mac: bool,
+    model: String,
+    items: Vec<MacItem>,
+}
+
+fn read_dmi(name: &str) -> String {
+    std::fs::read_to_string(format!("/sys/class/dmi/id/{name}")).map(|s| s.trim().to_string()).unwrap_or_default()
+}
+
+// The FaceTime HD camera is the Broadcom 1570 PCIe device (14e4:1570).
+fn facetime_camera_present() -> bool {
+    let Ok(devices) = std::fs::read_dir("/sys/bus/pci/devices") else { return false };
+    devices.flatten().any(|device| {
+        let read = |file: &str| std::fs::read_to_string(device.path().join(file)).unwrap_or_default().trim().to_lowercase();
+        read("vendor") == "0x14e4" && read("device") == "0x1570"
+    })
+}
+
+// An Apple computer is told by the vendor in its DMI data. The fan daemon and
+// the battery manager are offered on MacBooks only; the camera driver on any
+// Mac that has the camera.
+fn detect_mac(installed: &[String]) -> MacInfo {
+    let vendor = read_dmi("sys_vendor").to_lowercase();
+    if !vendor.starts_with("apple") {
+        return MacInfo::default();
+    }
+    let model = read_dmi("product_name");
+    let mut items = Vec::new();
+    if model.starts_with("MacBook") {
+        for (id, package) in [("mbpfan", "mbpfan"), ("tlp", "tlp")] {
+            let installed = is_installed(installed, package);
+            items.push(MacItem { id: id.to_string(), installed, removable: installed });
+        }
+    }
+    if facetime_camera_present() {
+        let packaged = is_installed(installed, "facetimehd-dkms");
+        let loaded = std::path::Path::new("/sys/module/facetimehd").exists();
+        items.push(MacItem { id: "facetimehd".to_string(), installed: packaged || loaded, removable: packaged });
+    }
+    MacInfo { is_mac: true, model, items }
+}
+
 #[derive(Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct UnnecessaryFinding {
@@ -527,6 +583,7 @@ pub struct ScanResults {
     bluetooth: Option<SimpleDeviceInfo>,
     printers: Option<SimpleDeviceInfo>,
     vm_detection: VmInfo,
+    mac: MacInfo,
     unnecessary_software: Vec<UnnecessaryFinding>,
 }
 
@@ -582,6 +639,7 @@ pub fn scan_hardware() -> ScanResults {
     // above.
     let hybrid_gpu = detect_hybrid_gpu(&gpus);
     let unnecessary_software = detect_unnecessary_software(&gpus, &wifi, &vm_detection, &installed);
+    let mac = detect_mac(&installed);
 
-    ScanResults { cpu, memory, storage, network, gpus, hybrid_gpu, wifi, audio, bluetooth, printers, vm_detection, unnecessary_software }
+    ScanResults { cpu, memory, storage, network, gpus, hybrid_gpu, wifi, audio, bluetooth, printers, vm_detection, mac, unnecessary_software }
 }

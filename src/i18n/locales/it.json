@@ -466,6 +466,17 @@
     "familyWifi": "Wi-Fi e altri driver",
     "familyVm": "Strumenti VM",
     "soon": "Prossimamente",
+    "mac": {
+      "title": "Apple Mac",
+      "nothing": "Per questo Mac non viene offerto nulla in particolare.",
+      "installed": "Installato",
+      "notInstalled": "Non installato",
+      "hint": {
+        "mbpfan": "Controllo delle ventole dei MacBook.",
+        "tlp": "Gestione di batteria ed energia per portatili. Va in conflitto con power-profiles-daemon: l'installazione si ferma se il tuo desktop lo usa.",
+        "facetimehd": "Driver della fotocamera FaceTime HD, un progetto della comunità sperimentale. Viene compilato sul tuo computer e il firmware della fotocamera viene scaricato da Apple."
+      }
+    },
     "noPrinterDetected": "Nessuna stampante rilevata",
     "printerDriversLabel": "Driver di stampa",
     "printerDriversHint": "Driver per stampanti USB e di rete",

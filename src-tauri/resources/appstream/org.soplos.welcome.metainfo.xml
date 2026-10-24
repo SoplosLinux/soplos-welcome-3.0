@@ -254,6 +254,12 @@
   </developer>
 
   <releases>
+    <release version="3.0.1-4-beta" date="2026-10-24">
+      <description>
+        <p>Mac support in the hardware scan of the Drivers tab: on an Apple computer it offers mbpfan and TLP on MacBooks and the driver of the FaceTime HD camera (a community project, experimental). Nothing is shown on other computers.</p>
+        <p>The output of the terminal follows the light or dark theme instead of staying dark.</p>
+      </description>
+    </release>
     <release version="3.0.1-3-beta" date="2026-10-23">
       <description>
         <p>The window follows the light or dark theme of the desktop (Xfce, Plasma and GNOME); the button of the sidebar still lets you choose.</p>

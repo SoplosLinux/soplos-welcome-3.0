@@ -35,7 +35,7 @@
 {#if $terminalExpanded}
   <div
     bind:this={el}
-    class="content-scroll w-full {fullWidth ? '' : 'max-w-[700px] mx-auto'} h-[160px] overflow-y-auto overscroll-contain bg-[#1e1e20] border border-border rounded p-3 font-mono text-[0.75rem] text-text leading-relaxed"
+    class="content-scroll w-full {fullWidth ? '' : 'max-w-[700px] mx-auto'} h-[160px] overflow-y-auto overscroll-contain bg-panel border border-border rounded p-3 font-mono text-[0.75rem] text-text leading-relaxed"
   >
     {#each $terminalLines as line}
       <div>{line}</div>

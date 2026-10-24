@@ -2,6 +2,16 @@
 
 All notable changes to Soplos Welcome are documented in this file.
 
+## [3.0.1-4-beta] - 2026-10-24
+
+### Added
+
+- The hardware scan recognises an Apple computer from its DMI data and, in the Drivers tab, offers what a Mac needs: mbpfan (fan control) and TLP (battery) on MacBooks, both from Debian, and the driver of the FaceTime HD camera on any Mac that has it (Broadcom 1570), which is not in Debian. TLP stops the install instead of removing power-profiles-daemon when the desktop uses it. The camera driver is a community project and experimental: it is built into a local package from sources fetched at a pinned commit, so DKMS rebuilds it for every kernel and it can be removed, and the camera firmware is downloaded from Apple's update servers and checked against pinned checksums. Nothing is shown on a computer that is not a Mac.
+
+### Fixed
+
+- The output of the terminal had a fixed dark background, so in the light theme it stayed dark while its text changed color. It now uses the panel color of the theme.
+
 ## [3.0.1-3-beta] - 2026-10-23
 
 ### Added

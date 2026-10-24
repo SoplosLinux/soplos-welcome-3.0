@@ -5,6 +5,7 @@ pub mod drivers;
 pub mod gaming;
 pub mod hardware_scan;
 pub mod kernels;
+pub mod mac;
 pub mod recommended;
 pub mod search;
 pub mod security;

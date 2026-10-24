@@ -4,6 +4,7 @@
   import { api } from "../lib/api";
   import { runTracked, terminalExpanded, terminalLines } from "../lib/progress";
   import TerminalOutput from "../components/TerminalOutput.svelte";
+  import MacCard from "../components/MacCard.svelte";
   import { _ } from "svelte-i18n";
   import { CircuitBoard, ChevronDown, AlertTriangle, Cpu, MemoryStick, HardDrive, Network } from "lucide-svelte";
 
@@ -42,6 +43,7 @@
     bluetooth: SimpleDeviceInfo | null;
     printers: SimpleDeviceInfo | null;
     vmDetection: { isVm: boolean; vmType: string | null; driverStatus: string; missingPackages: string[]; requiredPackages: string[] };
+    mac: { isMac: boolean; model: string; items: { id: string; installed: boolean; removable: boolean }[] };
     unnecessarySoftware: UnnecessaryFinding[];
   }
 
@@ -77,6 +79,19 @@
     showScanResults = false;
     await runTracked(command, args);
     await scanHardware();
+  }
+
+  // What the scan offers on a Mac: the fan daemon, TLP and the camera driver.
+  async function macInstall(id: string) {
+    if (id === "mbpfan") await runAndRescan("install_apt_packages", { packages: "mbpfan" });
+    else if (id === "tlp") await runAndRescan("install_tlp");
+    else if (id === "facetimehd") await runAndRescan("install_facetimehd");
+  }
+
+  async function macRemove(id: string) {
+    if (id === "mbpfan") await runAndRescan("uninstall_apt_packages", { packages: "mbpfan" });
+    else if (id === "tlp") await runAndRescan("uninstall_apt_packages", { packages: "tlp tlp-rdw" });
+    else if (id === "facetimehd") await runAndRescan("uninstall_facetimehd");
   }
 
   async function installGpuRecommended(gpu: GpuInfo) {
@@ -687,6 +702,9 @@
         </div>
       {/if}
 
+      <!-- Apple Mac -->
+      <MacCard mac={scan.mac} on:install={(e) => macInstall(e.detail)} on:remove={(e) => macRemove(e.detail)} />
+
       <!-- Storage -->
       <div class="border border-border rounded p-3">
         <div class="text-[0.7rem] font-semibold text-text-muted uppercase tracking-wide mb-1">{$_("drivers.storage")}</div>
@@ -1152,6 +1170,13 @@
       </div>
     {/if}
   </div>
+
+  <!-- Apple Mac: only when the scan recognised one -->
+  {#if scan?.mac.isMac}
+    <div class="bg-surface border border-border rounded p-4">
+      <MacCard mac={scan.mac} on:install={(e) => macInstall(e.detail)} on:remove={(e) => macRemove(e.detail)} />
+    </div>
+  {/if}
 </div>
 
 {#if $terminalLines.length > 0 && $terminalExpanded}

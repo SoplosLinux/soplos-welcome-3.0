@@ -485,6 +485,17 @@
     "familyWifi": "Wi-Fi & other drivers",
     "familyVm": "VM Tools",
     "soon": "Soon",
+    "mac": {
+      "title": "Apple Mac",
+      "nothing": "Nothing in particular is offered for this Mac.",
+      "installed": "Installed",
+      "notInstalled": "Not installed",
+      "hint": {
+        "mbpfan": "Fan control for MacBooks.",
+        "tlp": "Battery and power management for laptops. It conflicts with power-profiles-daemon: the install stops if your desktop uses it.",
+        "facetimehd": "Driver of the FaceTime HD camera, a community project that is experimental. It is built on your computer and the camera firmware is downloaded from Apple."
+      }
+    },
     "noPrinterDetected": "No printer detected",
     "printerDriversLabel": "Printer drivers",
     "printerDriversHint": "Drivers for USB and network printers",
