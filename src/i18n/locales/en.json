@@ -301,6 +301,7 @@
       "steam": "Digital distribution platform for video games",
       "lutris": "Unified platform for managing games on Linux",
       "heroic": "Launcher for Epic, GOG and Amazon Games",
+      "heronite": "Light game launcher written in Rust",
       "bottles": "Run Windows applications on Linux using Wine",
       "r2modman": "Mod manager for Lethal Company, Valheim and more",
       "vinegar": "Modern launcher for playing Roblox on Linux",

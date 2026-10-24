@@ -2,6 +2,12 @@
 
 All notable changes to Soplos Welcome are documented in this file.
 
+## [3.0.1-5-beta] - 2026-10-24
+
+### Added
+
+- Gaming tab (launchers): Heronite, a light game launcher written in Rust that gathers Steam, Epic, GOG and Amazon games. It is installed from the `.deb` of its GitHub release, like R2ModMan, and the description is translated in the 8 supported languages.
+
 ## [3.0.1-4-beta] - 2026-10-24
 
 ### Added

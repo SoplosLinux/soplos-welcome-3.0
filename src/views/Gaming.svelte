@@ -73,6 +73,7 @@
     { key: "steam", name: "Steam", icon: "/assets/icons/gaming/steam.png", kind: "flatpak", flatpakId: "com.valvesoftware.Steam" },
     { key: "lutris", name: "Lutris", icon: "/assets/icons/gaming/lutris.png", kind: "flatpak", flatpakId: "net.lutris.Lutris", official: true },
     { key: "heroic", name: "Heroic Games Launcher", icon: "/assets/icons/gaming/heroic.png", kind: "flatpak", flatpakId: "com.heroicgameslauncher.hgl" },
+    { key: "heronite", name: "Heronite", icon: "/assets/icons/gaming/heronite.png", kind: "deb", package: "heronite", debUrl: "https://github.com/RafaelGoulartB/Heronite/releases/download/v0.14.0/heronite_0.14.0-1_amd64.deb" },
     { key: "bottles", name: "Bottles", icon: "/assets/icons/gaming/bottles.png", kind: "flatpak", flatpakId: "com.usebottles.bottles" },
     { key: "r2modman", name: "R2ModMan", icon: "/assets/icons/gaming/r2modman.png", kind: "deb", package: "r2modman", debUrl: "https://github.com/ebkr/r2modmanPlus/releases/download/v3.2.11/r2modman_3.2.11_amd64.deb" },
     { key: "vinegar", name: "Vinegar (Roblox)", icon: "/assets/icons/gaming/vinegar.png", kind: "flatpak", flatpakId: "org.vinegarhq.Vinegar" },
