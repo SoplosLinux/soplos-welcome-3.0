@@ -254,6 +254,11 @@
   </developer>
 
   <releases>
+    <release version="3.0.1-6-beta" date="2026-10-28">
+      <description>
+        <p>Fixed Google Antigravity version detection in the Recommended tab to read product ideVersion instead of the base Electron version.</p>
+      </description>
+    </release>
     <release version="3.0.1-5-beta" date="2026-10-24">
       <description>
         <p>Added the Heronite game launcher, written in Rust, to the Gaming tab.</p>

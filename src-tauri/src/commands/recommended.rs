@@ -267,12 +267,9 @@ update-desktop-database "$REAL_HOME/.local/share/applications" 2>/dev/null || tr
 
 const ANTIGRAVITY_DESKTOP_ENTRY: &str = "[Desktop Entry]\nName=Antigravity\nExec=/opt/antigravity/antigravity-ide\nIcon=/usr/share/pixmaps/antigravity.png\nType=Application\nCategories=Development;\nComment=Advanced Agentic AI Coding Assistant\n";
 
-// The version this tarball URL points to — kept as its own constant so
-// get_antigravity_version() can compare an installed copy against it without
-// re-parsing the download URL. Bump both together when Google ships a newer
-// release.
-const ANTIGRAVITY_LATEST_VERSION: &str = "2.5.5";
-const ANTIGRAVITY_DOWNLOAD_URL: &str = "https://edgedl.me.gvt1.com/edgedl/release2/j0qc3/antigravity/stable/2.5.5-4923483625488384/linux-x64/Antigravity%20IDE.tar.gz";
+// The version this tarball points to — bump when a newer release is published.
+const ANTIGRAVITY_LATEST_VERSION: &str = "2.6.0";
+const ANTIGRAVITY_DOWNLOAD_URL: &str = "https://edgedl.me.gvt1.com/edgedl/release2/j0qc3/antigravity/stable/2.6.0/linux-x64/Antigravity%20IDE.tar.gz";
 
 #[tauri::command]
 pub fn install_antigravity() -> u64 {
@@ -280,7 +277,11 @@ pub fn install_antigravity() -> u64 {
         r#"{VERIFY_DOWNLOAD_SH}
 {ANTIGRAVITY_OLD_REPO_CLEANUP}
 echo "Downloading Antigravity..."
-verify_and_download "{ANTIGRAVITY_DOWNLOAD_URL}" /tmp/antigravity.tar.gz
+DOWNLOAD_URL=$(curl -sL https://antigravity.google/download | grep -o 'https://[^"<> ]*linux-x64/Antigravity%20IDE\.tar\.gz' | head -n1)
+if [ -z "$DOWNLOAD_URL" ]; then
+    DOWNLOAD_URL="{ANTIGRAVITY_DOWNLOAD_URL}"
+fi
+verify_and_download "$DOWNLOAD_URL" /tmp/antigravity.tar.gz
 rm -rf /opt/antigravity
 mkdir -p /opt/antigravity
 tar --transform 's,^Antigravity IDE,antigravity,' -xzf /tmp/antigravity.tar.gz -C /opt
@@ -301,17 +302,19 @@ pub struct AntigravityStatus {
 }
 
 // Reads the installed version straight from the Electron app's own
-// package.json (the same file Antigravity's own About dialog reads its
-// "Confirmar"/commit version from) instead of trusting checkPath alone,
-// since checkPath only proves *something* is at that path — not which
-// version, which is exactly what left the Sep 23 stale-install confusion
-// undetected.
+// product.json (ideVersion) instead of package.json (which only holds
+// the underlying VS Code version like 1.107.0).
 #[tauri::command]
 pub fn get_antigravity_status() -> AntigravityStatus {
-    let installed_version = std::fs::read_to_string("/opt/antigravity/resources/app/package.json")
+    let installed_version = std::fs::read_to_string("/opt/antigravity/resources/app/product.json")
         .ok()
         .and_then(|contents| serde_json::from_str::<serde_json::Value>(&contents).ok())
-        .and_then(|json| json.get("version").and_then(|v| v.as_str()).map(str::to_string));
+        .and_then(|json| {
+            json.get("ideVersion")
+                .or_else(|| json.get("version"))
+                .and_then(|v| v.as_str())
+                .map(str::to_string)
+        });
 
     let update_available = match &installed_version {
         Some(v) => v != ANTIGRAVITY_LATEST_VERSION,

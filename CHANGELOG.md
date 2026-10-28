@@ -2,6 +2,12 @@
 
 All notable changes to Soplos Welcome are documented in this file.
 
+## [3.0.1-6-beta] - 2026-10-28
+
+### Fixed
+
+- Recommended tab (Development): Google Antigravity version detection now reads `ideVersion` from `product.json` instead of VS Code's base version in `package.json`, accurately identifying installed versions and update availability for 2.6.0.
+
 ## [3.0.1-5-beta] - 2026-10-24
 
 ### Added
