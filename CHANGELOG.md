@@ -2,6 +2,12 @@
 
 All notable changes to Soplos Welcome are documented in this file.
 
+## [3.0.1-8-beta] - 2026-10-29
+
+### Changed
+
+- New application icon: an open welcome box with the shield, the chip and the gamepad rising out of it, and the Soplos seal on the ribbon, in place of the S of the logo. It is changed in the sizes of the package (`.ico`, `.icns` and the square logos), the window and the About dialog.
+
 ## [3.0.1-7-beta] - 2026-10-28
 
 ### Changed
