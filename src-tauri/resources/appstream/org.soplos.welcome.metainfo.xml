@@ -254,6 +254,11 @@
   </developer>
 
   <releases>
+    <release version="3.0.1-9-beta" date="2026-10-29">
+      <description>
+        <p>The window no longer has the frame of the system: it is a card with rounded corners and its own minimize, maximize and close buttons. New screenshots of every page.</p>
+      </description>
+    </release>
     <release version="3.0.1-8-beta" date="2026-10-29">
       <description>
         <p>New application icon: an open welcome box with the shield, the chip and the gamepad rising out of it, and the Soplos seal on the ribbon.</p>

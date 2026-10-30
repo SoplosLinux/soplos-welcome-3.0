@@ -25,5 +25,10 @@ DEB="$(find "$BUNDLE_DIR/deb" -maxdepth 1 -name '*.deb' -print -quit)"
 cp "$DEB" "$DEST_DIR/"
 echo "Copied: $DEST_DIR/$(basename "$DEB")"
 
+MEGA_DIR="$HOME/MEGA/Soplos Apps/Soplos Apps 3.0"
+mkdir -p "$MEGA_DIR"
+cp "$DEB" "$MEGA_DIR/"
+echo "Copied: $MEGA_DIR/$(basename "$DEB")"
+
 rm -rf "$BUNDLE_DIR"
 echo "Cleaned up: $BUNDLE_DIR"

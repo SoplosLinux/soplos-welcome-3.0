@@ -7,6 +7,7 @@
   import { isRunning, progressFraction } from "./lib/progress";
   import Sidebar from "./components/Sidebar.svelte";
   import Header from "./components/Header.svelte";
+  import WindowControls from "./components/WindowControls.svelte";
   import AboutDialog from "./components/AboutDialog.svelte";
   import Home from "./views/Home.svelte";
   import Software from "./views/Software.svelte";
@@ -55,13 +56,34 @@
   let appVersion = "";
   let envInfo: { desktopEnvironment: string; displayProtocol: string } | null = null;
 
-  onMount(async () => {
-    try {
-      appVersion = await getVersion();
-    } catch { appVersion = ""; }
-    try {
-      envInfo = await api.invoke("get_environment_info");
-    } catch { envInfo = null; }
+  // With `decorations` off in tauri.conf.json (and `transparent` on) the system
+  // draws no frame: the window is one card with rounded corners and the buttons
+  // of the window are in the sidebar. With `decorations` on, nothing of this
+  // shows, so that setting is the only switch between the two.
+  let frameless = false;
+  let maximized = false;
+
+  onMount(() => {
+    let unlisten: (() => void) | undefined;
+    (async () => {
+      try {
+        appVersion = await getVersion();
+      } catch { appVersion = ""; }
+      try {
+        envInfo = await api.invoke("get_environment_info");
+      } catch { envInfo = null; }
+      try {
+        const win = getCurrentWindow();
+        frameless = !(await win.isDecorated());
+        if (frameless) {
+          maximized = await win.isMaximized();
+          unlisten = await win.onResized(async () => {
+            maximized = await win.isMaximized();
+          });
+        }
+      } catch { frameless = false; }
+    })();
+    return () => unlisten?.();
   });
 
   function select(id: string) {
@@ -104,12 +126,16 @@
 
 <svelte:window on:keydown={handleKeydown} />
 
-<div class="flex h-screen overflow-hidden">
+<div class="relative flex h-screen overflow-hidden bg-dark {frameless && !maximized ? 'window-card' : ''}">
   <Sidebar {tabs} {active} onSelect={select} {appVersion} {envInfo} />
+
+  {#if frameless}
+    <div class="absolute right-2 top-[5px] z-40"><WindowControls {maximized} /></div>
+  {/if}
 
   <div class="flex-1 flex flex-col overflow-hidden min-w-0">
     {#if active !== "home"}
-      <Header title={activeTab.title}>
+      <Header title={activeTab.title} {frameless}>
         <svelte:fragment slot="back">
           {#if prevTab}
             <button
@@ -142,7 +168,12 @@
         </svelte:fragment>
       </Header>
     {/if}
-    <div id="main-scroll" class="content-scroll flex-1 overflow-y-auto p-7">
+    <!-- Home has no header: the strip over it (its old top padding) holds the
+         window buttons and moves the window. -->
+    {#if frameless && active === "home"}
+      <div class="h-7 shrink-0" data-tauri-drag-region></div>
+    {/if}
+    <div id="main-scroll" class="content-scroll flex-1 overflow-y-auto p-7 {frameless && active === 'home' ? 'pt-0' : ''}">
       <svelte:component this={ActiveView} />
     </div>
 
@@ -154,11 +185,11 @@
       {/if}
     </div>
   </div>
-</div>
 
-{#if aboutOpen}
-  <AboutDialog onClose={() => (aboutOpen = false)} />
-{/if}
+  {#if aboutOpen}
+    <AboutDialog onClose={() => (aboutOpen = false)} />
+  {/if}
+</div>
 
 <style>
   .progress-fill {

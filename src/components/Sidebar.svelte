@@ -60,8 +60,9 @@
   }
 </script>
 
-<aside class="w-[230px] shrink-0 flex flex-col pt-[18px] px-[10px] pb-2 bg-panel border-r border-border">
-  <div class="flex items-center gap-2 px-3 pb-[22px] font-bold text-[0.98rem] text-text-bright">
+<aside class="w-[230px] shrink-0 flex flex-col pt-[18px] px-[10px] pb-2 bg-panel border-r border-border" data-tauri-drag-region>
+  <!-- With no frame of the system, the top of the sidebar moves the window. -->
+  <div class="flex items-center gap-2 px-3 pb-[22px] font-bold text-[0.98rem] text-text-bright" data-tauri-drag-region="deep">
     <img src="/assets/icons/soplos-logo.png" alt="Soplos" class="w-[28px] h-[28px] object-contain shrink-0" />
     <span class="whitespace-nowrap">Soplos Welcome</span>
   </div>

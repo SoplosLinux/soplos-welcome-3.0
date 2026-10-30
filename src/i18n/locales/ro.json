@@ -1,5 +1,11 @@
 {
   "app": {
+    "window": {
+      "minimize": "Minimizează",
+      "maximize": "Maximizează",
+      "restore": "Restaurează",
+      "close": "Închide"
+    },
     "tabs": {
       "home": {
         "label": "Acasă",

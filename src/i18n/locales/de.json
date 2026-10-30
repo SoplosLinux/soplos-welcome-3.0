@@ -1,5 +1,11 @@
 {
   "app": {
+    "window": {
+      "minimize": "Minimieren",
+      "maximize": "Maximieren",
+      "restore": "Wiederherstellen",
+      "close": "Schließen"
+    },
     "tabs": {
       "home": {
         "label": "Start",

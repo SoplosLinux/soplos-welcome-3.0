@@ -1,5 +1,11 @@
 {
   "app": {
+    "window": {
+      "minimize": "Riduci a icona",
+      "maximize": "Ingrandisci",
+      "restore": "Ripristina",
+      "close": "Chiudi"
+    },
     "tabs": {
       "home": {
         "label": "Home",
