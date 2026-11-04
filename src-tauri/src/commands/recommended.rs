@@ -1365,3 +1365,230 @@ echo "Audacity removed.""#
     )
 }
 
+
+// === AI agents ===
+
+// OpenCode ships a desktop .deb (package "opencode") and, separately, the
+// plain CLI as a tarball with a single binary. The release asset names do not
+// carry the version, so the "latest" redirect always resolves to the newest.
+#[tauri::command]
+pub fn install_opencode_desktop() -> u64 {
+    start_pkexec_job(format!(
+        r#"{VERIFY_DOWNLOAD_SH}
+verify_and_download "https://github.com/anomalyco/opencode/releases/latest/download/opencode-desktop-linux-amd64.deb" /var/tmp/opencode-desktop.deb
+apt install -y /var/tmp/opencode-desktop.deb
+rm -f /var/tmp/opencode-desktop.deb
+echo "OpenCode Desktop installed.""#
+    ))
+}
+
+#[tauri::command]
+pub fn uninstall_opencode_desktop() -> u64 {
+    start_pkexec_job(
+        r#"apt purge -y opencode
+echo "OpenCode Desktop removed.""#
+            .to_string(),
+    )
+}
+
+#[tauri::command]
+pub fn install_opencode_cli() -> u64 {
+    start_pkexec_job(format!(
+        r#"{VERIFY_DOWNLOAD_SH}
+TMP=$(mktemp -d /var/tmp/soplos-opencode.XXXXXX)
+trap 'rm -rf "$TMP"' EXIT
+verify_and_download "https://github.com/anomalyco/opencode/releases/latest/download/opencode-linux-x64.tar.gz" "$TMP/opencode.tar.gz"
+tar -xzf "$TMP/opencode.tar.gz" -C "$TMP" opencode
+install -o root -g root -m 755 "$TMP/opencode" /usr/local/bin/opencode
+echo "OpenCode CLI installed in /usr/local/bin. Run: opencode""#
+    ))
+}
+
+#[tauri::command]
+pub fn uninstall_opencode_cli() -> u64 {
+    start_pkexec_job(
+        r#"rm -f /usr/local/bin/opencode
+echo "OpenCode CLI removed.""#
+            .to_string(),
+    )
+}
+
+// Ollama: same layout as its own install.sh (tarball unpacked into
+// /usr/local, "ollama" system user, systemd unit), but the tarball is checked
+// against the sha256sum.txt published with the release before it is unpacked,
+// and it is downloaded to /var/tmp (about 1.5 GB, too big for a tmpfs /tmp).
+// Downloaded models live in /usr/share/ollama and are kept on uninstall.
+#[tauri::command]
+pub fn install_ollama() -> u64 {
+    start_pkexec_job(
+        r#"set -e
+export DEBIAN_FRONTEND=noninteractive
+apt-get install -y curl zstd
+BASE="https://github.com/ollama/ollama/releases/latest/download"
+FILE="ollama-linux-amd64.tar.zst"
+TMP=$(mktemp -d /var/tmp/soplos-ollama.XXXXXX)
+trap 'rm -rf "$TMP"' EXIT
+echo "Downloading Ollama (about 1.5 GB)..."
+curl -fsSL -o "$TMP/$FILE" "$BASE/$FILE"
+curl -fsSL -o "$TMP/sha256sum.txt" "$BASE/sha256sum.txt"
+EXPECTED=$(awk -v f="./$FILE" '$2 == f {print $1}' "$TMP/sha256sum.txt")
+if [ -z "$EXPECTED" ]; then
+    echo "ERROR: no checksum published for $FILE - aborting."
+    exit 1
+fi
+echo "Verifying the download..."
+if [ "$(sha256sum "$TMP/$FILE" | awk '{print $1}')" != "$EXPECTED" ]; then
+    echo "Checksum verification failed for $FILE - aborting."
+    exit 1
+fi
+rm -rf /usr/local/lib/ollama
+zstd -dc "$TMP/$FILE" | tar -xf - -C /usr/local
+if ! getent passwd ollama >/dev/null; then
+    useradd -r -s /bin/false -U -m -d /usr/share/ollama ollama
+fi
+getent group render >/dev/null && usermod -a -G render ollama
+getent group video >/dev/null && usermod -a -G video ollama
+if [ -n "$PKEXEC_UID" ]; then
+    REAL_USER=$(getent passwd "$PKEXEC_UID" | cut -d: -f1)
+    [ -n "$REAL_USER" ] && usermod -a -G ollama "$REAL_USER"
+fi
+cat > /etc/systemd/system/ollama.service <<'UNIT'
+[Unit]
+Description=Ollama Service
+After=network-online.target
+
+[Service]
+ExecStart=/usr/local/bin/ollama serve
+User=ollama
+Group=ollama
+Restart=always
+RestartSec=3
+Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
+[Install]
+WantedBy=default.target
+UNIT
+systemctl daemon-reload
+systemctl enable --now ollama
+echo "Ollama installed and running on 127.0.0.1:11434. Run: ollama run <model>""#
+            .to_string(),
+    )
+}
+
+#[tauri::command]
+pub fn uninstall_ollama() -> u64 {
+    start_pkexec_job(
+        r#"systemctl disable --now ollama 2>/dev/null || true
+rm -f /etc/systemd/system/ollama.service
+systemctl daemon-reload
+rm -f /usr/local/bin/ollama
+rm -rf /usr/local/lib/ollama
+getent passwd ollama >/dev/null && userdel ollama
+getent group ollama >/dev/null && groupdel ollama
+echo "Ollama removed. Downloaded models were kept in /usr/share/ollama.""#
+            .to_string(),
+    )
+}
+
+// Claude Code: Anthropic's own signed apt repository (stable channel). The
+// signing key is only accepted if its fingerprint matches the one Anthropic
+// documents, otherwise the repository is not added.
+#[tauri::command]
+pub fn install_claude_code() -> u64 {
+    start_pkexec_job(
+        r#"set -e
+export DEBIAN_FRONTEND=noninteractive
+apt-get install -y curl gnupg
+install -d -m 0755 /etc/apt/keyrings
+curl -fsSL https://downloads.claude.ai/keys/claude-code.asc -o /etc/apt/keyrings/claude-code.asc
+FPR=$(gpg --show-keys --with-colons /etc/apt/keyrings/claude-code.asc | awk -F: '/^fpr:/ {print $10; exit}')
+if [ "$FPR" != "31DDDE24DDFAB679F42D7BD2BAA929FF1A7ECACE" ]; then
+    echo "ERROR: the signing key does not match the published fingerprint - aborting."
+    rm -f /etc/apt/keyrings/claude-code.asc
+    exit 1
+fi
+echo "deb [signed-by=/etc/apt/keyrings/claude-code.asc] https://downloads.claude.ai/claude-code/apt/stable stable main" > /etc/apt/sources.list.d/claude-code.list
+apt-get update
+apt-get install -y claude-code
+echo "Claude Code installed. Run: claude""#
+            .to_string(),
+    )
+}
+
+#[tauri::command]
+pub fn uninstall_claude_code() -> u64 {
+    start_pkexec_job(
+        r#"apt-get purge -y claude-code
+rm -f /etc/apt/sources.list.d/claude-code.list /etc/apt/keyrings/claude-code.asc
+echo "Claude Code removed.""#
+            .to_string(),
+    )
+}
+
+// DeepSeek Harness and 9router are npm packages. Node.js and npm come from
+// Debian (one administrator password), but the package itself is installed
+// as the real user into ~/.local, never as root: 9router runs a postinstall
+// script. runuser drops from root back to the user that started pkexec.
+const NPM_USER_INSTALL_SH: &str = r#"npm_user_install() {
+  local pkg="$1"
+  if [ -z "$PKEXEC_UID" ]; then
+    echo "ERROR: could not tell which user to install for."
+    exit 1
+  fi
+  local real_user real_home
+  real_user=$(getent passwd "$PKEXEC_UID" | cut -d: -f1)
+  real_home=$(getent passwd "$PKEXEC_UID" | cut -d: -f6)
+  mkdir -p "$real_home/.local"
+  chown "$real_user" "$real_home/.local"
+  runuser -u "$real_user" -- npm install -g --prefix "$real_home/.local" "$pkg"
+}"#;
+
+#[tauri::command]
+pub fn install_deepseek_harness() -> u64 {
+    start_pkexec_job(format!(
+        r#"set -e
+export DEBIAN_FRONTEND=noninteractive
+{NPM_USER_INSTALL_SH}
+apt-get install -y nodejs npm
+npm_user_install @deepseek-ai/dsh
+echo "DeepSeek Harness installed in ~/.local/bin. Run: dsh web""#
+    ))
+}
+
+#[tauri::command]
+pub fn uninstall_deepseek_harness() -> u64 {
+    start_job(
+        "bash",
+        vec![
+            "-c".to_string(),
+            r#"npm uninstall -g --prefix "$HOME/.local" @deepseek-ai/dsh
+echo "DeepSeek Harness removed.""#
+                .to_string(),
+        ],
+    )
+}
+
+#[tauri::command]
+pub fn install_9router() -> u64 {
+    start_pkexec_job(format!(
+        r#"set -e
+export DEBIAN_FRONTEND=noninteractive
+{NPM_USER_INSTALL_SH}
+apt-get install -y nodejs npm
+npm_user_install 9router
+echo "9router installed in ~/.local/bin. Run: 9router (dashboard on localhost:20128)""#
+    ))
+}
+
+#[tauri::command]
+pub fn uninstall_9router() -> u64 {
+    start_job(
+        "bash",
+        vec![
+            "-c".to_string(),
+            r#"npm uninstall -g --prefix "$HOME/.local" 9router
+echo "9router removed.""#
+                .to_string(),
+        ],
+    )
+}

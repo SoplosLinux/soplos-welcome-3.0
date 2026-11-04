@@ -154,7 +154,8 @@
       "hardware": "Hardware",
       "files": "Files",
       "remotes": "Remote Desktops",
-      "virtual": "Virtualization"
+      "virtual": "Virtualization",
+      "ai": "AI agents"
     },
     "desc": {
       "firefox": "Free and open-source web browser developed by Mozilla",
@@ -237,6 +238,13 @@
       "google-antigravity": "Advanced Agentic AI Coding Assistant",
       "sublime-text": "Sophisticated text editor for code and markup",
       "cursor": "Code editor with integrated AI",
+      "opencode-desktop": "Open source AI coding agent, desktop app",
+      "opencode-cli": "Open source AI coding agent for the terminal",
+      "claude-code": "Anthropic's AI coding agent for the terminal",
+      "llama-cpp": "Run language models on your own machine, from the Debian repositories",
+      "ollama": "Run language models locally with a simple command and a local server",
+      "deepseek-harness": "DeepSeek's coding agent, with a local web interface (developer preview)",
+      "9router": "Local proxy that routes AI coding tools across providers, with a dashboard",
       "zed": "High-performance, multiplayer code editor",
       "pulsar": "A community-led, hyper-hackable text editor",
       "geany": "Lightweight and fast IDE with multi-language support",

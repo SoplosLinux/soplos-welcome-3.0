@@ -1,6 +1,6 @@
 # Soplos Welcome 3.0
 
-![Version](https://img.shields.io/badge/version-3.0.1--9--beta-blue)
+![Version](https://img.shields.io/badge/version-3.0.2--beta-blue)
 ![License](https://img.shields.io/badge/license-GPL--3.0--or--later-green)
 ![Platform](https://img.shields.io/badge/platform-Linux-lightgrey)
 ![Tauri](https://img.shields.io/badge/Tauri-2-orange)
@@ -17,7 +17,7 @@ It gives you one place to update the system, install drivers and kernels, harden
 |---|---|
 | ![Home](src-tauri/resources/screenshots/screenshot01.png) **Home**: system overview, quick links and session environment status | ![Software](src-tauri/resources/screenshots/screenshot02.png) **Software**: APT, Flatpak, Snap, Flathub and system cleanup |
 | ![Drivers](src-tauri/resources/screenshots/screenshot03.png) **Drivers**: hardware detection, GPU drivers (NVIDIA/CUDA/ROCm/oneAPI) and Wi-Fi | ![Kernels](src-tauri/resources/screenshots/screenshot04.png) **Kernels**: Soplos Kernels repository, Liquorix, XanMod and kernel cleanup |
-| ![Security](src-tauri/resources/screenshots/screenshot05.png) **Security**: UFW firewall, ClamAV antivirus, rkhunter scans and network tools | ![Recommended](src-tauri/resources/screenshots/screenshot06.png) **Recommended**: curated applications across 12 categories with bulk selection |
+| ![Security](src-tauri/resources/screenshots/screenshot05.png) **Security**: UFW firewall, ClamAV antivirus, rkhunter scans and network tools | ![Recommended](src-tauri/resources/screenshots/screenshot06.png) **Recommended**: curated applications across 13 categories with bulk selection |
 | ![Customization](src-tauri/resources/screenshots/screenshot07.png) **Customization**: desktop tools for Xfce, GNOME and KDE, wallpapers and fonts | ![Gaming](src-tauri/resources/screenshots/screenshot08.png) **Gaming**: launchers, game mode, sysctl optimizations and MangoHud |
 
 ## Architecture
@@ -44,7 +44,7 @@ sudo apt install soplos-welcome
 - **Drivers**: hardware detection with NVIDIA proprietary drivers, CUDA toolkit, AMD ROCm, Intel oneAPI, Broadcom / MediaTek Wi-Fi firmware, and VirtualBox guest additions.
 - **Kernels**: Soplos Kernels repository, XanMod and Liquorix kernels, kernel cleanup for removing old unused kernels, and integration with Soplos Kernel Installer.
 - **Security**: firewall management (UFW), antivirus scans (ClamAV), rootkit detection (rkhunter), VPN configuration, and system hardening checks.
-- **Recommended**: about 100 curated applications across 12 categories, single or multiple selection for batch install/uninstall, and extended search.
+- **Recommended**: about 100 curated applications across 13 categories, single or multiple selection for batch install/uninstall, and extended search.
 - **Customization**: desktop personalization tools for Xfce, GNOME and KDE Plasma, wallpaper manager, and font rendering presets.
 - **Gaming**: game launchers (Steam, Heroic, Lutris, Bottles), GameMode configuration, low-latency sysctl tuning, GPU optimizations, and MangoHud overlay setup.
 

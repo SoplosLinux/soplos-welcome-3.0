@@ -670,6 +670,66 @@
       ],
     },
     {
+      key: "ai",
+      packages: [
+        {
+          name: "OpenCode Desktop",
+          icon: "opencode.png",
+          kind: "custom",
+          package: "opencode",
+          customInstall: "install_opencode_desktop",
+          customUninstall: "uninstall_opencode_desktop",
+        },
+        {
+          name: "OpenCode CLI",
+          icon: "opencode-cli.png",
+          kind: "custom",
+          checkPath: "/usr/local/bin/opencode",
+          customInstall: "install_opencode_cli",
+          customUninstall: "uninstall_opencode_cli",
+        },
+        {
+          name: "Claude Code",
+          icon: "claude-code.png",
+          kind: "custom",
+          package: "claude-code",
+          customInstall: "install_claude_code",
+          customUninstall: "uninstall_claude_code",
+        },
+        {
+          name: "llama.cpp",
+          icon: "llama-cpp.png",
+          official: true,
+          kind: "apt",
+          package: "llama.cpp",
+        },
+        {
+          name: "Ollama",
+          icon: "ollama.png",
+          kind: "custom",
+          checkPath: "/usr/local/bin/ollama",
+          customInstall: "install_ollama",
+          customUninstall: "uninstall_ollama",
+        },
+        {
+          name: "DeepSeek Harness",
+          icon: "deepseek-harness.png",
+          kind: "custom",
+          checkPath: "~/.local/bin/dsh",
+          customInstall: "install_deepseek_harness",
+          customUninstall: "uninstall_deepseek_harness",
+        },
+        {
+          name: "9router",
+          icon: "9router.png",
+          kind: "custom",
+          checkPath: "~/.local/bin/9router",
+          customInstall: "install_9router",
+          customUninstall: "uninstall_9router",
+        },
+      ],
+    },
+    {
       key: "app_management",
       packages: [
         {

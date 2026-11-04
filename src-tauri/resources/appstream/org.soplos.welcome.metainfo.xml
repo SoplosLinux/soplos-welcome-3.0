@@ -142,7 +142,7 @@
     <keyword xml:lang="ru">ядра</keyword>
   </keywords>
 
-  <launchable type="desktop-id">org.soplos.welcome.desktop</launchable>
+  <launchable type="desktop-id">soplos-welcome.desktop</launchable>
 
   <screenshots>
     <screenshot type="default">
@@ -254,6 +254,11 @@
   </developer>
 
   <releases>
+    <release version="3.0.2-beta" date="2026-11-04">
+      <description>
+        <p>New AI agents category in Recommended: OpenCode, Claude Code, llama.cpp, Ollama, DeepSeek Harness and 9router.</p>
+      </description>
+    </release>
     <release version="3.0.1-9-beta" date="2026-10-29">
       <description>
         <p>The window no longer has the frame of the system: it is a card with rounded corners and its own minimize, maximize and close buttons. New screenshots of every page.</p>

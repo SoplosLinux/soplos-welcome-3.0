@@ -2,6 +2,16 @@
 
 All notable changes to Soplos Welcome are documented in this file.
 
+## [3.0.2-beta] - 2026-11-04
+
+### Added
+
+- New category in Recommended, AI agents: OpenCode (desktop and command line), Claude Code, llama.cpp, Ollama, DeepSeek Harness and 9router. Claude Code is installed from the signed repository of Anthropic, after checking the fingerprint of its key. Ollama is checked against the checksum published with its release before it is unpacked, and it is set up with its service. DeepSeek Harness and 9router are installed for the user in `~/.local`, never as administrator.
+
+### Changed
+
+- The manual page of the program lists the gaming launchers and the Proton managers, and now counts 13 categories in Recommended.
+
 ## [3.0.1-9-beta] - 2026-10-29
 
 ### Changed

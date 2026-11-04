@@ -154,7 +154,8 @@
       "hardware": "Hardware",
       "files": "Dateien",
       "remotes": "Fernzugriff",
-      "virtual": "Virtualisierung"
+      "virtual": "Virtualisierung",
+      "ai": "KI-Agenten"
     },
     "desc": {
       "firefox": "Freier Open-Source-Webbrowser von Mozilla",
@@ -237,6 +238,13 @@
       "google-antigravity": "Programmierassistent mit fortgeschrittener agentischer KI",
       "sublime-text": "Anspruchsvoller Texteditor für Code und Markup",
       "cursor": "Code-Editor mit integrierter KI",
+      "opencode-desktop": "Quelloffener KI-Programmieragent als Desktop-Anwendung",
+      "opencode-cli": "Quelloffener KI-Programmieragent für das Terminal",
+      "claude-code": "KI-Programmieragent von Anthropic für das Terminal",
+      "llama-cpp": "Sprachmodelle auf dem eigenen Rechner ausführen, aus den Debian-Paketquellen",
+      "ollama": "Sprachmodelle lokal mit einem einfachen Befehl und einem lokalen Server ausführen",
+      "deepseek-harness": "Programmieragent von DeepSeek mit lokaler Weboberfläche (Entwicklervorschau)",
+      "9router": "Lokaler Proxy, der KI-Programmierwerkzeuge auf mehrere Anbieter verteilt, mit Dashboard",
       "zed": "Leistungsstarker Multiplayer-Code-Editor",
       "pulsar": "Von der Community getragener, hochgradig anpassbarer Texteditor",
       "geany": "Leichte, schnelle IDE mit Unterstützung für viele Sprachen",

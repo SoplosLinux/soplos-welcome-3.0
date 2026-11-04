@@ -154,7 +154,8 @@
       "hardware": "Hardware",
       "files": "Ficheiros",
       "remotes": "Ambientes de trabalho remotos",
-      "virtual": "Virtualização"
+      "virtual": "Virtualização",
+      "ai": "Agentes de IA"
     },
     "desc": {
       "firefox": "Navegador web livre e de código aberto desenvolvido pela Mozilla",
@@ -237,6 +238,13 @@
       "google-antigravity": "Assistente de programação com IA agêntica avançada",
       "sublime-text": "Editor de texto sofisticado para código e marcação",
       "cursor": "Editor de código com IA integrada",
+      "opencode-desktop": "Agente de programação com IA de código aberto, aplicação de ambiente de trabalho",
+      "opencode-cli": "Agente de programação com IA de código aberto para o terminal",
+      "claude-code": "Agente de programação com IA da Anthropic para o terminal",
+      "llama-cpp": "Execute modelos de linguagem no seu computador, a partir dos repositórios Debian",
+      "ollama": "Execute modelos de linguagem localmente com um comando simples e um servidor local",
+      "deepseek-harness": "Agente de programação da DeepSeek, com interface web local (pré-visualização para programadores)",
+      "9router": "Proxy local que encaminha as ferramentas de programação com IA entre fornecedores, com painel de controlo",
       "zed": "Editor de código multijogador de alto desempenho",
       "pulsar": "Editor de texto hiperpersonalizável impulsionado pela comunidade",
       "geany": "IDE leve e rápido com suporte para várias linguagens",

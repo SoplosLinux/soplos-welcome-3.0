@@ -154,7 +154,8 @@
       "hardware": "Hardware",
       "files": "Fișiere",
       "remotes": "Desktop la distanță",
-      "virtual": "Virtualizare"
+      "virtual": "Virtualizare",
+      "ai": "Agenți IA"
     },
     "desc": {
       "firefox": "Browser web liber și open source dezvoltat de Mozilla",
@@ -237,6 +238,13 @@
       "google-antigravity": "Asistent de programare cu IA agentică avansată",
       "sublime-text": "Editor de text sofisticat pentru cod și marcare",
       "cursor": "Editor de cod cu IA integrată",
+      "opencode-desktop": "Agent de programare cu IA open source, aplicație desktop",
+      "opencode-cli": "Agent de programare cu IA open source pentru terminal",
+      "claude-code": "Agent de programare cu IA de la Anthropic pentru terminal",
+      "llama-cpp": "Rulează modele de limbaj pe calculatorul tău, din depozitele Debian",
+      "ollama": "Rulează modele de limbaj local, cu o comandă simplă și un server local",
+      "deepseek-harness": "Agentul de programare DeepSeek, cu interfață web locală (previzualizare pentru dezvoltatori)",
+      "9router": "Proxy local care direcționează uneltele de programare cu IA între furnizori, cu panou de control",
       "zed": "Editor de cod multiplayer de înaltă performanță",
       "pulsar": "Editor de text hiperpersonalizabil, susținut de comunitate",
       "geany": "IDE ușor și rapid cu suport pentru multe limbaje",
