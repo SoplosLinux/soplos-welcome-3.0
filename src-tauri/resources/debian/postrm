@@ -1,0 +1,18 @@
+#!/bin/sh
+# What the package leaves on the computer when it is removed: the kernel hook of
+# the nvidia-patches project, unless Soplos Kernel Installer, which puts the same
+# one in place, is still installed.
+set -e
+
+case "$1" in
+    remove|purge)
+        if ! dpkg-query -W -f='${db:Status-Abbrev}' soplos-kernel-installer 2>/dev/null | grep -q '^ii'; then
+            rm -f /etc/kernel/postinst.d/00-soplos-nvidia-patches \
+                  /etc/kernel/header_postinst.d/00-soplos-nvidia-patches
+            rm -rf /var/lib/soplos-nvidia-patches
+            rm -f /var/log/soplos-nvidia-patches.log
+        fi
+        ;;
+esac
+
+exit 0

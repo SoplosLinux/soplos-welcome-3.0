@@ -254,6 +254,11 @@
   </developer>
 
   <releases>
+    <release version="3.0.2-1-beta" date="2026-11-07">
+      <description>
+        <p>On a computer with an NVIDIA graphics card, the package installs a kernel hook that downloads the latest patches of the nvidia-patches project and applies them to the NVIDIA driver sources before DKMS builds the module, so the kernels that arrive from a terminal build it too.</p>
+      </description>
+    </release>
     <release version="3.0.2-beta" date="2026-11-04">
       <description>
         <p>New AI agents category in Recommended: OpenCode, Claude Code, llama.cpp, Ollama, DeepSeek Harness and 9router.</p>

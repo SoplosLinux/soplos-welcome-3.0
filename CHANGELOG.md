@@ -2,6 +2,12 @@
 
 All notable changes to Soplos Welcome are documented in this file.
 
+## [3.0.2-1-beta] - 2026-11-07
+
+### Added
+
+- The package installs, only on a computer that has an NVIDIA graphics card, the kernel hook of the nvidia-patches project (`00-soplos-nvidia-patches`) in `/etc/kernel/postinst.d` and `/etc/kernel/header_postinst.d`, and runs it once. The hook runs before the DKMS hook of Debian when a kernel or its headers are installed: it downloads the latest patches (checked against the sha256 of their MANIFEST, with the ones downloaded before as a fallback) and applies them to the NVIDIA sources, so a kernel that arrives from a terminal builds the module. It never makes the installation of a kernel fail. The same hook is put in place by Soplos Kernel Installer, and the package removes it when it is removed, unless the Kernel Installer is still installed. On a computer with no NVIDIA graphics card nothing is left in `/etc` or `/var`.
+
 ## [3.0.2-beta] - 2026-11-04
 
 ### Added
