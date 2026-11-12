@@ -685,7 +685,8 @@
       "theme-manager": "Personalizează temele GTK, pictogramele, cursoarele și panoul XFCE",
       "grub-editor": "Editează meniul de pornire (configurația GRUB)",
       "plymouth-manager": "Personalizează ecranul de pornire",
-      "layout-switcher": "Comută între configurațiile predefinite GNOME Shell"
+      "layout-switcher": "Comută între configurațiile predefinite GNOME Shell",
+      "look-manager": "Schimbă temele, culorile, pictogramele, panourile și comportamentul ferestrelor din Plasma"
     },
     "native": {
       "xfce": {

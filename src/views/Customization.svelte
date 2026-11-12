@@ -45,6 +45,7 @@
       { key: "plymouth-manager", label: "Plymouth Manager", icon: "/assets/icons/soplos/soplos-plymouth-manager.png", command: "soplos-plymouth-manager", package: "soplos-plymouth-manager" },
     ],
     kde: [
+      { key: "look-manager", label: "Look Manager", icon: "/assets/icons/soplos/soplos-look-manager.png", command: "soplos-look-manager", package: "soplos-look-manager" },
       { key: "grub-editor", label: "GRUB Editor", icon: "/assets/icons/soplos/soplos-grub-editor.png", command: "soplos-grub-editor", package: "soplos-grub-editor" },
       { key: "plymouth-manager", label: "Plymouth Manager", icon: "/assets/icons/soplos/soplos-plymouth-manager.png", command: "soplos-plymouth-manager", package: "soplos-plymouth-manager" },
     ],

@@ -685,7 +685,8 @@
       "theme-manager": "GTK-Designs, Symbole, Mauszeiger und das XFCE-Panel anpassen",
       "grub-editor": "Bootmenü bearbeiten (GRUB-Konfiguration)",
       "plymouth-manager": "Boot-Splash-Screen anpassen",
-      "layout-switcher": "Zwischen GNOME-Shell-Layout-Vorlagen wechseln"
+      "layout-switcher": "Zwischen GNOME-Shell-Layout-Vorlagen wechseln",
+      "look-manager": "Designs, Farben, Symbole, Leisten und Fensterverhalten von Plasma ändern"
     },
     "native": {
       "xfce": {

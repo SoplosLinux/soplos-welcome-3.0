@@ -685,7 +685,8 @@
       "theme-manager": "Настройка тем GTK, значков, курсоров и панели XFCE",
       "grub-editor": "Редактирование меню загрузки (конфигурация GRUB)",
       "plymouth-manager": "Настройка экрана загрузки",
-      "layout-switcher": "Переключение между готовыми раскладками GNOME Shell"
+      "layout-switcher": "Переключение между готовыми раскладками GNOME Shell",
+      "look-manager": "Темы, цвета, значки, панели и поведение окон Plasma"
     },
     "native": {
       "xfce": {

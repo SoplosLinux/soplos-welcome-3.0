@@ -2,6 +2,12 @@
 
 All notable changes to Soplos Welcome are documented in this file.
 
+## [3.0.2-2-beta] - 2026-11-12
+
+### Added
+
+- Customization, Plasma tab: Soplos Look Manager 3.0 is listed with the other Soplos tools (GRUB Editor and Plymouth Manager), with its icon and its description in the 8 languages.
+
 ## [3.0.2-1-beta] - 2026-11-07
 
 ### Added

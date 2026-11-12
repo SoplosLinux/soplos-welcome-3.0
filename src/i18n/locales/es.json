@@ -685,7 +685,8 @@
       "theme-manager": "Personaliza temas GTK, iconos, cursores y el panel de XFCE",
       "grub-editor": "Edita el menú de arranque (configuración de GRUB)",
       "plymouth-manager": "Personaliza la pantalla de arranque",
-      "layout-switcher": "Cambia entre los diseños predefinidos de GNOME Shell"
+      "layout-switcher": "Cambia entre los diseños predefinidos de GNOME Shell",
+      "look-manager": "Cambia temas, colores, iconos, paneles y comportamiento de las ventanas de Plasma"
     },
     "native": {
       "xfce": {
