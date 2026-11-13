@@ -147,7 +147,14 @@
     }
   }
 
+  // GRUB Editor only edits GRUB: greyed out on Limine and systemd-boot.
+  let bootloader = "grub";
+
   onMount(async () => {
+    api
+      .invoke<string>("get_bootloader")
+      .then((b) => (bootloader = b))
+      .catch(() => (bootloader = "grub"));
     try {
       const info = await api.invoke<{ desktop: string }>("get_system_info");
       desktop = detectDesktopKind(info.desktop);
@@ -174,8 +181,12 @@
   <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-5">
     {#each soplosToolsByDesktop[desktop] as tool}
       {@const installed = installedVersion >= 0 && installedMap[tool.key]}
+      {@const unavailable = tool.key === "grub-editor" && bootloader !== "grub"}
       <button
-        class="flex flex-col items-center text-center gap-1.5 bg-surface border border-border rounded p-4 hover:bg-surface-2 transition-colors"
+        class="flex flex-col items-center text-center gap-1.5 bg-surface border border-border rounded p-4 transition-colors
+          {unavailable ? 'opacity-45 cursor-not-allowed' : 'hover:bg-surface-2'}"
+        disabled={unavailable}
+        title={unavailable ? $_("customization.onlyGrub") : undefined}
         on:click={() => onSoplosToolClick(tool)}
       >
         <img src={tool.icon} alt="" class="w-12 h-12 object-contain" />
@@ -186,7 +197,7 @@
             ? 'bg-success/15 text-success'
             : 'bg-surface-2 text-text'}"
         >
-          {installed ? $_("customization.clickToOpen") : $_("customization.clickToInstallOpen")}
+          {unavailable ? $_("customization.onlyGrub") : installed ? $_("customization.clickToOpen") : $_("customization.clickToInstallOpen")}
         </span>
       </button>
     {/each}

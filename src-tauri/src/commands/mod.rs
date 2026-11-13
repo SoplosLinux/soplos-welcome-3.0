@@ -1,3 +1,4 @@
+pub mod boot;
 pub mod customization;
 pub mod environment;
 pub mod davinci;

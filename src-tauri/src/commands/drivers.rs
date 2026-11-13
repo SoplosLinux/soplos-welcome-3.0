@@ -1,5 +1,6 @@
 use std::process::Command;
 
+use super::boot::BOOT_FUNCTIONS;
 use serde::Serialize;
 
 use super::software::start_pkexec_job;
@@ -68,7 +69,7 @@ fn detect_installed_nvidia_version() -> Option<String> {
 }
 
 // Marker substrings for GPUs of the Turing generation or newer — the only
-// cards the 610/590 driver branches support. Installing them on an older
+// cards the 620 driver branch supports. Installing them on an older
 // card leaves the machine with no working module, and since the NVIDIA
 // package blacklists nouveau, with no graphics driver at all. Ported as-is
 // from hardware_detector.py's NVIDIA_TURING_PLUS_MARKERS.
@@ -117,7 +118,10 @@ pub(crate) fn contains_word_boundary(haystack: &str, needle: &str) -> bool {
 
 pub(crate) fn is_nvidia_turing_or_newer(model: &str) -> bool {
     let model_lower = model.to_lowercase();
-    NVIDIA_TURING_PLUS_MARKERS.iter().any(|marker| contains_word_boundary(&model_lower, marker))
+    // "gtx 16" is the start of a model number (GTX 1650, 1660 Ti): as a whole
+    // word it never matched, and these Turing cards were sent to nouveau.
+    ["gtx 16", "gtx16"].iter().any(|m| model_lower.contains(m))
+        || NVIDIA_TURING_PLUS_MARKERS.iter().any(|marker| contains_word_boundary(&model_lower, marker))
 }
 
 fn extract_bracketed_model(line: &str) -> Option<String> {
@@ -158,7 +162,7 @@ fn recommend_nvidia_driver(model: &str) -> String {
     let model_lower = model.to_lowercase();
 
     if is_nvidia_turing_or_newer(&model_lower) {
-        return "nvidia-driver-610".to_string();
+        return "nvidia-driver-620".to_string();
     }
     let pascal_maxwell = [
         "gtx 10", "gtx10", "gtx 1080", "gtx 1070", "gtx 1060", "gtx 1050", "gt 1030", "mx350",
@@ -1084,8 +1088,10 @@ pub fn install_nvidia_repo(package: String) -> Result<u64, String> {
     }
     let patch = nvidia_dkms_patch_commands();
     let llvm = LLVM_DKMS_TOOLCHAIN;
+    let boot = BOOT_FUNCTIONS;
     let script = format!(
         r#"set -e
+{boot}
 echo "Installing NVIDIA driver from repository..."
 echo "Removing NVIDIA DKMS modules from all kernels..."
 for entry in $(dkms status | grep -i nvidia | awk -F'[:,]' '{{print $1"/"$2}}' | tr -d ' '); do
@@ -1120,19 +1126,15 @@ dkms autoinstall || true
 if ! dkms status | grep -qi "nvidia.*installed"; then
     echo "WARNING: the NVIDIA DKMS module did not build. Run 'dkms autoinstall' manually before rebooting."
 fi
-echo "Configuring GRUB with nvidia-drm.modeset=1..."
-if ! grep -q "nvidia-drm.modeset=1" /etc/default/grub; then
-    sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="\([^"]*\)"/GRUB_CMDLINE_LINUX_DEFAULT="\1 nvidia-drm.modeset=1"/' /etc/default/grub
-    update-grub
-fi
 if command -v dracut >/dev/null 2>&1; then
     mkdir -p /etc/dracut.conf.d
     echo 'omit_drivers+=" nouveau "' > /etc/dracut.conf.d/blacklist-nouveau.conf
     rm -f /etc/dracut.conf.d/nvidia.conf
-    dracut --force
-elif command -v update-initramfs >/dev/null 2>&1; then
-    update-initramfs -u
 fi
+update-initramfs -u -k all
+echo "Adding nvidia-drm.modeset=1 to the kernel command line..."
+soplos_cmdline_add nvidia-drm.modeset=1
+soplos_boot_update
 echo "=== Installation completed ==="
 echo "NVIDIA driver installed successfully. Restart the system to apply the changes."
 "#
@@ -1141,12 +1143,12 @@ echo "NVIDIA driver installed successfully. Restart the system to apply the chan
 }
 
 // Installs an NVIDIA driver from the official NVIDIA CUDA repository — used
-// by the 580/590/610 branches, each pinned to the Debian release NVIDIA
+// by the 580 and 620 branches, each pinned to the Debian release NVIDIA
 // actually publishes packages for. Ported from
 // drivers_tab.py's _on_nvidia_cuda_repo_clicked.
 #[tauri::command]
 pub fn install_nvidia_cuda(version: String) -> Result<u64, String> {
-    if !is_valid_identifier(&version) {
+    if !matches!(version.as_str(), "580" | "620") {
         return Err(format!("Invalid version: {version}"));
     }
     let (repo_setup, install_driver, repo_cleanup): (String, String, String) = match version.as_str() {
@@ -1157,21 +1159,6 @@ trap 'rm -f /etc/apt/sources.list.d/cuda-debian12-x86_64.list' EXIT"#
                 .to_string(),
             "apt install -y nvidia-driver-pinning-580\napt install -y --allow-downgrades cuda-drivers-580".to_string(),
             "trap - EXIT\nrm -f /etc/apt/sources.list.d/cuda-debian12-x86_64.list\napt update -q".to_string(),
-        ),
-        "590" => (
-            r#"TEMP_DIR=$(mktemp -d)
-wget -q -O "$TEMP_DIR/cuda-keyring.deb" \
-    https://developer.download.nvidia.com/compute/cuda/repos/debian13/x86_64/cuda-keyring_1.1-1_all.deb
-if [ ! -s "$TEMP_DIR/cuda-keyring.deb" ]; then
-    echo "ERROR: Failed to download cuda-keyring."
-    rm -rf "$TEMP_DIR"
-    exit 1
-fi
-dpkg -i "$TEMP_DIR/cuda-keyring.deb"
-rm -rf "$TEMP_DIR""#
-                .to_string(),
-            "apt install -y nvidia-driver-pinning-590\napt install -y nvidia-open-590".to_string(),
-            "apt purge -y cuda-keyring\nrm -f /etc/apt/sources.list.d/cuda-debian13-x86_64.list\napt update -q".to_string(),
         ),
         _ => (
             r#"TEMP_DIR=$(mktemp -d)
@@ -1185,7 +1172,10 @@ fi
 dpkg -i "$TEMP_DIR/cuda-keyring.deb"
 rm -rf "$TEMP_DIR""#
                 .to_string(),
-            "apt install -y nvidia-driver-pinning-610\napt install -y nvidia-open-610".to_string(),
+            // NVIDIA's debian13 repository has no nvidia-open-NNN packages:
+            // the branch is chosen with the pinning package, then the meta
+            // package nvidia-open follows it.
+            format!("apt install -y nvidia-driver-pinning-{version}\napt install -y nvidia-open"),
             "apt purge -y cuda-keyring\nrm -f /etc/apt/sources.list.d/cuda-debian13-x86_64.list\napt update -q".to_string(),
         ),
     };
@@ -1193,8 +1183,10 @@ rm -rf "$TEMP_DIR""#
     let patch = nvidia_dkms_patch_commands();
     let llvm = LLVM_DKMS_TOOLCHAIN;
 
+    let boot = BOOT_FUNCTIONS;
     let script = format!(
         r#"set -e
+{boot}
 echo "=== NVIDIA {version} Official CUDA Repository ({distro}) ==="
 echo "[0/6] Removing NVIDIA DKMS modules from all kernels..."
 for entry in $(dkms status | grep -i nvidia | awk -F'[:,]' '{{print $1"/"$2}}' | tr -d ' '); do
@@ -1244,15 +1236,11 @@ if command -v dracut >/dev/null 2>&1; then
     mkdir -p /etc/dracut.conf.d
     echo 'omit_drivers+=" nouveau "' > /etc/dracut.conf.d/blacklist-nouveau.conf
     rm -f /etc/dracut.conf.d/nvidia.conf
-    dracut --force
-elif command -v update-initramfs >/dev/null 2>&1; then
-    update-initramfs -u
 fi
-echo "[+] Configuring GRUB with nvidia-drm.modeset=1..."
-if ! grep -q "nvidia-drm.modeset=1" /etc/default/grub; then
-    sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="\([^"]*\)"/GRUB_CMDLINE_LINUX_DEFAULT="\1 nvidia-drm.modeset=1"/' /etc/default/grub
-fi
-update-grub
+update-initramfs -u -k all
+echo "[+] Adding nvidia-drm.modeset=1 to the kernel command line..."
+soplos_cmdline_add nvidia-drm.modeset=1
+soplos_boot_update
 echo "[6/6] Done."
 echo "NVIDIA driver {version} installed. Restart to apply changes."
 "#
@@ -1265,7 +1253,7 @@ echo "NVIDIA driver {version} installed. Restart to apply changes."
 // _build_nvidia_uninstall_script.
 #[tauri::command]
 pub fn uninstall_nvidia() -> u64 {
-    let script = r#"echo "=== Removing all NVIDIA drivers ==="
+    let script = BOOT_FUNCTIONS.to_string() + r#"echo "=== Removing all NVIDIA drivers ==="
 echo "[0/7] Removing NVIDIA DKMS modules from all kernels..."
 for entry in $(dkms status | grep -i nvidia | awk -F'[:,]' '{print $1"/"$2}' | tr -d ' '); do
     dkms remove --force "$entry" --all 2>/dev/null || true
@@ -1295,18 +1283,13 @@ echo "[4/7] Removing NVIDIA dracut configuration..."
 rm -f /etc/dracut.conf.d/nvidia.conf
 rm -f /etc/dracut.conf.d/blacklist-nouveau.conf
 rm -f /etc/apt/apt.conf.d/99nvidia-sha1-exception
-echo "[5/7] Restoring GRUB defaults..."
-sed -i 's/ nvidia-drm.modeset=1//' /etc/default/grub 2>/dev/null || true
-update-grub 2>/dev/null || true
-echo "[6/7] Regenerating initramfs..."
-if command -v dracut >/dev/null 2>&1; then
-    dracut --force
-elif command -v update-initramfs >/dev/null 2>&1; then
-    update-initramfs -u
-fi
+echo "[5/7] Regenerating initramfs..."
+update-initramfs -u -k all || true
+echo "[6/7] Removing nvidia-drm.modeset=1 from the kernel command line..."
+soplos_cmdline_remove nvidia-drm.modeset=1
+soplos_boot_update || true
 echo "[7/7] Done. Restart the system before installing a new driver version."
-"#
-    .to_string();
+"#;
     start_pkexec_job(script)
 }
 
@@ -1716,16 +1699,14 @@ echo "Use 'prime-run <command>' to execute apps with NVIDIA."
             start_pkexec_job(script)
         }
         "nvidia" => {
-            let script = r#"echo "=== Configuring NVIDIA as Primary GPU ==="
+            let script = BOOT_FUNCTIONS.to_string() + r#"echo "=== Configuring NVIDIA as Primary GPU ==="
 if command -v prime-select &>/dev/null; then
     prime-select nvidia 2>/dev/null || true
 fi
 
-if ! grep -q "nvidia-drm.modeset=1" /etc/default/grub 2>/dev/null; then
-    echo "Adding nvidia-drm.modeset=1 to GRUB..."
-    sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="\([^"]*\)"/GRUB_CMDLINE_LINUX_DEFAULT="\1 nvidia-drm.modeset=1"/' /etc/default/grub
-    update-grub 2>/dev/null || true
-fi
+echo "Adding nvidia-drm.modeset=1 to the kernel command line..."
+soplos_cmdline_add nvidia-drm.modeset=1
+soplos_boot_update || true
 
 mkdir -p /etc/environment.d
 cat > /etc/environment.d/10-nvidia-primary.conf << 'ENVCONF'
@@ -1747,7 +1728,7 @@ XORGCONF
 
 echo "NVIDIA configured as Primary GPU."
 echo "IMPORTANT: Restart the system to apply changes."
-"#.to_string();
+"#;
             start_pkexec_job(script)
         }
         "intel" | "amd" => {
@@ -1833,7 +1814,7 @@ pub async fn check_nvidia_update(branch: String) -> Result<NvidiaUpdateStatus, S
     let major = installed.split('.').next().unwrap_or("").to_string();
     let target_prefix = if branch.is_empty() { major.clone() } else { branch.clone() };
 
-    // For 580 use debian12 repo; for 590/610 use debian13.
+    // For 580 use debian12 repo; for 620 use debian13.
     let repo = if target_prefix == "580" {
         "debian12"
     } else {
@@ -1896,3 +1877,16 @@ pub async fn check_nvidia_update(branch: String) -> Result<NvidiaUpdateStatus, S
 
 
 
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn gtx16_cards_get_the_620_branch() {
+        assert_eq!(recommend_nvidia_driver("GeForce GTX 1650"), "nvidia-driver-620");
+        assert_eq!(recommend_nvidia_driver("TU116 [GeForce GTX 1660 Ti]"), "nvidia-driver-620");
+        assert_eq!(recommend_nvidia_driver("GeForce RTX 4070"), "nvidia-driver-620");
+        assert_eq!(recommend_nvidia_driver("GeForce GTX 960M"), "nvidia-driver-580");
+    }
+}

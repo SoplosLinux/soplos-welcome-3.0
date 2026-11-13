@@ -7,6 +7,7 @@ use std::io::Write;
 use serde::Serialize;
 
 use super::drivers::{detect_gpus, nvidia_dkms_patch_commands};
+use super::boot::BOOT_FUNCTIONS;
 use super::software::start_pkexec_job;
 use crate::utils::is_valid_pkg_name;
 
@@ -112,7 +113,35 @@ pub fn get_cpu_vendor() -> Option<String> {
 // === XanMod kernel variants ===
 // Ported from _get_cpu_psabi_level / _get_xanmod_package / on_install_xanmod_clicked.
 
+/// The x86-64 level the dynamic linker reports as supported ("x86-64-v3
+/// (supported, searched)"), as Soplos Kernel Installer shows it and Soplos
+/// Linux Installer installs by. The flags alone gave v2 on an Intel N150
+/// under Proxmox that runs v3 kernels (2026-11-13).
+fn psabi_from_ld() -> Option<u8> {
+    for ld in ["/lib64/ld-linux-x86-64.so.2", "/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2"] {
+        let Ok(out) = Command::new(ld).arg("--help").output() else { continue };
+        let text = String::from_utf8_lossy(&out.stdout).to_string() + &String::from_utf8_lossy(&out.stderr);
+        if !text.contains("glibc-hwcaps") {
+            continue;
+        }
+        return Some(
+            [4u8, 3, 2]
+                .into_iter()
+                .find(|level| {
+                    let marker = format!("x86-64-v{level}");
+                    text.lines().any(|l| l.trim_start().starts_with(&marker) && l.contains("(supported"))
+                })
+                .unwrap_or(1),
+        );
+    }
+    None
+}
+
 fn get_cpu_psabi_level() -> u8 {
+    if let Some(level) = psabi_from_ld() {
+        return level;
+    }
+    // No dynamic linker answer: the flags of the processor.
     let cpuinfo = std::fs::read_to_string("/proc/cpuinfo").unwrap_or_default();
     let flags: std::collections::HashSet<&str> = cpuinfo
         .lines()
@@ -449,12 +478,13 @@ pub fn clean_kernels(packages: Vec<String>) -> Result<u64, String> {
         return Err("Invalid package name in cleanup list".to_string());
     }
     let packages_str = packages.join(" ");
+    let boot = BOOT_FUNCTIONS;
     let script = format!(
         r#"set -e
+{boot}
 echo "Purging old kernels and headers..."
 apt purge -y {packages_str}
-echo "Updating GRUB..."
-update-grub
+soplos_boot_update
 echo "Cleanup complete."
 "#
     );
@@ -463,16 +493,8 @@ echo "Cleanup complete."
 
 #[tauri::command]
 pub fn update_grub() -> u64 {
-    let script = r#"set -e
-echo "Updating GRUB..."
-if [ -x /usr/sbin/update-grub ]; then
-    /usr/sbin/update-grub
-else
-    update-grub
-fi
-echo "GRUB update complete."
-"#
-    .to_string();
+    // GRUB, Limine or systemd-boot: whichever this system boots with.
+    let script = format!("set -e\n{BOOT_FUNCTIONS}\nsoplos_boot_update\necho \"Boot menu updated.\"\n");
     start_pkexec_job(script)
 }
 

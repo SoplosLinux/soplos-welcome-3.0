@@ -2,6 +2,27 @@
 
 All notable changes to Soplos Welcome are documented in this file.
 
+## [3.0.2-3-beta] - 2026-11-14
+
+### Added
+
+- The boot loader of the system is detected: GRUB, Limine (the settings `limine-soplos` saves) or systemd-boot (its package and its folder on the EFI partition), the three that Soplos Linux Installer offers. The scripts share one set of functions for it (`src-tauri/src/commands/boot.rs`): the kernel parameters go to `/etc/default/grub` with GRUB and to `/etc/kernel/cmdline` with Limine and systemd-boot, and the boot menu is written again with `update-grub`, `limine-update` or `kernel-install add` for every kernel.
+- Customization: GRUB Editor is greyed out, with "Only with GRUB", when the system boots with Limine or systemd-boot.
+
+### Changed
+
+- NVIDIA (repository of Debian and of NVIDIA), uninstalling NVIDIA and the PRIME "NVIDIA as primary GPU" mode put `nvidia-drm.modeset=1` where the boot loader reads it, instead of always in `/etc/default/grub`.
+- Kernels: cleaning old kernels and the button "Update the boot menu" (before, "Update GRUB") update the boot loader the system has.
+- The initramfs is rebuilt with `update-initramfs -u -k all` instead of `dracut --force`: on Soplos it is dracut's own wrapper, which also runs the hooks that copy the new initramfs to the EFI partition for systemd-boot, and it does every kernel, not only the running one.
+- NVIDIA branches: 620 (Turing and newer) replaces 590 and 610; 580 stays for Maxwell and Pascal. The 620 branch is installed as NVIDIA publishes it for Debian 13, `nvidia-driver-pinning-620` and then `nvidia-open`.
+- XanMod kernels: the x86-64 level of the processor is the one the dynamic linker reports (`ld.so --help`), as Soplos Kernel Installer shows it, and the flags only when that fails.
+
+### Fixed
+
+- The GTX 1650 and 1660 (Turing) were recommended nouveau: "gtx 16" was matched as a whole word, which a model number never is. They get the 620 branch.
+- The NVIDIA 590 and 610 branches installed `nvidia-open-590` and `nvidia-open-610`, packages that NVIDIA's Debian 13 repository does not have.
+- XanMod kernels: an Intel N150 under Proxmox that runs v3 kernels was read as v2.
+
 ## [3.0.2-2-beta] - 2026-11-12
 
 ### Added

@@ -98,7 +98,7 @@
     const rec = gpu.recommendedDriver;
     if (!rec) return;
     if (gpu.vendor === "NVIDIA") {
-      const cudaMatch = rec.match(/^nvidia-driver-(610|590|580)$/);
+      const cudaMatch = rec.match(/^nvidia-driver-(620|580)$/);
       if (cudaMatch) {
         await runAndRescan("install_nvidia_cuda", { version: cudaMatch[1] });
       } else if (rec === "nouveau") {
@@ -193,8 +193,7 @@
   }
 
   const nvidiaBranchIds = [
-    "610",
-    "590",
+    "620",
     "580",
     "nvidia-driver",
     "nvidia-tesla-470-driver",
@@ -202,8 +201,7 @@
     "nvidia-legacy-340xx-driver",
   ] as const;
   const nvidiaBranchKind: Record<(typeof nvidiaBranchIds)[number], "cuda" | "repo"> = {
-    "610": "cuda",
-    "590": "cuda",
+    "620": "cuda",
     "580": "cuda",
     "nvidia-driver": "repo",
     "nvidia-tesla-470-driver": "repo",

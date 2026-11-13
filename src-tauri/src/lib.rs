@@ -100,6 +100,7 @@ pub fn run() {
             commands::kernels::preview_clean_kernels,
             commands::kernels::clean_kernels,
             commands::kernels::update_grub,
+            commands::boot::get_bootloader,
             commands::kernels::is_soplos_kernels_repo_installed,
             commands::kernels::add_soplos_kernels_repo,
             commands::kernels::remove_soplos_kernels_repo,
