@@ -254,6 +254,11 @@
   </developer>
 
   <releases>
+    <release version="3.0.2-4-beta" date="2026-11-14">
+      <description>
+        <p>Grub BTRFS, in Security, is greyed out when the system does not boot with GRUB, as GRUB Editor.</p>
+      </description>
+    </release>
     <release version="3.0.2-3-beta" date="2026-11-14">
       <description>
         <p>The NVIDIA drivers, the PRIME mode and the kernel cleanup work with the three boot loaders of Soplos Linux Installer, GRUB, Limine and systemd-boot. The NVIDIA 620 branch replaces 590 and 610, and the GTX 1650 and 1660 get it instead of nouveau. GRUB Editor is greyed out when the system does not boot with GRUB.</p>

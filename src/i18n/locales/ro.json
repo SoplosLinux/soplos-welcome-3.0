@@ -617,6 +617,7 @@
     "deactivate": "Dezactivează",
     "activate": "Activează",
     "notAvailableOn": "Indisponibil pe {fs}",
+    "onlyGrub": "Doar cu GRUB",
     "installed": "Instalat",
     "notInstalled": "Neinstalat",
     "updateDefinitions": "Actualizează definițiile",

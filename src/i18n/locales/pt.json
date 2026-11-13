@@ -617,6 +617,7 @@
     "deactivate": "Desativar",
     "activate": "Ativar",
     "notAvailableOn": "Não disponível em {fs}",
+    "onlyGrub": "Apenas com GRUB",
     "installed": "Instalado",
     "notInstalled": "Não instalado",
     "updateDefinitions": "Atualizar definições",

@@ -617,6 +617,7 @@
     "deactivate": "Отключить",
     "activate": "Включить",
     "notAvailableOn": "Недоступно в {fs}",
+    "onlyGrub": "Только с GRUB",
     "installed": "Установлено",
     "notInstalled": "Не установлено",
     "updateDefinitions": "Обновить базы",

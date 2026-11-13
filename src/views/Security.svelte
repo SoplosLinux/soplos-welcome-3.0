@@ -25,6 +25,8 @@
     customInstallCmd?: string;
     customUninstallCmd?: string;
     onlyBtrfs?: boolean;
+    /** It only works with GRUB (greyed out with Limine and systemd-boot). */
+    onlyGrub?: boolean;
     extra?: "clamtk" | "rkhunter";
   }
 
@@ -35,6 +37,7 @@
   }
 
   let filesystem = "unknown";
+  let bootloader = "grub";
 
   const families: Family[] = [
     {
@@ -42,7 +45,7 @@
       icon: "/assets/icons/security/timeshift.png",
       items: [
         { key: "timeshift", label: "Timeshift", hintKey: "timeshift", icon: "/assets/icons/security/timeshift.png", badgeKey: "recommended", kind: "apt", packages: "timeshift", openCommand: "timeshift-gtk", openPrivileged: true },
-        { key: "grub-btrfs", label: "Grub BTRFS", hintKey: "grubBtrfs", icon: "/assets/icons/security/grub-btrfs.png", kind: "apt", packages: "grub-btrfs", onlyBtrfs: true },
+        { key: "grub-btrfs", label: "Grub BTRFS", hintKey: "grubBtrfs", icon: "/assets/icons/security/grub-btrfs.png", kind: "apt", packages: "grub-btrfs", onlyBtrfs: true, onlyGrub: true },
         { key: "deja-dup", label: "Deja Dup", hintKey: "dejaDup", icon: "/assets/icons/security/dejadup.png", kind: "apt", packages: "deja-dup" },
         { key: "btrfs-assistant", label: "BTRFS Assistant", hintKey: "btrfsAssistant", icon: "/assets/icons/security/btrfs-assistant.png", kind: "apt", packages: "btrfs-assistant", onlyBtrfs: true, openCommand: "btrfs-assistant", openPrivileged: true },
       ],
@@ -242,6 +245,7 @@
 
   onMount(() => {
     api.invoke<string>("detect_filesystem").then((fs) => (filesystem = fs));
+    api.invoke<string>("get_bootloader").then((b) => (bootloader = b)).catch(() => (bootloader = "grub"));
     refreshAllStatuses();
     refreshUfwStatus();
     ufwTimer = setInterval(refreshUfwStatus, 3000);
@@ -306,7 +310,9 @@
           {/if}
 
           {#each family.items as item}
-            {@const wired = !item.onlyBtrfs || filesystem === "btrfs"}
+            {@const onBtrfs = !item.onlyBtrfs || filesystem === "btrfs"}
+            {@const onGrub = !item.onlyGrub || bootloader === "grub"}
+            {@const wired = onBtrfs && onGrub}
             {@const installed = installedVersion >= 0 && installedMap[item.key]}
             <div
               class="border rounded p-3 transition-colors {wired ? 'border-border' : 'border-border opacity-50'}"
@@ -323,7 +329,7 @@
                 </div>
                 {#if !wired}
                   <span class="text-[0.68rem] px-2 py-0.5 rounded-full bg-surface-2 text-text shrink-0">
-                    {$_("security.notAvailableOn", { values: { fs: filesystem.toUpperCase() } })}
+                    {onBtrfs ? $_("security.onlyGrub") : $_("security.notAvailableOn", { values: { fs: filesystem.toUpperCase() } })}
                   </span>
                 {:else}
                   <span

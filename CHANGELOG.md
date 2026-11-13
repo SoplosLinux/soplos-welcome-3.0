@@ -2,6 +2,12 @@
 
 All notable changes to Soplos Welcome are documented in this file.
 
+## [3.0.2-4-beta] - 2026-11-14
+
+### Added
+
+- Security: Grub BTRFS (the snapshots of btrfs in the boot menu) is greyed out, with "Only with GRUB", when the system boots with Limine or systemd-boot, as GRUB Editor in Customization.
+
 ## [3.0.2-3-beta] - 2026-11-14
 
 ### Added

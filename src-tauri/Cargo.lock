@@ -3605,7 +3605,7 @@ dependencies = [
 
 [[package]]
 name = "soplos-welcome"
-version = "3.0.2-3-beta"
+version = "3.0.2-4-beta"
 dependencies = [
  "base64 0.23.1",
  "flate2",
