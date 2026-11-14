@@ -2,6 +2,17 @@
 
 All notable changes to Soplos Welcome are documented in this file.
 
+## [3.0.2-5-beta] - 2026-11-14
+
+### Changed
+
+- Recommended: PrintCraft is now PDFCraft. The releases of `storytold/pdfcraft` ship `pdfcraft-<ver>-linux-x86_64.deb` with the package `pdfcraft` since 0.21; the card, its description in the 8 languages and its icon follow. Installing it removes the old `printcraft` package first, and removing it removes either.
+- Downloads from a GitHub release are checked against the `SHA256SUMS.txt` of that release when it publishes one and it names the file, besides the `.sha256` of the file as before; a download that does not match stops the installation.
+
+### Fixed
+
+- Recommended: the ArtCraft apps (PhotoCraft, VectorCraft, FilmCraft, EffectCraft, SoundCraft, LightCraft, PDFCraft, WordCraft, GridCraft, DeckCraft, DesignCraft, FigCraft and the ArtCraft Launcher) and Concat did not install. Their releases now also publish the signature of each package (`…linux-x86_64.deb.asc`), so the download address took two lines; only the file that ends in `linux-x86_64.deb` is taken now.
+
 ## [3.0.2-4-beta] - 2026-11-14
 
 ### Added

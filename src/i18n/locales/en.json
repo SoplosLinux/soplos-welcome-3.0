@@ -186,7 +186,7 @@
       "genoffice": "Open-source AI office suite: Docs, Sheets, Slides, PDF, HTML and Markdown",
       "adobe-reader": "Adobe PDF reader",
       "jopdf": "PDF editor: annotate, sign, fill forms and merge PDFs",
-      "printcraft": "Clean-room Acrobat alternative written in Rust",
+      "pdfcraft": "Clean-room Acrobat alternative written in Rust",
       "wordcraft": "Clean-room Word alternative written in Rust",
       "gridcraft": "Clean-room Excel alternative written in Rust",
       "deckcraft": "Clean-room PowerPoint alternative written in Rust",

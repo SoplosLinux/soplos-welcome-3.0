@@ -245,10 +245,10 @@
           customInstall: "install_jopdf",
         },
         {
-          name: "PrintCraft",
-          icon: "printcraft.png",
+          name: "PDFCraft",
+          icon: "pdfcraft.png",
           kind: "custom",
-          package: "printcraft",
+          package: "pdfcraft",
           customInstall: "install_printcraft",
           customUninstall: "uninstall_printcraft",
         },

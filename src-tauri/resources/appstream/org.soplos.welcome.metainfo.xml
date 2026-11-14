@@ -254,6 +254,11 @@
   </developer>
 
   <releases>
+    <release version="3.0.2-5-beta" date="2026-11-14">
+      <description>
+        <p>The ArtCraft apps install again, now checked against the checksums their releases publish. PrintCraft is now PDFCraft, the name its releases use.</p>
+      </description>
+    </release>
     <release version="3.0.2-4-beta" date="2026-11-14">
       <description>
         <p>Grub BTRFS, in Security, is greyed out when the system does not boot with GRUB, as GRUB Editor.</p>

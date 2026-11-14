@@ -509,7 +509,7 @@ pub fn uninstall_patchy() -> u64 {
 pub fn install_photocraft() -> u64 {
     start_pkexec_job(format!(
         r#"{VERIFY_DOWNLOAD_SH}
-PHOTOCRAFT_URL=$(curl -s https://api.github.com/repos/storytold/photocraft/releases/latest | grep browser_download_url | grep linux-x86_64.deb | cut -d\" -f4)
+PHOTOCRAFT_URL=$(curl -s https://api.github.com/repos/storytold/photocraft/releases/latest | grep browser_download_url | cut -d\" -f4 | grep -E 'linux-x86_64\.deb$' | head -n 1)
 verify_and_download "$PHOTOCRAFT_URL" /tmp/photocraft.deb
 apt install -y /tmp/photocraft.deb
 rm -f /tmp/photocraft.deb
@@ -529,7 +529,7 @@ pub fn uninstall_photocraft() -> u64 {
 pub fn install_concat() -> u64 {
     start_pkexec_job(format!(
         r#"{VERIFY_DOWNLOAD_SH}
-CONCAT_URL=$(curl -s https://api.github.com/repos/jub0t/Concat/releases/latest | grep browser_download_url | grep linux-x86_64.deb | cut -d\" -f4)
+CONCAT_URL=$(curl -s https://api.github.com/repos/jub0t/Concat/releases/latest | grep browser_download_url | cut -d\" -f4 | grep -E 'linux-x86_64\.deb$' | head -n 1)
 verify_and_download "$CONCAT_URL" /tmp/concat.deb
 apt install -y /tmp/concat.deb
 rm -f /tmp/concat.deb
@@ -1096,7 +1096,7 @@ pub fn uninstall_vbox_extpack() -> u64 {
 pub fn install_vectorcraft() -> u64 {
     start_pkexec_job(format!(
         r#"{VERIFY_DOWNLOAD_SH}
-VECTORCRAFT_URL=$(curl -s https://api.github.com/repos/storytold/vectorcraft/releases/latest | grep browser_download_url | grep linux-x86_64.deb | cut -d\" -f4)
+VECTORCRAFT_URL=$(curl -s https://api.github.com/repos/storytold/vectorcraft/releases/latest | grep browser_download_url | cut -d\" -f4 | grep -E 'linux-x86_64\.deb$' | head -n 1)
 verify_and_download "$VECTORCRAFT_URL" /tmp/vectorcraft.deb
 apt install -y /tmp/vectorcraft.deb
 rm -f /tmp/vectorcraft.deb
@@ -1113,7 +1113,7 @@ pub fn uninstall_vectorcraft() -> u64 {
 pub fn install_filmcraft() -> u64 {
     start_pkexec_job(format!(
         r#"{VERIFY_DOWNLOAD_SH}
-FILMCRAFT_URL=$(curl -s https://api.github.com/repos/storytold/filmcraft/releases/latest | grep browser_download_url | grep linux-x86_64.deb | cut -d\" -f4)
+FILMCRAFT_URL=$(curl -s https://api.github.com/repos/storytold/filmcraft/releases/latest | grep browser_download_url | cut -d\" -f4 | grep -E 'linux-x86_64\.deb$' | head -n 1)
 verify_and_download "$FILMCRAFT_URL" /tmp/filmcraft.deb
 apt install -y /tmp/filmcraft.deb
 rm -f /tmp/filmcraft.deb
@@ -1130,7 +1130,7 @@ pub fn uninstall_filmcraft() -> u64 {
 pub fn install_effectcraft() -> u64 {
     start_pkexec_job(format!(
         r#"{VERIFY_DOWNLOAD_SH}
-EFFECTCRAFT_URL=$(curl -s https://api.github.com/repos/storytold/effectcraft/releases/latest | grep browser_download_url | grep linux-x86_64.deb | cut -d\" -f4)
+EFFECTCRAFT_URL=$(curl -s https://api.github.com/repos/storytold/effectcraft/releases/latest | grep browser_download_url | cut -d\" -f4 | grep -E 'linux-x86_64\.deb$' | head -n 1)
 verify_and_download "$EFFECTCRAFT_URL" /tmp/effectcraft.deb
 apt install -y /tmp/effectcraft.deb
 rm -f /tmp/effectcraft.deb
@@ -1147,7 +1147,7 @@ pub fn uninstall_effectcraft() -> u64 {
 pub fn install_soundcraft() -> u64 {
     start_pkexec_job(format!(
         r#"{VERIFY_DOWNLOAD_SH}
-SOUNDCRAFT_URL=$(curl -s https://api.github.com/repos/storytold/soundcraft/releases/latest | grep browser_download_url | grep linux-x86_64.deb | cut -d\" -f4)
+SOUNDCRAFT_URL=$(curl -s https://api.github.com/repos/storytold/soundcraft/releases/latest | grep browser_download_url | cut -d\" -f4 | grep -E 'linux-x86_64\.deb$' | head -n 1)
 verify_and_download "$SOUNDCRAFT_URL" /tmp/soundcraft.deb
 apt install -y /tmp/soundcraft.deb
 rm -f /tmp/soundcraft.deb
@@ -1164,7 +1164,7 @@ pub fn uninstall_soundcraft() -> u64 {
 pub fn install_lightcraft() -> u64 {
     start_pkexec_job(format!(
         r#"{VERIFY_DOWNLOAD_SH}
-LIGHTCRAFT_URL=$(curl -s https://api.github.com/repos/storytold/lightcraft/releases/latest | grep browser_download_url | grep linux-x86_64.deb | cut -d\" -f4)
+LIGHTCRAFT_URL=$(curl -s https://api.github.com/repos/storytold/lightcraft/releases/latest | grep browser_download_url | cut -d\" -f4 | grep -E 'linux-x86_64\.deb$' | head -n 1)
 verify_and_download "$LIGHTCRAFT_URL" /tmp/lightcraft.deb
 apt install -y /tmp/lightcraft.deb
 rm -f /tmp/lightcraft.deb
@@ -1177,34 +1177,39 @@ pub fn uninstall_lightcraft() -> u64 {
     start_pkexec_job("apt remove -y lightcraft && echo 'LightCraft removed.'".to_string())
 }
 
-// The storytold/pdfcraft repo (an Acrobat clone) actually ships its builds
-// under the product name "PrintCraft" — confirmed from the real release
-// asset names (printcraft-*-linux-x86_64.deb) and the installed package's
-// own control file (Package: printcraft), not "pdfcraft". The GitHub repo
-// path below is still /pdfcraft because that's genuinely where the
-// releases live; only the package/product name differs.
+// The storytold/pdfcraft repo (an Acrobat clone). Its first releases shipped
+// the package as "printcraft" (printcraft-*-linux-x86_64.deb, Package:
+// printcraft); since 0.21 it is "pdfcraft" (pdfcraft-*-linux-x86_64.deb,
+// Package: pdfcraft), checked 2026-11-14. The old package is removed first,
+// so the two never end up installed side by side.
 #[tauri::command]
 pub fn install_printcraft() -> u64 {
     start_pkexec_job(format!(
         r#"{VERIFY_DOWNLOAD_SH}
-PRINTCRAFT_URL=$(curl -s https://api.github.com/repos/storytold/pdfcraft/releases/latest | grep browser_download_url | grep linux-x86_64.deb | cut -d\" -f4)
-verify_and_download "$PRINTCRAFT_URL" /tmp/printcraft.deb
-apt install -y /tmp/printcraft.deb
-rm -f /tmp/printcraft.deb
-echo "PrintCraft installed.""#
+PDFCRAFT_URL=$(curl -s https://api.github.com/repos/storytold/pdfcraft/releases/latest | grep browser_download_url | cut -d\" -f4 | grep -E 'linux-x86_64\.deb$' | head -n 1)
+verify_and_download "$PDFCRAFT_URL" /tmp/pdfcraft.deb
+if dpkg-query -W -f='${{Status}}' printcraft 2>/dev/null | grep -q "install ok installed"; then
+    apt remove -y printcraft
+fi
+apt install -y /tmp/pdfcraft.deb
+rm -f /tmp/pdfcraft.deb
+echo "PDFCraft installed.""#
     ))
 }
 
 #[tauri::command]
 pub fn uninstall_printcraft() -> u64 {
-    start_pkexec_job("apt remove -y printcraft && echo 'PrintCraft removed.'".to_string())
+    start_pkexec_job(
+        "for p in pdfcraft printcraft; do dpkg-query -W -f='${Status}' \"$p\" 2>/dev/null | grep -q 'install ok installed' && apt remove -y \"$p\"; done; echo 'PDFCraft removed.'"
+            .to_string(),
+    )
 }
 
 #[tauri::command]
 pub fn install_wordcraft() -> u64 {
     start_pkexec_job(format!(
         r#"{VERIFY_DOWNLOAD_SH}
-WORDCRAFT_URL=$(curl -s https://api.github.com/repos/storytold/wordcraft/releases/latest | grep browser_download_url | grep linux-x86_64.deb | cut -d\" -f4)
+WORDCRAFT_URL=$(curl -s https://api.github.com/repos/storytold/wordcraft/releases/latest | grep browser_download_url | cut -d\" -f4 | grep -E 'linux-x86_64\.deb$' | head -n 1)
 verify_and_download "$WORDCRAFT_URL" /tmp/wordcraft.deb
 apt install -y /tmp/wordcraft.deb
 rm -f /tmp/wordcraft.deb
@@ -1221,7 +1226,7 @@ pub fn uninstall_wordcraft() -> u64 {
 pub fn install_gridcraft() -> u64 {
     start_pkexec_job(format!(
         r#"{VERIFY_DOWNLOAD_SH}
-GRIDCRAFT_URL=$(curl -s https://api.github.com/repos/storytold/gridcraft/releases/latest | grep browser_download_url | grep linux-x86_64.deb | cut -d\" -f4)
+GRIDCRAFT_URL=$(curl -s https://api.github.com/repos/storytold/gridcraft/releases/latest | grep browser_download_url | cut -d\" -f4 | grep -E 'linux-x86_64\.deb$' | head -n 1)
 verify_and_download "$GRIDCRAFT_URL" /tmp/gridcraft.deb
 apt install -y /tmp/gridcraft.deb
 rm -f /tmp/gridcraft.deb
@@ -1238,7 +1243,7 @@ pub fn uninstall_gridcraft() -> u64 {
 pub fn install_deckcraft() -> u64 {
     start_pkexec_job(format!(
         r#"{VERIFY_DOWNLOAD_SH}
-DECKCRAFT_URL=$(curl -s https://api.github.com/repos/storytold/deckcraft/releases/latest | grep browser_download_url | grep linux-x86_64.deb | cut -d\" -f4)
+DECKCRAFT_URL=$(curl -s https://api.github.com/repos/storytold/deckcraft/releases/latest | grep browser_download_url | cut -d\" -f4 | grep -E 'linux-x86_64\.deb$' | head -n 1)
 verify_and_download "$DECKCRAFT_URL" /tmp/deckcraft.deb
 apt install -y /tmp/deckcraft.deb
 rm -f /tmp/deckcraft.deb
@@ -1255,7 +1260,7 @@ pub fn uninstall_deckcraft() -> u64 {
 pub fn install_designcraft() -> u64 {
     start_pkexec_job(format!(
         r#"{VERIFY_DOWNLOAD_SH}
-DESIGNCRAFT_URL=$(curl -s https://api.github.com/repos/storytold/designcraft/releases/latest | grep browser_download_url | grep linux-x86_64.deb | cut -d\" -f4)
+DESIGNCRAFT_URL=$(curl -s https://api.github.com/repos/storytold/designcraft/releases/latest | grep browser_download_url | cut -d\" -f4 | grep -E 'linux-x86_64\.deb$' | head -n 1)
 verify_and_download "$DESIGNCRAFT_URL" /tmp/designcraft.deb
 apt install -y /tmp/designcraft.deb
 rm -f /tmp/designcraft.deb
@@ -1272,7 +1277,7 @@ pub fn uninstall_designcraft() -> u64 {
 pub fn install_figcraft() -> u64 {
     start_pkexec_job(format!(
         r#"{VERIFY_DOWNLOAD_SH}
-FIGCRAFT_URL=$(curl -s https://api.github.com/repos/storytold/figcraft/releases/latest | grep browser_download_url | grep linux-x86_64.deb | cut -d\" -f4)
+FIGCRAFT_URL=$(curl -s https://api.github.com/repos/storytold/figcraft/releases/latest | grep browser_download_url | cut -d\" -f4 | grep -E 'linux-x86_64\.deb$' | head -n 1)
 verify_and_download "$FIGCRAFT_URL" /tmp/figcraft.deb
 apt install -y /tmp/figcraft.deb
 rm -f /tmp/figcraft.deb
@@ -1293,7 +1298,7 @@ pub fn uninstall_figcraft() -> u64 {
 pub fn install_artcraft_launcher() -> u64 {
     start_pkexec_job(format!(
         r#"{VERIFY_DOWNLOAD_SH}
-ARTCRAFT_LAUNCHER_URL=$(curl -s https://api.github.com/repos/storytold/craft-launcher/releases/latest | grep browser_download_url | grep linux-x86_64.deb | cut -d\" -f4)
+ARTCRAFT_LAUNCHER_URL=$(curl -s https://api.github.com/repos/storytold/craft-launcher/releases/latest | grep browser_download_url | cut -d\" -f4 | grep -E 'linux-x86_64\.deb$' | head -n 1)
 verify_and_download "$ARTCRAFT_LAUNCHER_URL" /tmp/artcraft-launcher.deb
 apt install -y /tmp/artcraft-launcher.deb
 rm -f /tmp/artcraft-launcher.deb

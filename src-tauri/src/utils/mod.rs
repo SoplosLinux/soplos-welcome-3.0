@@ -73,6 +73,27 @@ pub const VERIFY_DOWNLOAD_SH: &str = r#"verify_and_download() {
     fi
   fi
   rm -f "$dest.sha256"
+  # GitHub releases often publish one SHA256SUMS.txt for every asset instead
+  # of a .sha256 per file (the ArtCraft suite does). When the release has it
+  # and it names this file, the download must match it.
+  case "$url" in
+    https://github.com/*/releases/download/*)
+      local sums="$dest.sums" name
+      name="$(basename "$url")"
+      if wget -q -O "$sums" "$(dirname "$url")/SHA256SUMS.txt" 2>/dev/null && [ "$(wc -c < "$sums")" -le 1048576 ] \
+          && grep -qE "^[0-9a-fA-F]{64}[[:space:]]+\*?$name\$" "$sums"; then
+        local expected
+        expected="$(grep -E "^[0-9a-fA-F]{64}[[:space:]]+\*?$name\$" "$sums" | head -n 1 | awk '{print $1}')"
+        if [ "$(sha256sum "$dest" | awk '{print $1}')" != "$expected" ]; then
+          echo "Checksum verification failed for $name — aborting."
+          rm -f "$dest" "$sums"
+          exit 1
+        fi
+        echo "Checksum of $name verified."
+      fi
+      rm -f "$sums"
+      ;;
+  esac
 }
 "#;
 

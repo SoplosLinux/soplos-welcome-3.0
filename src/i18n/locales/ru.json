@@ -186,7 +186,7 @@
       "genoffice": "Офисный пакет с открытым кодом и ИИ: Docs, Sheets, Slides, PDF, HTML и Markdown",
       "adobe-reader": "Программа для просмотра PDF от Adobe",
       "jopdf": "Редактор PDF: заметки, подписи, заполнение форм и объединение PDF",
-      "printcraft": "Альтернатива Acrobat, написанная на Rust",
+      "pdfcraft": "Альтернатива Acrobat, написанная на Rust",
       "wordcraft": "Альтернатива Word, написанная на Rust",
       "gridcraft": "Альтернатива Excel, написанная на Rust",
       "deckcraft": "Альтернатива PowerPoint, написанная на Rust",
