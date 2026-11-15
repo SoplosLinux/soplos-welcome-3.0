@@ -195,7 +195,7 @@ mkdir -p "{home}/AppImages/.icons"
 verify_and_download "https://github.com/oguzhaninan/Stacer/releases/download/v1.1.0/Stacer-1.1.0-x64.AppImage" "{home}/AppImages/Stacer.AppImage"
 chmod +x "{home}/AppImages/Stacer.AppImage"
 mkdir -p "{home}/.local/share/applications"
-wget -q -O "{home}/AppImages/.icons/stacer.png" "https://raw.githubusercontent.com/oguzhaninan/Stacer/master/stacer/images/stacer.png" || true
+wget -q -O "{home}/AppImages/.icons/stacer.png" "https://raw.githubusercontent.com/oguzhaninan/Stacer/master/icons/hicolor/256x256/apps/stacer.png" || true
 cat > "{home}/.local/share/applications/stacer.desktop" << EOF
 [Desktop Entry]
 Name=Stacer

@@ -2,6 +2,22 @@
 
 All notable changes to Soplos Welcome are documented in this file.
 
+## [3.0.0] - 2026-11-15
+
+First stable release of Soplos Welcome 3.0. The version starts again at 3.0.0, without revision: the betas (up to 3.0.2-5-beta) were only for the development team and have to be removed before installing it.
+
+### Changed
+
+- Gaming: the Epic Games Launcher installs from Epic's own Linux package (`EpicGamesLauncher-x86_64.deb`, package `epic-games-launcher`) instead of the AppImage, whose address no longer exists. It is installed and removed with apt, and the package brings its menu entry, its icon and the `com.epicgames.launcher` link for the browser login.
+- Recommended: Antigravity reads its latest version from its download page, the same one the installation takes, so the update notice follows every new release without a new version of Welcome. The address kept for installing without that page is the 2.7.0 one.
+- New screenshots of the eight sections, in English.
+- The AppStream metadata lists 3.0.0 as the only release: the betas were internal, and the software centers would sort them above 3.0.0. Their history stays in this file.
+
+### Fixed
+
+- Security: the icon of Stacer moved in its repository; it is downloaded from `icons/hicolor/256x256/apps/stacer.png` now.
+- Every address Welcome uses was checked: repositories, keys, downloads and pages answer.
+
 ## [3.0.2-5-beta] - 2026-11-14
 
 ### Changed

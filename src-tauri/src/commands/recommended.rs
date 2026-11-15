@@ -268,8 +268,8 @@ update-desktop-database "$REAL_HOME/.local/share/applications" 2>/dev/null || tr
 const ANTIGRAVITY_DESKTOP_ENTRY: &str = "[Desktop Entry]\nName=Antigravity\nExec=/opt/antigravity/antigravity-ide\nIcon=/usr/share/pixmaps/antigravity.png\nType=Application\nCategories=Development;\nComment=Advanced Agentic AI Coding Assistant\n";
 
 // The version this tarball points to — bump when a newer release is published.
-const ANTIGRAVITY_LATEST_VERSION: &str = "2.6.0";
-const ANTIGRAVITY_DOWNLOAD_URL: &str = "https://edgedl.me.gvt1.com/edgedl/release2/j0qc3/antigravity/stable/2.6.0/linux-x64/Antigravity%20IDE.tar.gz";
+const ANTIGRAVITY_LATEST_VERSION: &str = "2.7.0";
+const ANTIGRAVITY_DOWNLOAD_URL: &str = "https://edgedl.me.gvt1.com/edgedl/release2/j0qc3/antigravity/stable/2.7.0-4507555968450560/linux-x64/Antigravity%20IDE.tar.gz";
 
 #[tauri::command]
 pub fn install_antigravity() -> u64 {
@@ -301,11 +301,31 @@ pub struct AntigravityStatus {
     update_available: bool,
 }
 
+// The latest version, read from the download page (the same link the install
+// takes: …/antigravity/stable/<version>-<build>/linux-x64/…). Google keeps no
+// fixed "latest" address, so the constant is only the fallback without network.
+fn antigravity_latest_version() -> String {
+    std::process::Command::new("curl")
+        .args(["-sL", "--max-time", "8", "https://antigravity.google/download"])
+        .output()
+        .ok()
+        .and_then(|out| {
+            let page = String::from_utf8_lossy(&out.stdout);
+            let start = page.find("/antigravity/stable/")? + "/antigravity/stable/".len();
+            let rest = &page[start..];
+            let end = rest.find("/linux-x64/")?;
+            let version = rest[..end].split('-').next()?.to_string();
+            (!version.is_empty() && version.chars().all(|c| c.is_ascii_digit() || c == '.')).then_some(version)
+        })
+        .unwrap_or_else(|| ANTIGRAVITY_LATEST_VERSION.to_string())
+}
+
 // Reads the installed version straight from the Electron app's own
 // product.json (ideVersion) instead of package.json (which only holds
-// the underlying VS Code version like 1.107.0).
+// the underlying VS Code version like 1.107.0). Async, so the download page
+// is read off the main thread.
 #[tauri::command]
-pub fn get_antigravity_status() -> AntigravityStatus {
+pub async fn get_antigravity_status() -> AntigravityStatus {
     let installed_version = std::fs::read_to_string("/opt/antigravity/resources/app/product.json")
         .ok()
         .and_then(|contents| serde_json::from_str::<serde_json::Value>(&contents).ok())
@@ -316,14 +336,21 @@ pub fn get_antigravity_status() -> AntigravityStatus {
                 .map(str::to_string)
         });
 
+    let latest_version = if installed_version.is_some() {
+        tauri::async_runtime::spawn_blocking(antigravity_latest_version)
+            .await
+            .unwrap_or_else(|_| ANTIGRAVITY_LATEST_VERSION.to_string())
+    } else {
+        ANTIGRAVITY_LATEST_VERSION.to_string()
+    };
     let update_available = match &installed_version {
-        Some(v) => v != ANTIGRAVITY_LATEST_VERSION,
+        Some(v) => *v != latest_version,
         None => false,
     };
 
     AntigravityStatus {
         installed_version,
-        latest_version: ANTIGRAVITY_LATEST_VERSION.to_string(),
+        latest_version,
         update_available,
     }
 }
@@ -748,58 +775,30 @@ echo "Xodus Nexus removed.""#
     )
 }
 
-// Epic Games Launcher — Epic's own Linux AppImage. The URL always serves the
-// current build (it redirects to a versioned file on Epic's CDN), and Epic
-// publishes no checksum, so it is downloaded over HTTPS without one. The
-// desktop entry carries the com.epicgames.launcher URL scheme the launcher
-// registers itself for, so the browser login can hand control back to it.
-const EPIC_DESKTOP_ENTRY: &str = "[Desktop Entry]\nName=Epic Games Launcher\nExec=%HOME%/AppImages/EpicGamesLauncher-x86_64.AppImage %u\nIcon=%HOME%/AppImages/.icons/epic-games-launcher.png\nType=Application\nCategories=Game;\nComment=Epic Games Launcher\nStartupWMClass=EpicGamesLauncher\nMimeType=x-scheme-handler/com.epicgames.launcher;\nTerminal=false\n";
-
+// Epic Games Launcher — Epic's own Linux .deb (package epic-games-launcher,
+// /usr/bin/EpicGamesLauncher). The URL always serves the current build, and
+// Epic publishes no checksum, so it is downloaded over HTTPS without one. The
+// package brings its desktop entry with the com.epicgames.launcher URL scheme,
+// so the browser login can hand control back to it.
 #[tauri::command]
-pub fn install_epic_games_launcher(app: tauri::AppHandle) -> Result<u64, String> {
-    use tauri::Manager;
-    let icon = app
-        .path()
-        .resolve("resources/appimage-icons/epic-games-launcher.png", tauri::path::BaseDirectory::Resource)
-        .map_err(|e| e.to_string())?
-        .to_string_lossy()
-        .into_owned();
-    Ok(start_job(
-        "bash",
-        vec![
-            "-c".to_string(),
-            format!(
-                r#"{VERIFY_DOWNLOAD_SH}
-mkdir -p "$HOME/AppImages/.icons"
-mkdir -p "$HOME/.local/share/applications"
+pub fn install_epic_games_launcher() -> u64 {
+    start_pkexec_job(format!(
+        r#"{VERIFY_DOWNLOAD_SH}
 echo "Downloading Epic Games Launcher..."
-EPIC_DEST="$HOME/AppImages/EpicGamesLauncher-x86_64.AppImage"
-verify_and_download "https://launcher-public-service-prod06.ol.epicgames.com/launcher/api/installer/download/EpicGamesLauncher-x86_64.AppImage" "$EPIC_DEST"
-chmod +x "$EPIC_DEST"
-cp "{icon}" "$HOME/AppImages/.icons/epic-games-launcher.png"
-printf '%s' '{EPIC_DESKTOP_ENTRY}' | sed "s|%HOME%|$HOME|g" > "$HOME/.local/share/applications/epic-games-launcher.desktop"
-update-desktop-database "$HOME/.local/share/applications" 2>/dev/null || true
-xdg-mime default epic-games-launcher.desktop x-scheme-handler/com.epicgames.launcher 2>/dev/null || true
+verify_and_download "https://launcher-public-service-prod06.ol.epicgames.com/launcher/api/installer/download/EpicGamesLauncher-x86_64.deb" /tmp/epic-games-launcher.deb
+apt install -y /tmp/epic-games-launcher.deb
+rm -f /tmp/epic-games-launcher.deb
 echo "Epic Games Launcher installed.""#
-            ),
-        ],
     ))
 }
 
 #[tauri::command]
 pub fn uninstall_epic_games_launcher() -> u64 {
-    start_job(
-        "bash",
-        vec![
-            "-c".to_string(),
-            r#"echo "Removing Epic Games Launcher..."
-rm -f "$HOME/AppImages/EpicGamesLauncher-x86_64.AppImage"
-rm -f "$HOME/AppImages/.icons/epic-games-launcher.png"
-rm -f "$HOME/.local/share/applications/epic-games-launcher.desktop"
-update-desktop-database "$HOME/.local/share/applications" 2>/dev/null || true
+    start_pkexec_job(
+        r#"echo "Removing Epic Games Launcher..."
+apt remove -y epic-games-launcher
 echo "Epic Games Launcher removed.""#
-                .to_string(),
-        ],
+            .to_string(),
     )
 }
 
