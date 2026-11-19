@@ -35,8 +35,9 @@
   $: deLabel = envInfo ? (DE_LABELS[envInfo.desktopEnvironment] ?? envInfo.desktopEnvironment) : "";
   $: protoLabel = envInfo ? (PROTO_LABELS[envInfo.displayProtocol] ?? "") : "";
   $: envLabel = [deLabel, protoLabel].filter(Boolean).join(" · ");
-  // "3.0.0-1-beta" → "3.0.0-beta"  (quita el número de revisión Debian del medio)
-  $: cleanVersion = appVersion.replace(/-\d+-/, "-");
+  // The footer never shows the Debian revision, in the middle or at the end:
+  // "3.0.0-1-beta" -> "3.0.0-beta", "3.0.0-1" -> "3.0.0". About shows it whole.
+  $: cleanVersion = appVersion.replace(/-\d+(?=-|$)/, "");
   $: footerLabel = [envLabel, cleanVersion].filter(Boolean).join(" · ") || "Soplos Welcome";
 
   let autostartEnabled = false;

@@ -70,6 +70,8 @@
   ];
 
   const launchers: LauncherItem[] = [
+    // The gaming tool of Soplos itself, from its repository, first.
+    { key: "soplos-gaming-panel", name: "Soplos Gaming Panel", icon: "/assets/icons/gaming/soplos-gaming-panel.png", kind: "apt", package: "soplos-gaming-panel" },
     { key: "steam", name: "Steam", icon: "/assets/icons/gaming/steam.png", kind: "flatpak", flatpakId: "com.valvesoftware.Steam" },
     { key: "lutris", name: "Lutris", icon: "/assets/icons/gaming/lutris.png", kind: "flatpak", flatpakId: "net.lutris.Lutris", official: true },
     { key: "heroic", name: "Heroic Games Launcher", icon: "/assets/icons/gaming/heroic.png", kind: "flatpak", flatpakId: "com.heroicgameslauncher.hgl" },

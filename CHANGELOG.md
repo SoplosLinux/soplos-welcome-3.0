@@ -2,6 +2,16 @@
 
 All notable changes to Soplos Welcome are documented in this file.
 
+## [3.0.0-1] - 2026-11-19
+
+### Added
+
+- Soplos Gaming Panel in the Gaming page, first among the programs: it installs `soplos-gaming-panel` from the Soplos repository, with its icon and a description in the eight languages.
+
+### Fixed
+
+- The footer showed the Debian revision of a version without a stage ("3.0.0-1"): it only took it away from the middle ("3.0.0-1-beta"). It now shows "3.0.0" in both cases; About still shows the whole version.
+
 ## [3.0.0] - 2026-11-15
 
 First stable release of Soplos Welcome 3.0. The version starts again at 3.0.0, without revision: the betas (up to 3.0.2-5-beta) were only for the development team and have to be removed before installing it.
