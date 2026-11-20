@@ -30,7 +30,7 @@
     { name: "Snap Store", packages: "snap:snap-store", icon: "/assets/icons/software/snap-store.png" },
     {
       name: "Flatpak",
-      packages: "flatpak gnome-software-plugin-flatpak package-update-indicator",
+      packages: "flatpak",
       icon: "/assets/icons/software/flatpak.png",
     },
     { name: "Snap", packages: "snapd gnome-software-plugin-snap", icon: "/assets/icons/software/snap.png" },

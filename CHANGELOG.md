@@ -2,6 +2,12 @@
 
 All notable changes to Soplos Welcome are documented in this file.
 
+## [3.0.0-2] - 2026-11-20
+
+### Fixed
+
+- In the Software page, the Flatpak tile on Tyron (Xfce) was installing `gnome-software-plugin-flatpak` and `package-update-indicator` as extra packages, which pulled in GNOME Software as a dependency. It now installs only `flatpak`.
+
 ## [3.0.0-1] - 2026-11-19
 
 ### Added
